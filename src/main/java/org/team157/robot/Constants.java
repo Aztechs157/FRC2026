@@ -16,4 +16,7 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+  public static class AzmimuthConstants {
+    public static final int MOTOR_ID = 67; // TODO: put actual id here
+  }
 }
