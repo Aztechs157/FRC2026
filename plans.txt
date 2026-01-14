@@ -3,9 +3,11 @@ shooter (start stop change speed) ( shot 15 shots with 80 percent accuracy)
         -(change angle of shot)
         - limit switch both sides
         - pos sensor
+            - liekly 5 or 10 turn pot 
         -(return to default pos)
         -? how figure out where default positon is
         -angle of motion = 32.5 deg
+        
  
     - turret
         -(change heading of shot)
