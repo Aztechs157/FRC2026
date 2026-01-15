@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class azmimuthSystem extends SubsystemBase {
 
   private SparkMax motor = new SparkMax(AzmimuthConstants.MOTOR_ID, MotorType.kBrushless);
+  
   /** Creates a new azmimuth. */
   public azmimuthSystem() {}
 
