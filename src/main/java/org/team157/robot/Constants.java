@@ -32,7 +32,7 @@ public final class Constants {
     public static final int POS_SENSOR_ID = 32;
   }
 
-  public static class AzmimuthConstants {
+  public static class HoodConstants {
     public static final int MOTOR_ID = 33;
     public static final int POT_ID = 34;
   }
