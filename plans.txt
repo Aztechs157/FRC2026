@@ -1,0 +1,59 @@
+shooter (start stop change speed) ( shot 15 shots with 80 percent accuracy)
+    - azmimuth 
+        -(change angle of shot)
+        - limit switch both sides
+        - pos sensor
+            - liekly 5 or 10 turn pot 
+        -(return to default pos)
+        -? how figure out where default positon is
+        -angle of motion = 32.5 deg
+        
+ 
+    - turret
+        -(change heading of shot)
+        - limit switch both sides
+        - pos sensor 
+        -(return to default pos)
+        -? how figure out where default positon is
+    - flywheels
+        - (spin up)
+        - (match calculated trajectory)
+        - ? max rpm
+    -? how many motors, what motors do, limits, sensor?, servos?
+    -? intake size/intake rate
+
+intake
+    - over the bumper
+        - (deploy)
+        - (recall)
+        - (start)
+        - (stop)
+    -? how many motors, what motors do, limits, sensor?, servos?
+    -? size, intake capability, 
+
+drive
+    - swerve pods
+        - wheel distance 22 in
+        - radius 2in
+        - steer ratio = 24:1
+        - drive ratio = 6.23:1
+
+
+uptake 
+    - ????
+    - (on)
+    - (off)
+
+vision
+    - multiple tags on one camera
+    - multiple cameras?
+    - (ball spotting??????)
+    - ? how many cameras
+
+cliber/hangar/uppies
+    - ? how climb
+    - (climb l1)
+    - (enhanced climb aka L2 and L3)
+    - (climb back down)
+    - ? how many motors, what motors do, limits, sensor?, servos?
+

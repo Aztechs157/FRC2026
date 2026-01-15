@@ -13,7 +13,40 @@ package org.team157.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
+
+  public static class ControllerConstants {
+    public static final int DRIVER_CONTROLLER_PORT = 0;
+    public static final int OPPERATOR_CONTROLLER_PORT = 1;
   }
+
+  public static class IntakeConstants {
+    public static final int MOTOR_ID = 21;
+  }
+
+  public static class UptakeConstants {
+    public static final int MOTOR_ID = 22;
+  }
+
+  public static class TurretConstants {
+    public static final int MOTOR_ID = 31;
+    public static final int POS_SENSOR_ID = 32;
+  }
+
+  public static class AzmimuthConstants {
+    public static final int MOTOR_ID = 33;
+    public static final int POT_ID = 34;
+  }
+  
+  public static class FlywheelConstants {
+    public static final int MOTOR_ID = 35;
+    // public static final int MOTOR2_ID = 36; if we end up having 2 flywheels
+  }
+
+  public static class VisionConstants {
+    public static final String FL_CAM_NAME = "Front Left Camera";
+    public static final String FR_CAM_NAME = "Front Right Camera";
+    public static final String BL_CAM_NAME = "Back Left Camera";
+    public static final String BR_CAM_NAME = "Back Right Camera";
+  }
+
 }
