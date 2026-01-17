@@ -4,19 +4,28 @@
 
 package org.team157.robot;
 
-/**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
- */
 public final class Constants {
 
+  public static class ModifierConstants {
+    // Reduces drive speed by this factor when precision mode is active.
+    public static final double PRECISION_DRIVE_MODIFIER = 0.75;
+    // When true, reduces drive speed by 50%.
+    public static final boolean ROOKIE_MODE = false;
+    public static final double ROOKIE_DRIVE_MODIFIER = 0.5;
+    // When true, reduces drive speed by 75% and disables auto positioning.
+    // Overrides ROOKIE_MODE.
+    public static final boolean DEMO_MODE = false;
+    public static final double DEMO_DRIVE_MODIFIER = 0.25;
+  }
+
   public static class ControllerConstants {
-    public static final int DRIVER_CONTROLLER_PORT = 0;
-    public static final int OPPERATOR_CONTROLLER_PORT = 1;
+      // Ports for the Joysticks, as set in Driver Station
+      public static final int DRIVER_CONTROLLER_PORT = 0, OPERATOR_CONTROLLER_PORT = 1;
+      // Joystick Deadband
+      // TODO: since these are all the same, could we not just have a single DEADBAND constant?
+      public static final double LEFT_X_DEADBAND = 0.05;
+      public static final double LEFT_Y_DEADBAND = 0.05;
+      public static final double RIGHT_X_DEADBAND = 0.05;
   }
 
   public static class IntakeConstants {
