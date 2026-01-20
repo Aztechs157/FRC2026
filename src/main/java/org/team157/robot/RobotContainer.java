@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.*;
 
 import java.lang.reflect.Modifier;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -23,6 +24,7 @@ import org.team157.robot.Constants.ControllerConstants;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.CommandSwerveDrivetrain;
+import org.team157.robot.subsystems.VisionSystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -40,6 +42,7 @@ public class RobotContainer {
     private final CommandXboxController driverController = new CommandXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public final VisionSystem visionSystem = new VisionSystem();
 
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
@@ -99,6 +102,26 @@ public class RobotContainer {
     public double modifySpeed(final double speed) {
         final var modifier = 1 - driverController.getRightTriggerAxis() * ModifierConstants.PRECISION_DRIVE_MODIFIER;
         return speed * modifier;
+    }
+
+    public void updateVisionPose(boolean reset_pose) {
+        var speeds = drivetrain.getStateCopy().Speeds;
+
+        var velX = Math.abs(speeds.vxMetersPerSecond);
+        var velY = Math.abs(speeds.vyMetersPerSecond);
+        var velAngular = Math.abs(speeds.omegaRadiansPerSecond);
+
+        if (velX <= 1 && velY <= 1 && velAngular <= Math.PI) {
+            double visionTime = visionSystem.getTimeStamp();
+            if (visionTime != 0 && (visionSystem.hasTag)) {
+                drivetrain.addVisionMeasurement(visionSystem.getEstimatedGlobalPose2d(),
+                // TODO: ensure that timestamp is correct
+                        Utils.fpgaToCurrentTime(visionTime));
+                if (reset_pose) {
+                    drivetrain.resetPose(visionSystem.getEstimatedGlobalPose2d());
+                }
+            }
+        }
     }
 
     public Command getAutonomousCommand() {
