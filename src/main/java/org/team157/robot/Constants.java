@@ -37,8 +37,9 @@ public final class Constants {
   }
 
   public static class TurretConstants {
-    public static final int MOTOR_ID = 31;
-    public static final int POS_SENSOR_ID = 32;
+    public static final int MOTOR_ID = 21;
+    public static final int POS_SENSOR_ID = 0;
+    public static final double MIN_POSITION = 0, MAX_POSITION = 100;
   }
 
   public static class HoodConstants {
