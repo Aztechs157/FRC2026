@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import org.team157.robot.Constants.ControllerConstants;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.generated.TunerConstants;
-import org.team157.robot.subsystems.CommandSwerveDrivetrain;
+import org.team157.robot.subsystems.DriveSystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -39,7 +39,7 @@ public class RobotContainer {
 
     private final CommandXboxController driverController = new CommandXboxController(0);
 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
