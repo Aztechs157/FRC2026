@@ -81,7 +81,8 @@ public class VisionSystem extends SubsystemBase {
     // this.prettyLights = prettyLights;
     topRightCamera = new PhotonCamera(VisionConstants.TOPRIGHT_CAMERA_NICKNAME);
     bottomCamera = new PhotonCamera(VisionConstants.BOTTOM_CAMERA_NICKNAME);
-    PortForwarder.add(5800, "photonvision.local", 5800);
+    PortForwarder.add(5800, "photonvision1.local", 5800);
+    PortForwarder.add(5800, "photonvision2.local", 5800);
 
     try {
       tagLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2025ReefscapeAndyMark.m_resourceFile);
