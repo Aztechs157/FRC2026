@@ -59,11 +59,13 @@ public class VisionSystem extends SubsystemBase {
   // TODO: move to constants.java
   final PoseStrategy poseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
 
-  PhotonCamera topRightCamera;
-  PhotonCamera bottomCamera;
+  PhotonCamera frontRightCamera;
+  PhotonCamera frontLeftCamera;
+  PhotonCamera topBackCamera;
   AprilTagFieldLayout tagLayout;
-  PhotonPoseEstimator poseEstimatorTopRight;
-  PhotonPoseEstimator poseEstimatorBottom;
+  PhotonPoseEstimator poseEstimatorFrontRight;
+  PhotonPoseEstimator poseEstimatorFrontLeft;
+  PhotonPoseEstimator poseEstimatorTopBack;
   EstimatedRobotPose currentEstimatedPose = new EstimatedRobotPose(new Pose3d(), getTimeStamp(), new ArrayList<>(),
       poseStrategy);
   PhotonPipelineResult latestResult;
@@ -79,23 +81,27 @@ public class VisionSystem extends SubsystemBase {
   /** Creates a new vision. */
   public VisionSystem() {
     // this.prettyLights = prettyLights;
-    topRightCamera = new PhotonCamera(VisionConstants.TOPRIGHT_CAMERA_NICKNAME);
-    bottomCamera = new PhotonCamera(VisionConstants.BOTTOM_CAMERA_NICKNAME);
+    frontRightCamera = new PhotonCamera(VisionConstants.FRONTRIGHT_CAMERA_NICKNAME);
+    frontLeftCamera = new PhotonCamera(VisionConstants.FRONTLEFT_CAMERA_NICKNAME);
+    topBackCamera = new PhotonCamera(VisionConstants.BACK_CAMERA_NICKNAME);
     PortForwarder.add(5800, "photonvision1.local", 5800);
     PortForwarder.add(5800, "photonvision2.local", 5800);
 
     try {
-      tagLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2025ReefscapeAndyMark.m_resourceFile);
+      tagLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2026RebuiltAndymark.m_resourceFile);
     } catch (IOException exception) {
-      topRightCamera.close();
-      bottomCamera.close();
+      frontRightCamera.close();
+      frontLeftCamera.close();
+      topBackCamera.close();
       throw new RuntimeException(exception);
     }
 
-    poseEstimatorTopRight = new PhotonPoseEstimator(tagLayout, poseStrategy,
-        VisionConstants.TOPRIGHT_CAMERA_PLACEMENT); // TODO: decide which pose strategy to use
-    poseEstimatorBottom = new PhotonPoseEstimator(tagLayout, poseStrategy,
-        VisionConstants.BOTTOM_CAMERA_PLACEMENT); // TODO: decide which pose strategy to use
+    poseEstimatorFrontRight = new PhotonPoseEstimator(tagLayout, poseStrategy,
+        VisionConstants.FRONTRIGHT_CAMERA_PLACEMENT); // TODO: decide which pose strategy to use
+    poseEstimatorFrontLeft = new PhotonPoseEstimator(tagLayout, poseStrategy,
+        VisionConstants.FRONTLEFT_CAMERA_PLACEMENT); // TODO: decide which pose strategy to use
+    poseEstimatorTopBack = new PhotonPoseEstimator(tagLayout, poseStrategy,
+        VisionConstants.BACK_CAMERA_PLACEMENT); // TODO: decide which pose strategy to use
 
     Shuffleboard.getTab("vision").add("vision based field", vision_field).withWidget(BuiltInWidgets.kField);
     Shuffleboard.getTab("vision").add("Desired Position", desiredField).withWidget(BuiltInWidgets.kField);
@@ -279,7 +285,7 @@ public class VisionSystem extends SubsystemBase {
   // (tagLayout.getTagPose(target.getFiducialId()).isPresent())
 
   public Pose3d getFieldRelativePose(Pose3d tagPose, Transform3d cameraToTarget) {
-    return PhotonUtils.estimateFieldToRobotAprilTag(cameraToTarget, tagPose, VisionConstants.TOPRIGHT_CAMERA_PLACEMENT);
+    return PhotonUtils.estimateFieldToRobotAprilTag(cameraToTarget, tagPose, VisionConstants.FRONTLEFT_CAMERA_PLACEMENT);
   }
 
   // TODO: Define 2d version of camera placement to use this function
@@ -297,7 +303,7 @@ public class VisionSystem extends SubsystemBase {
 
   public double getDistanceToTarget(double targetHeight, double cameraPitch,
       double targetPitch) {
-    return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.TOPRIGHT_CAMERA_PLACEMENT.getY(), targetHeight,
+    return PhotonUtils.calculateDistanceToTargetMeters(VisionConstants.FRONTRIGHT_CAMERA_PLACEMENT.getY(), targetHeight,
         cameraPitch,
         Units.degreesToRadians(targetPitch)); // TODO: convert cameraPitch to use a constant
   }
@@ -335,7 +341,7 @@ public class VisionSystem extends SubsystemBase {
    */
 
   public void driverModeToggle(boolean toggleOn) {
-    topRightCamera.setDriverMode(toggleOn);
+    frontLeftCamera.setDriverMode(toggleOn);
   }
 
   /*
@@ -343,7 +349,7 @@ public class VisionSystem extends SubsystemBase {
    */
 
   public void setPipelineIndex(int index) {
-    topRightCamera.setPipelineIndex(index);
+    frontLeftCamera.setPipelineIndex(index);
   }
 
   public void setDesiredPose(Pose2d pose) {
@@ -369,19 +375,19 @@ public class VisionSystem extends SubsystemBase {
    */
 
   public void setLED(VisionLEDMode LEDMode) {
-    topRightCamera.setLED(LEDMode);
+    frontLeftCamera.setLED(LEDMode);
   }
 
   void updatePhotonPipelineResult(PhotonPipelineResult pipelineResult, boolean useTopRight) {
     latestResult = pipelineResult;
     if(useTopRight) {
-      var newPose = poseEstimatorTopRight.update(pipelineResult);
+      var newPose = poseEstimatorFrontRight.update(pipelineResult);
       if (newPose.isPresent()) {
         currentEstimatedPose = newPose.get();
       }
     }
     else {
-      var newPose = poseEstimatorBottom.update(pipelineResult);
+      var newPose = poseEstimatorTopBack.update(pipelineResult);
       if (newPose.isPresent()) {
         currentEstimatedPose = newPose.get();
       }
@@ -392,22 +398,25 @@ public class VisionSystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
-    List<PhotonPipelineResult> pipelineResultsBottom = bottomCamera.getAllUnreadResults();
-    List<PhotonPipelineResult> pipelineResultsTopRight = topRightCamera.getAllUnreadResults();
+    List<PhotonPipelineResult> pipelineResultsFrontLeft = frontLeftCamera.getAllUnreadResults();
+    List<PhotonPipelineResult> pipelineResultsFrontRight = frontRightCamera.getAllUnreadResults();
+    List<PhotonPipelineResult> pipelineResultsTopBack = topBackCamera.getAllUnreadResults();
 
-    if(!pipelineResultsBottom.isEmpty()) {
-      if(pipelineResultsBottom.get(0).hasTargets()) {
+    if(!pipelineResultsFrontLeft.isEmpty()) {
+      if(!pipelineResultsFrontRight.isEmpty()) {
+      if(pipelineResultsFrontRight.get(0).hasTargets()) {
         hasBotTag = true;
-        for (var pipelineResult : pipelineResultsBottom) {
+        for (var pipelineResult : pipelineResultsFrontRight) {
             updatePhotonPipelineResult(pipelineResult, false);
         }
       }
+    }
       else {
         hasBotTag = false;
-        if(!pipelineResultsTopRight.isEmpty()) {
-          if(pipelineResultsTopRight.get(0).hasTargets()) {
+        if(!pipelineResultsFrontRight.isEmpty()) {
+          if(pipelineResultsFrontRight.get(0).hasTargets()) {
             hasTopTag = true;
-            for (var pipelineResult : pipelineResultsTopRight) {
+            for (var pipelineResult : pipelineResultsFrontRight) {
               updatePhotonPipelineResult(pipelineResult, true);
             }
         }
