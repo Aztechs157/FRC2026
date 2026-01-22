@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import org.team157.robot.Constants.ControllerConstants;
 import org.team157.robot.Constants.ModifierConstants;
+import org.team157.robot.commands.moveTurret;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.CommandSwerveDrivetrain;
 import org.team157.robot.subsystems.TurretSystem;
@@ -44,11 +45,18 @@ public class RobotContainer {
     private final CommandXboxController driverController = new CommandXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
+ 
     public final TurretSystem turret = new TurretSystem();
 
     private final SendableChooser<Command> autoChooser;
 
+    public Command turretCW(){
+        return new moveTurret(turret, 0.157);
+    }
+
+    public Command turretCCW(){
+        return new moveTurret(turret, -0.157);
+    }
 
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
@@ -103,6 +111,9 @@ public class RobotContainer {
         driverController.back().and(driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
+        driverController.povLeft().whileTrue(turretCCW());
+        driverController.povRight().whileTrue(turretCW());
 
         // Reset the field-centric heading on start button press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
