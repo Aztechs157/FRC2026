@@ -45,7 +45,7 @@ public class TurretSystem extends SubsystemBase {
 
   public double getPos() {
     return encoder.get();
-0  }
+  }
 
   public double getScaledPos() {
     return PosUtils.mapRange(getPos(), TurretConstants.MIN_POSITION, TurretConstants.MAX_POSITION, 0.0,
