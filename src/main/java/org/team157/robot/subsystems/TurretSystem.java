@@ -4,22 +4,41 @@
 
 package org.team157.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+
 import org.team157.robot.Constants.TurretConstants;
 import org.team157.utilities.PosUtils;
 
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import yams.mechanisms.config.PivotConfig;
+import yams.motorcontrollers.SmartMotorController;
+import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
+import yams.motorcontrollers.remote.TalonFXSWrapper;
+import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class TurretSystem extends SubsystemBase {
   private TalonFX motor;
   private DutyCycleEncoder encoder;
+  private DutyCycleOut request;
+  private SmartMotorControllerConfig conf;
+  private SmartMotorController smartMotor ;
+  private PivotConfig m_config;
 
   // public static StructArrayPublisher<Pose3d> zeroedPoses =
   // NetworkTableInstance.getDefault()
@@ -31,16 +50,28 @@ public class TurretSystem extends SubsystemBase {
   public TurretSystem() {
     motor = new TalonFX(TurretConstants.MOTOR_ID);
     encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
-    
+    request = new DutyCycleOut(0.0);
+    conf = new SmartMotorControllerConfig(this)
+    .withControlMode(ControlMode.CLOSED_LOOP)
+    .withClosedLoopController(1, 0, 0) //TODO: this PID will probably not be accurate
+    .withIdleMode(MotorMode.BRAKE)
+    .withMotorInverted(false)
+    .withTelemetry("TurretMotor", TelemetryVerbosity.HIGH) //TODO: maybe change telemetry velocity
+    .withStatorCurrentLimit(Amps.of(40))
+    .withClosedLoopRampRate(Seconds.of(0.25));
+    smartMotor = new TalonFXWrapper(motor, DCMotor.getFalcon500(1), conf); //TODO: is this a falcon 500? and also is this only 1 motor?
+    m_config = new PivotConfig(smartMotor)
+    .withStartingPosition(Degrees.of(0))
+    .withTelemetry("PivotExample", TelemetryVerbosity.HIGH);
 
   }
 
   public void runMotor(double power) {
-    motor.set(power);
+    smartMotor.setDutyCycle(power);
   }
 
   public void runWithLimits() {
-    motor.set(PosUtils.runWithLimits(getPos(), getScaledPos(), getPos()));
+    smartMotor.setDutyCycle(PosUtils.runWithLimits(getPos(), getScaledPos(), getPos()));
   }
 
   public double getPos() {
@@ -53,7 +84,7 @@ public class TurretSystem extends SubsystemBase {
   }
 
   public double getVelocity() {
-    return motor.getVelocity().getValueAsDouble();
+    return smartMotor.getMechanismVelocity().in(DegreesPerSecond);
   }
 
   @Override
