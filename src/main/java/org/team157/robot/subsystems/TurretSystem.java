@@ -31,8 +31,7 @@ public class TurretSystem extends SubsystemBase {
   public TurretSystem() {
     motor = new TalonFX(TurretConstants.MOTOR_ID);
     encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
-    SmartDashboard.putNumber("Turret Pos", getPos());
-    SmartDashboard.putNumber("Scaled Turret Pos", getScaledPos());
+    
 
   }
 
@@ -46,7 +45,7 @@ public class TurretSystem extends SubsystemBase {
 
   public double getPos() {
     return encoder.get();
-  }
+0  }
 
   public double getScaledPos() {
     return PosUtils.mapRange(getPos(), TurretConstants.MIN_POSITION, TurretConstants.MAX_POSITION, 0.0,
@@ -60,5 +59,7 @@ public class TurretSystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Turret Pos", getPos());
+    SmartDashboard.putNumber("Scaled Turret Pos", getScaledPos());
   }
 }
