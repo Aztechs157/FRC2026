@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import org.team157.robot.Constants.TurretConstants;
+import org.team157.robot.generated.TunerConstants;
 import org.team157.utilities.PosUtils;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -23,13 +24,13 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import yams.mechanisms.config.PivotConfig;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
-import yams.motorcontrollers.remote.TalonFXSWrapper;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class TurretSystem extends SubsystemBase {
@@ -48,7 +49,7 @@ public class TurretSystem extends SubsystemBase {
 
   /** Creates a new TurretSystem. */
   public TurretSystem() {
-    motor = new TalonFX(TurretConstants.MOTOR_ID);
+    motor = new TalonFX(TurretConstants.MOTOR_ID, TunerConstants.kCANBus);
     encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
     request = new DutyCycleOut(0.0);
     conf = new SmartMotorControllerConfig(this)
@@ -56,10 +57,11 @@ public class TurretSystem extends SubsystemBase {
     .withClosedLoopController(1, 0, 0) //TODO: this PID will probably not be accurate
     .withIdleMode(MotorMode.BRAKE)
     .withMotorInverted(false)
+    .withGearing(0.1)
     .withTelemetry("TurretMotor", TelemetryVerbosity.HIGH) //TODO: maybe change telemetry velocity
     .withStatorCurrentLimit(Amps.of(40))
     .withClosedLoopRampRate(Seconds.of(0.25));
-    smartMotor = new TalonFXWrapper(motor, DCMotor.getFalcon500(1), conf); //TODO: is this a falcon 500? and also is this only 1 motor?
+    smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), conf); //TODO: is this a falcon 500? and also is this only 1 motor?
     m_config = new PivotConfig(smartMotor)
     .withStartingPosition(Degrees.of(0))
     .withTelemetry("PivotExample", TelemetryVerbosity.HIGH);

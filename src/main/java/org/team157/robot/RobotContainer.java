@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import org.team157.robot.Constants.ControllerConstants;
 import org.team157.robot.Constants.ModifierConstants;
+import org.team157.robot.commands.moveTurret;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.CommandSwerveDrivetrain;
 import org.team157.robot.subsystems.TurretSystem;
@@ -49,6 +50,13 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
+    public Command turretCW(){
+        return new moveTurret(turret, 0.1);
+    }
+
+    public Command turretCCW(){
+        return new moveTurret(turret, -0.1);
+    }
 
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
@@ -106,6 +114,9 @@ public class RobotContainer {
 
         // Reset the field-centric heading on start button press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+
+        driverController.povLeft().whileTrue(turretCW());
+        driverController.povRight().whileTrue(turretCCW());
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
