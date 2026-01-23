@@ -6,7 +6,7 @@ package org.team157.robot.subsystems;
 
 import org.team157.robot.Constants.TurretConstants;
 import org.team157.utilities.PosUtils;
-
+import org.team157.robot.generated.TunerConstants;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -19,9 +19,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class TurretSystem extends SubsystemBase {
-  private TalonFX motor;
-  private DutyCycleEncoder encoder;
-  private DutyCycleOut request;
+  private TalonFX motor = new TalonFX(TurretConstants.MOTOR_ID, TunerConstants.kCANBus);
+
+  private DutyCycleEncoder encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
+  private DutyCycleOut request = new DutyCycleOut(0.0);
 
   // public static StructArrayPublisher<Pose3d> zeroedPoses =
   // NetworkTableInstance.getDefault()
@@ -31,14 +32,11 @@ public class TurretSystem extends SubsystemBase {
 
   /** Creates a new TurretSystem. */
   public TurretSystem() {
-    motor = new TalonFX(TurretConstants.MOTOR_ID);
-    encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
-    request = new DutyCycleOut(0.0);
-
+  
   }
 
   public void runMotor(double power) {
-    motor.setControl(request.withOutput(power));
+    motor.set(power);
   }
 
   public void runWithLimits() {
