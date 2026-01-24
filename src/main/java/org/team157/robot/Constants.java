@@ -68,7 +68,7 @@ public final class Constants {
     public static final Transform3d FRONTRIGHT_CAMERA_PLACEMENT = new Transform3d(
             FRONTRIGHT_CAMERA_TRANSLATION, FRONTRIGHT_CAMERA_ROTATION);  
     public static final String BACK_CAMERA_NICKNAME = "backTopCam";
-    public static final Rotation3d BACK_CAMERA_ROTATION = new Rotation3d(0, -0.0523599, 0);
+    public static final Rotation3d BACK_CAMERA_ROTATION = new Rotation3d(0, -0.0523599, 3.14159);
     public static final Translation3d BACK_CAMERA_TRANSLATION = new Translation3d(-0.2921, -0.0381, 0.4953);
     public static final Transform3d BACK_CAMERA_PLACEMENT = new Transform3d(
             BACK_CAMERA_TRANSLATION, BACK_CAMERA_ROTATION);

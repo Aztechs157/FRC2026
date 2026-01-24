@@ -100,6 +100,7 @@ public class VisionSystem extends SubsystemBase {
 
     this.currentPose = currentPose;
     this.field2d = field;
+    Shuffleboard.getTab("vision").add("vision based field", field2d).withWidget(BuiltInWidgets.kField);
 
     try {
       fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2026RebuiltAndymark.m_resourceFile);
@@ -179,6 +180,7 @@ public class VisionSystem extends SubsystemBase {
         swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
                                          pose.timestampSeconds,
                                          camera.curStdDevs);
+        field2d.setRobotPose(pose.estimatedPose.toPose2d());
       }
     }
 
