@@ -184,8 +184,8 @@ public class VisionSystem extends SubsystemBase {
           swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
                                           pose.timestampSeconds,
                                           camera.curStdDevs);
-          field2d.setRobotPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
-          // field2d.setRobotPose(swerveDrive.getPose()); // photon's pose combined with robot's known pose
+          field2d.getObject("Vision").setPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
+          field2d.setRobotPose(swerveDrive.getPose()); // photon's pose combined with robot's known pose
         }
       }
     }
