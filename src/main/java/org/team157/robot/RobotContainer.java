@@ -50,13 +50,13 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
-    public Command turretCW(){
-        return new moveTurret(turret, 0.1);
-    }
+    // public Command turretCW(){
+    //     return new moveTurret(turret, 0.1);
+    // }
 
-    public Command turretCCW(){
-        return new moveTurret(turret, -0.1);
-    }
+    // public Command turretCCW(){
+    //     return new moveTurret(turret, -0.1);
+    // }
 
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
@@ -93,6 +93,8 @@ public class RobotContainer {
                                                                                 // negative X (left)
         ));
 
+        turret.setDefaultCommand(turret.setAngle(Degrees.of(0)));
+
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
@@ -115,8 +117,10 @@ public class RobotContainer {
         // Reset the field-centric heading on start button press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        driverController.povLeft().whileTrue(turretCW());
-        driverController.povRight().whileTrue(turretCCW());
+        driverController.povUp().whileTrue(turret.setAngle(Degrees.of(-5)));
+        driverController.povDown().whileTrue(turret.setAngle(Degrees.of(15)));
+        driverController.povLeft().whileTrue(turret.set(-0.1));
+        driverController.povRight().whileTrue(turret.set(0.1));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
