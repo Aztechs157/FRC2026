@@ -10,7 +10,7 @@ public final class Constants {
     // Reduces drive speed by this factor when precision mode is active.
     public static final double PRECISION_DRIVE_MODIFIER = 0.75;
     // When true, reduces drive speed by 50%.
-    public static final boolean ROOKIE_MODE = false;
+    public static final boolean ROOKIE_MODE = true;
     public static final double ROOKIE_DRIVE_MODIFIER = 0.5;
     // When true, reduces drive speed by 75% and disables auto positioning.
     // Overrides ROOKIE_MODE.

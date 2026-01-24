@@ -46,12 +46,12 @@ public class TurretSystem extends SubsystemBase {
 
   private SmartMotorControllerConfig conf = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(1, 0, 0) //TODO: this PID will probably not be accurate
+      .withClosedLoopController(6, 0, 0) //TODO: this PID will probably not be accurate
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(false)
-      .withGearing(0.1)
+      .withGearing(14)
       .withTelemetry("TurretMotor", TelemetryVerbosity.HIGH) //TODO: maybe change telemetry velocity
-      .withStatorCurrentLimit(Amps.of(40))
+      .withStatorCurrentLimit(Amps.of(30))
       .withClosedLoopRampRate(Seconds.of(0.25));
   private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), conf);
   private PivotConfig m_config= new PivotConfig(smartMotor)
@@ -59,8 +59,7 @@ public class TurretSystem extends SubsystemBase {
       .withWrapping(Degrees.of(-180), Degrees.of(180))
       .withHardLimit(Degrees.of(-135), Degrees.of(135))
       .withSoftLimits(Degrees.of(-120), Degrees.of(120))
-      .withTelemetry("Pivot", TelemetryVerbosity.HIGH)
-      .withMOI());
+      .withTelemetry("Pivot", TelemetryVerbosity.HIGH);
   private Pivot turret = new Pivot(m_config);
 
   // public static StructArrayPublisher<Pose3d> zeroedPoses =
@@ -117,11 +116,13 @@ public class TurretSystem extends SubsystemBase {
         1.0);
   }
   
-  public Angle getScaledPosAngle() {
-    return Degrees.of(PosUtils.mapRange(getPos(), TurretConstants.MIN_POSITION, TurretConstants.MAX_POSITION, -135,
-        135
-        
-        ));
+  public double getScaledPosAngleKraken() {
+    return turret.getAngle().in(Degrees);
+  }
+
+  public double getScaledPosAngleEncoder() {
+    return PosUtils.mapRange(getPos(), TurretConstants.MIN_POSITION, TurretConstants.MAX_POSITION, -135,
+        135);
   }
 
   public double getVelocity() {
@@ -133,6 +134,8 @@ public class TurretSystem extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Turret Pos", getPos());
     SmartDashboard.putNumber("Scaled Turret Pos", getScaledPos());
+    SmartDashboard.putNumber("Turret Angle (YAMS)", getScaledPosAngleKraken());
+    SmartDashboard.putNumber("Turret Angle (Encoder)", getScaledPosAngleEncoder());
     turret.updateTelemetry();
   }
 

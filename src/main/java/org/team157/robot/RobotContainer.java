@@ -93,8 +93,6 @@ public class RobotContainer {
                                                                                 // negative X (left)
         ));
 
-        turret.setDefaultCommand(turret.setAngle(Degrees.of(0)));
-
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
