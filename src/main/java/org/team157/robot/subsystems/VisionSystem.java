@@ -176,11 +176,17 @@ public class VisionSystem extends SubsystemBase {
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent())
       {
-        var pose = poseEst.get();
-        swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
-                                         pose.timestampSeconds,
-                                         camera.curStdDevs);
-        field2d.setRobotPose(pose.estimatedPose.toPose2d());
+        Optional<EstimatedRobotPose> filteredPose = filterPose(poseEst);
+        if (filteredPose.isPresent())
+        {
+          var pose = filteredPose.get();
+        
+          swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
+                                          pose.timestampSeconds,
+                                          camera.curStdDevs);
+          field2d.setRobotPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
+          // field2d.setRobotPose(swerveDrive.getPose()); // photon's pose combined with robot's known pose
+        }
       }
     }
 
