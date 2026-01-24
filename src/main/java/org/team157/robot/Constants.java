@@ -58,18 +58,26 @@ public final class Constants {
 
   public static class VisionConstants {
     public static final String FRONTLEFT_CAMERA_NICKNAME = "frontLeftCam";
+    public static final Rotation3d FRONTLEFT_CAMERA_ROTATION = new Rotation3d(0, -0.0523599, -0.139626);
+    public static final Translation3d FRONTLEFT_CAMERA_TRANSLATION = new Translation3d(0.2286, 0.3302, 0.4953);
     public static final Transform3d FRONTLEFT_CAMERA_PLACEMENT = new Transform3d(
-            new Translation3d(0.2286, 0.3302, 0.4953), new Rotation3d(0, -0.0523599, -0.139626));
+            FRONTLEFT_CAMERA_TRANSLATION, FRONTLEFT_CAMERA_ROTATION);
     public static final String FRONTRIGHT_CAMERA_NICKNAME = "frontRightCam";
+    public static final Rotation3d FRONTRIGHT_CAMERA_ROTATION = new Rotation3d(0, -0.0523599, 0.139626);
+    public static final Translation3d FRONTRIGHT_CAMERA_TRANSLATION = new Translation3d(0.2286, 0.3038, 0.4953);
     public static final Transform3d FRONTRIGHT_CAMERA_PLACEMENT = new Transform3d(
-            new Translation3d(0.2286, 0.3038, 0.4953), new Rotation3d(0, -0.0523599, 0.139626));  
+            FRONTRIGHT_CAMERA_TRANSLATION, FRONTRIGHT_CAMERA_ROTATION);  
     public static final String BACK_CAMERA_NICKNAME = "backTopCam";
+    public static final Rotation3d BACK_CAMERA_ROTATION = new Rotation3d(0, -0.0523599, 0);
+    public static final Translation3d BACK_CAMERA_TRANSLATION = new Translation3d(-0.2921, -0.0381, 0.4953);
     public static final Transform3d BACK_CAMERA_PLACEMENT = new Transform3d(
-            new Translation3d(-0.2921, -0.0381, 0.4953), new Rotation3d(0, -0.0523599, 0));
+            BACK_CAMERA_TRANSLATION, BACK_CAMERA_ROTATION);
 
     public static final String TURRET_CAMERA_NICKNAME = "turretCam";
+    public static final Rotation3d TURRET_CAMERA_ROTATION = new Rotation3d(0, -0.349066, 0);
+    public static final Translation3d TURRET_CAMERA_TRANSLATION = new Translation3d(0.2602992, 0, 0.126);
     public static final Transform3d TURRET_CAMERA_PLACEMENT = new Transform3d(
-            new Translation3d(0.2602992, 0, 0.126), new Rotation3d(0, -0.349066, 0));
+            TURRET_CAMERA_TRANSLATION, TURRET_CAMERA_ROTATION);
 
 
     public static final PIDController AIMING_PID = new PIDController(0.05, 0, 0.01);

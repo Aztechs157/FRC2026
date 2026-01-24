@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-  public final Field2d m_field = new Field2d();
+  public static final Field2d m_field = new Field2d();
 
   private final RobotContainer m_robotContainer;
 
@@ -55,20 +55,16 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-    m_field.setRobotPose(m_robotContainer.visionSystem.getEstimatedGlobalPose2d());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    m_robotContainer.updateVisionPose(true);
+    m_robotContainer.visionSystem.updatePoseEstimation(m_robotContainer.drivetrain);
   }
 
   @Override
-  public void disabledPeriodic() {
-    m_robotContainer.updateVisionPose(true);
-    m_field.setRobotPose(m_robotContainer.visionSystem.getEstimatedGlobalPose2d());
-    
+  public void disabledPeriodic() { 
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
