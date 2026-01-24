@@ -49,10 +49,15 @@ public class TurretSystem extends SubsystemBase {
       .withClosedLoopController(6, 0, 0) //TODO: this PID will probably not be accurate
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(false)
-      .withGearing(14)
+      .withGearing(10)
       .withTelemetry("TurretMotor", TelemetryVerbosity.HIGH) //TODO: maybe change telemetry velocity
       .withStatorCurrentLimit(Amps.of(30))
-      .withClosedLoopRampRate(Seconds.of(0.25));
+      .withClosedLoopRampRate(Seconds.of(0.25))
+      .withExternalEncoder(encoder)
+      .withExternalEncoderInverted(false)
+      .withExternalEncoderGearing(1)
+      .withExternalEncoderZeroOffset(Degrees.of(180))
+      .withUseExternalFeedbackEncoder(true);
   private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), conf);
   private PivotConfig m_config= new PivotConfig(smartMotor)
       .withStartingPosition(Degrees.of(0))
