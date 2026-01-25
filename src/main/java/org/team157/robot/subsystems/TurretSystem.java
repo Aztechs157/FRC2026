@@ -15,10 +15,8 @@ import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.utilities.PosUtils;
 
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
@@ -42,15 +40,15 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 public class TurretSystem extends SubsystemBase {
   private TalonFX motor = new TalonFX(TurretConstants.MOTOR_ID, TunerConstants.kCANBus);
   private DutyCycleEncoder encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
-  private DutyCycleOut request = new DutyCycleOut(0.0);
 
-  private SmartMotorControllerConfig conf = new SmartMotorControllerConfig(this)
+  // Configure the turret motor controller for use with YAMS.
+  private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(6, 0, 0) //TODO: this PID will probably not be accurate
+      .withClosedLoopController(6, 0, 0) //TODO: tune this PID
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(false)
       .withGearing(10)
-      .withTelemetry("TurretMotor", TelemetryVerbosity.HIGH) //TODO: maybe change telemetry velocity
+      .withTelemetry("Turret Motor", TelemetryVerbosity.HIGH) 
       .withStatorCurrentLimit(Amps.of(30))
       .withClosedLoopRampRate(Seconds.of(0.25))
       .withExternalEncoder(encoder)
@@ -58,26 +56,29 @@ public class TurretSystem extends SubsystemBase {
       .withExternalEncoderGearing(1)
       .withExternalEncoderZeroOffset(Degrees.of(180))
       .withUseExternalFeedbackEncoder(true);
-  private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), conf);
-  private PivotConfig m_config= new PivotConfig(smartMotor)
+      // TODO: add .withMOI() for simulation
+
+  // Create the turret's motor controller with the above configuration.
+  private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), turretMotorConfig);
+
+  // Configure the physical characteristics of the turret.
+  private PivotConfig turretConfig= new PivotConfig(smartMotor)
       .withStartingPosition(Degrees.of(0))
       .withWrapping(Degrees.of(-180), Degrees.of(180))
       .withHardLimit(Degrees.of(-135), Degrees.of(135))
       .withSoftLimits(Degrees.of(-120), Degrees.of(120))
-      .withTelemetry("Pivot", TelemetryVerbosity.HIGH);
-  private Pivot turret = new Pivot(m_config);
+      .withTelemetry("Turret", TelemetryVerbosity.HIGH);
 
-  // public static StructArrayPublisher<Pose3d> zeroedPoses =
-  // NetworkTableInstance.getDefault()
-  // .getStructArrayTopic("ZeroedComponentPoses", Pose3d.struct).publish();
-
-  // public static DoublePublisher renameMe = NetworkTableInstance.
+  // Create the turret pivot system with the above configuration.
+  private Pivot turret = new Pivot(turretConfig);
 
   /** Creates a new TurretSystem. */
+  public TurretSystem() {
 
+  }
   
   /**
-   * Set the angle of the arm.
+   * Set the target angle of the turret.
    * @param angle Angle to go to.
    */
   public Command setAngle(Angle angle) { 
@@ -93,43 +94,63 @@ public class TurretSystem extends SubsystemBase {
   }
 
   /**
-   * Run sysId on the {@link Arm}
+   * Run sysId on the {@link TurretSystem}.
    */
   public Command sysId() { 
     return turret.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
   }
 
-
-  public TurretSystem() {
-
-  }
-
+  /**
+   * Set the duty cycle output of the turret motor.
+   * Primarily used for manual control
+   * @param power The power to be applied to the motor.
+   */
   public void runMotor(double power) {
     smartMotor.setDutyCycle(power);
   }
 
+  // This is not used currently.
   public void runWithLimits() {
     smartMotor.setDutyCycle(PosUtils.runWithLimits(getPos(), getScaledPos(), getPos()));
   }
 
+  /**
+   * Get the raw position of the turret's encoder.
+   * @return The current position of the turret in encoder rotations.
+   */
   public double getPos() {
     return encoder.get();
   }
 
+  /**
+   * Get the scaled position of the turret from 0 to 1.
+   * @return The position of the turret scaled from 0 to 1.
+   */
   public double getScaledPos() {
     return PosUtils.mapRange(getPos(), TurretConstants.MIN_POSITION, TurretConstants.MAX_POSITION, 0.0,
         1.0);
   }
-  
-  public double getScaledPosAngleKraken() {
+
+  /**
+   * Get the current angle of the turret, based on the YAMS pivot system.
+   * @return The angle of the turret, in degrees, from -180 to 180, using the YAMS pivot system.
+   */
+  public double getScaledPosAngleYAMS() {
     return turret.getAngle().in(Degrees);
   }
-
+  /**
+   * Get the current angle of the turret, directly from the encoder value.
+   * @return The angle of the turret, in degrees, from -180 to 180, using the encoder directly.
+   */
   public double getScaledPosAngleEncoder() {
     return PosUtils.mapRange(getPos(), TurretConstants.MIN_POSITION, TurretConstants.MAX_POSITION, -135,
         135);
   }
 
+  /**
+   * Get the current velocity of the turret.
+   * @return The velocity of the turret, in degrees per second.
+   */
   public double getVelocity() {
     return smartMotor.getMechanismVelocity().in(DegreesPerSecond);
   }
@@ -137,15 +158,22 @@ public class TurretSystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    // Send values to NT to display on Elastic.
+    /*  TODO: look into SmartDashboard alternatives, as it's deprecated, 
+     *  marked for removal along with Shuffleboard for next season.
+     *  Consider publishing to NT directly.
+     */
     SmartDashboard.putNumber("Turret Pos", getPos());
     SmartDashboard.putNumber("Scaled Turret Pos", getScaledPos());
-    SmartDashboard.putNumber("Turret Angle (YAMS)", getScaledPosAngleKraken());
+    SmartDashboard.putNumber("Turret Angle (YAMS)", getScaledPosAngleYAMS());
     SmartDashboard.putNumber("Turret Angle (Encoder)", getScaledPosAngleEncoder());
     turret.updateTelemetry();
   }
 
   @Override
   public void simulationPeriodic() {
+    // This method will be called once per scheduler run during simulation
+    // Updates the turret simulation's values,
     turret.simIterate();
   }
 }
