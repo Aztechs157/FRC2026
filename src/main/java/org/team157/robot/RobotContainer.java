@@ -119,6 +119,7 @@ public class RobotContainer {
         driverController.povDown().whileTrue(turret.setAngle(Degrees.of(15)));
         driverController.povLeft().whileTrue(turret.set(-0.1));
         driverController.povRight().whileTrue(turret.set(0.1));
+        driverController.x().whileTrue(turret.set(0));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

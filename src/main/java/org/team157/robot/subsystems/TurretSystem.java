@@ -27,6 +27,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import yams.gearing.GearBox;
+import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.PivotConfig;
 import yams.mechanisms.positional.Arm;
 import yams.mechanisms.positional.Pivot;
@@ -44,18 +46,18 @@ public class TurretSystem extends SubsystemBase {
   // Configure the turret motor controller for use with YAMS.
   private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(6, 0, 0) //TODO: tune this PID
+      .withClosedLoopController(1, 0, 0) //TODO: tune this PID
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(false)
-      .withGearing(10)
+      .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 5)))
       .withTelemetry("Turret Motor", TelemetryVerbosity.HIGH) 
       .withStatorCurrentLimit(Amps.of(30))
-      .withClosedLoopRampRate(Seconds.of(0.25))
-      .withExternalEncoder(encoder)
-      .withExternalEncoderInverted(false)
-      .withExternalEncoderGearing(1)
-      .withExternalEncoderZeroOffset(Degrees.of(180))
-      .withUseExternalFeedbackEncoder(true);
+      .withClosedLoopRampRate(Seconds.of(0.25));
+      // .withExternalEncoder(encoder)
+      // .withExternalEncoderInverted(false)
+      // .withExternalEncoderGearing(1)
+      // .withExternalEncoderZeroOffset(Degrees.of(180))
+      // .withUseExternalFeedbackEncoder(true);
       // TODO: add .withMOI() for simulation
 
   // Create the turret's motor controller with the above configuration.
