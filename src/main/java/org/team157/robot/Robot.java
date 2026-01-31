@@ -4,9 +4,23 @@
 
 package org.team157.robot;
 
-import com.ctre.phoenix6.HootAutoReplay;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.ctre.phoenix6.HootAutoReplay;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -16,7 +30,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
+  private String autoName, newAutoName;
+  private Optional<Alliance> alliance, newAlliance;
   private Command m_autonomousCommand;
+
+  public final Field2d m_field = new Field2d();
 
   private final RobotContainer m_robotContainer;
 
@@ -56,7 +74,31 @@ public class Robot extends TimedRobot {
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    newAlliance = DriverStation.getAlliance();
+    newAutoName = m_robotContainer.getAutonomousCommand().getName();
+    if (autoName != newAutoName || alliance != newAlliance) {
+      autoName = newAutoName;
+      alliance = newAlliance;
+      if (AutoBuilder.getAllAutoNames().contains(autoName)) {
+        try {
+          List<PathPlannerPath> pathPlannerPaths = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
+          List<Pose2d> poses = new ArrayList<>();
+          for (PathPlannerPath path : pathPlannerPaths) {
+            if (alliance.isPresent() && alliance.get() == Alliance.Red) {
+              path = path.flipPath();
+            }
+            poses.addAll(path.getAllPathPoints().stream()
+                .map(point -> new Pose2d(point.position.getX(), point.position.getY(), new Rotation2d()))
+                .collect(Collectors.toList()));
+          }
+          m_field.getObject("path").setPoses(poses);
+        } catch (IOException | org.json.simple.parser.ParseException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override

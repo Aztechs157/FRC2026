@@ -10,11 +10,13 @@ import java.lang.reflect.Modifier;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -23,6 +25,7 @@ import org.team157.robot.Constants.ControllerConstants;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.DriveSystem;
+import org.team157.robot.subsystems.TurretSystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -41,6 +44,18 @@ public class RobotContainer {
 
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
+    public final TurretSystem turret = new TurretSystem();
+
+    private final SendableChooser<Command> autoChooser;
+
+    // public Command turretCW(){
+    //     return new moveTurret(turret, 0.1);
+    // }
+
+    // public Command turretCCW(){
+    //     return new moveTurret(turret, -0.1);
+    // }
+
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
         if (ModifierConstants.DEMO_MODE) {
@@ -51,9 +66,18 @@ public class RobotContainer {
         }
 
         configureBindings();
+
+        autoChooser = AutoBuilder.buildAutoChooser("New Auto");
+                SmartDashboard.putData("Auto Chooser", autoChooser);
+
+
     }
 
     private void configureBindings() {
+        ////////////////////////////////////////////////////
+        /// DRIVETRAIN COMMANDS
+        ///////////////////////////////////////////////////
+        
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
@@ -92,6 +116,17 @@ public class RobotContainer {
 
         // Reset the field-centric heading on start button press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        
+        ////////////////////////////////////////////////////
+        /// TURRET COMMANDS
+        ///////////////////////////////////////////////////
+        turret.setDefaultCommand(turret.set(0));
+
+        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-30)));
+        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(70)));
+        driverController.povLeft().whileTrue(turret.set(-0.1));
+        driverController.povRight().whileTrue(turret.set(0.1));
+        driverController.x().whileTrue(turret.set(0));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
@@ -102,21 +137,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        // Simple drive forward auton
-        final var idle = new SwerveRequest.Idle();
-        return Commands.sequence(
-            // Reset our field centric heading to match the robot
-            // facing away from our alliance station wall (0 deg).
-            drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)),
-            // Then slowly drive forward (away from us) for 5 seconds.
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(0.5)
-                    .withVelocityY(0)
-                    .withRotationalRate(0)
-            )
-            .withTimeout(5.0),
-            // Finally idle for the rest of auton
-            drivetrain.applyRequest(() -> idle)
-        );
+        return autoChooser.getSelected();
     }
 }

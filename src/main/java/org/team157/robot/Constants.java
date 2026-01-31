@@ -4,13 +4,19 @@
 
 package org.team157.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+
+import edu.wpi.first.units.measure.Distance;
+import yams.gearing.GearBox;
+import yams.gearing.MechanismGearing;
+
 public final class Constants {
 
   public static class ModifierConstants {
     // Reduces drive speed by this factor when precision mode is active.
     public static final double PRECISION_DRIVE_MODIFIER = 0.75;
     // When true, reduces drive speed by 50%.
-    public static final boolean ROOKIE_MODE = false;
+    public static final boolean ROOKIE_MODE = true;
     public static final double ROOKIE_DRIVE_MODIFIER = 0.5;
     // When true, reduces drive speed by 75% and disables auto positioning.
     // Overrides ROOKIE_MODE.
@@ -37,8 +43,16 @@ public final class Constants {
   }
 
   public static class TurretConstants {
-    public static final int MOTOR_ID = 31;
-    public static final int POS_SENSOR_ID = 32;
+    public static final int MOTOR_ID = 21;
+    public static final int ENCODER_ID = 0;
+    public static final double MIN_POSITION = 0.118, MAX_POSITION = 0.846;
+    public static final double KP = 157, KI = 0, KD = 0;
+    public static final double ANGULAR_VELOCITY = 360, ANGULAR_ACCELERATION = 2880;
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromReductionStages(3, 5));
+    public static final double CURRENT_LIMIT = 30;
+    public static final double RAMP_RATE = 0.00157;
+    public static final double LOWER_SOFT_LIMIT = -120, UPPER_SOFT_LIMIT = 120;
+    public static final double LOWER_HARD_LIMIT = -135, UPPER_HARD_LIMIT = 135;
   }
 
   public static class HoodConstants {
