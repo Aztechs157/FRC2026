@@ -27,6 +27,7 @@ import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.commands.moveTurret;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.CommandSwerveDrivetrain;
+import org.team157.robot.subsystems.HoodSystem;
 import org.team157.robot.subsystems.TurretSystem;
 
 public class RobotContainer {
@@ -47,6 +48,8 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public final TurretSystem turret = new TurretSystem();
+
+    public final HoodSystem hood = new HoodSystem();
 
     private final SendableChooser<Command> autoChooser;
 
@@ -115,8 +118,8 @@ public class RobotContainer {
         // Reset the field-centric heading on start button press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        driverController.povUp().whileTrue(turret.setAngle(Degrees.of(-5)));
-        driverController.povDown().whileTrue(turret.setAngle(Degrees.of(15)));
+        driverController.povUp().whileTrue(hood.set(-5));
+        driverController.povDown().whileTrue(hood.set(15));
         driverController.povLeft().whileTrue(turret.set(-0.1));
         driverController.povRight().whileTrue(turret.set(0.1));
         driverController.x().whileTrue(turret.set(0));
