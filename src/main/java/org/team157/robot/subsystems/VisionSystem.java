@@ -192,6 +192,36 @@ public class VisionSystem extends SubsystemBase {
 
   }
 
+
+  
+    /**
+   * Reset the pose estimation inside of {@link SwerveDrive} with all of the given poses.
+   *
+   * @param swerveDrive {@link SwerveDrive} instance.
+   */
+  public void resetPoseEstimation(CommandSwerveDrivetrain swerveDrive)
+  {
+    for (Cameras camera : Cameras.values())
+    {
+      Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
+      if (poseEst.isPresent())
+      {
+        Optional<EstimatedRobotPose> filteredPose = filterPose(poseEst);
+        if (filteredPose.isPresent())
+        {
+          var pose = filteredPose.get();
+
+          swerveDrive.resetPose(pose.estimatedPose.toPose2d());
+
+          field2d.getObject("Vision").setPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
+          field2d.setRobotPose(swerveDrive.getPose()); // photon's pose combined with robot's known pose
+
+          break;
+        }
+      }
+    }
+
+  }
     /**
    * Generates the estimated robot pose. Returns empty if:
    * <ul>
