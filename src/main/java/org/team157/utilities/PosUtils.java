@@ -74,6 +74,21 @@ public interface PosUtils {
     }
   }
 
+  
+  static double runWithLimits(double speed, double currentPos, double limitMargin, double minPos, double maxPos) {
+    if (currentPos >= maxPos - limitMargin && speed < 0) {
+      return 0;
+    } else if (currentPos >= (maxPos * 0.9) - limitMargin && speed < 0) {
+      return speed * 0.75;
+    } else if (currentPos <= minPos + limitMargin && speed > 0) {
+      return 0;
+    } else if (currentPos <= (minPos * 0.9) + limitMargin && speed > 0) {
+      return speed * 0.75;
+    } else {
+      return speed;
+    }
+  }
+
   static boolean isWithin(double value, double target, double tolerance){
     return(value > target-tolerance && value < target+tolerance);
   }
