@@ -23,6 +23,7 @@ import org.team157.robot.Constants.ControllerConstants;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.DriveSystem;
+import org.team157.robot.subsystems.FlywheelSystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -40,6 +41,8 @@ public class RobotContainer {
     private final CommandXboxController driverController = new CommandXboxController(0);
 
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
+
+    public final FlywheelSystem flywheelSystem = new FlywheelSystem();
 
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
@@ -90,10 +93,20 @@ public class RobotContainer {
         driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
+
+
         // Reset the field-centric heading on start button press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+        
+        ////////////////////////////////////////////////////////
+        /// FLYWHEEL COMMANDS
+        ///////////////////////////////////////////////////////
+        
+        flywheelSystem.setDefaultCommand(flywheelSystem.set(0));
+
+        driverController.rightTrigger().whileTrue(flywheelSystem.setVelocity(RPM.of(60)));
     }
 
     public double modifySpeed(final double speed) {
