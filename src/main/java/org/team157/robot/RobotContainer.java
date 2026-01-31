@@ -76,6 +76,10 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+        ////////////////////////////////////////////////////
+        /// DRIVETRAIN COMMANDS
+        ///////////////////////////////////////////////////
+        
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
@@ -114,9 +118,14 @@ public class RobotContainer {
 
         // Reset the field-centric heading on start button press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        
+        ////////////////////////////////////////////////////
+        /// TURRET COMMANDS
+        ///////////////////////////////////////////////////
+        turret.setDefaultCommand(turret.set(0));
 
-        driverController.povUp().whileTrue(turret.setAngle(Degrees.of(-5)));
-        driverController.povDown().whileTrue(turret.setAngle(Degrees.of(15)));
+        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-30)));
+        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(30)));
         driverController.povLeft().whileTrue(turret.set(-0.1));
         driverController.povRight().whileTrue(turret.set(0.1));
         driverController.x().whileTrue(turret.set(0));

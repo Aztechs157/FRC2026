@@ -7,6 +7,7 @@ package org.team157.robot.subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -46,13 +47,13 @@ public class TurretSystem extends SubsystemBase {
   // Configure the turret motor controller for use with YAMS.
   private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(1, 0, 0) //TODO: tune this PID
+      .withClosedLoopController(157, 0, 0, DegreesPerSecond.of(360), DegreesPerSecondPerSecond.of(720)) //TODO: tune this PID
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(false)
       .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 5)))
       .withTelemetry("Turret Motor", TelemetryVerbosity.HIGH) 
       .withStatorCurrentLimit(Amps.of(30))
-      .withClosedLoopRampRate(Seconds.of(0.25));
+      .withClosedLoopRampRate(Seconds.of(0.00157));
       // .withExternalEncoder(encoder)
       // .withExternalEncoderInverted(false)
       // .withExternalEncoderGearing(1)
@@ -64,8 +65,8 @@ public class TurretSystem extends SubsystemBase {
   private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), turretMotorConfig);
 
   // Configure the physical characteristics of the turret.
-  private PivotConfig turretConfig= new PivotConfig(smartMotor)
-      .withStartingPosition(Degrees.of(0))
+  private PivotConfig turretConfig = new PivotConfig(smartMotor)
+      .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
       .withWrapping(Degrees.of(-180), Degrees.of(180))
       .withHardLimit(Degrees.of(-135), Degrees.of(135))
       .withSoftLimits(Degrees.of(-120), Degrees.of(120))
