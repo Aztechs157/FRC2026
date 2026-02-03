@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.*;
 
 import java.lang.reflect.Modifier;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -26,6 +27,7 @@ import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.DriveSystem;
 import org.team157.robot.subsystems.TurretSystem;
+import org.team157.robot.subsystems.VisionSystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -55,6 +57,7 @@ public class RobotContainer {
     // public Command turretCCW(){
     //     return new moveTurret(turret, -0.1);
     // }
+    public final VisionSystem visionSystem;
 
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
@@ -64,6 +67,8 @@ public class RobotContainer {
         } else if (ModifierConstants.ROOKIE_MODE) {
             MaxSpeed = MaxSpeed * ModifierConstants.ROOKIE_DRIVE_MODIFIER;
         }
+
+        visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
 
         configureBindings();
 
