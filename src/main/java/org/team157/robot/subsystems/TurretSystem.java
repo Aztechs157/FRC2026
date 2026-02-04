@@ -79,6 +79,10 @@ public class TurretSystem extends SubsystemBase {
     configurator.refresh(new ClosedLoopGeneralConfigs().withContinuousWrap(false));
   }
   
+     //////////////////////
+   /// TURRET COMMANDS ///
+  //////////////////////
+  
   /**
    * Set the target angle of the turret.
    * @param angle Angle to go to.
@@ -116,6 +120,10 @@ public class TurretSystem extends SubsystemBase {
 
   }
 
+     /////////////////////
+   /// TURRET METHODS ///
+  /////////////////////
+
   /**
    * Set the duty cycle output of the turret motor.
    * Primarily used for manual control
@@ -124,27 +132,6 @@ public class TurretSystem extends SubsystemBase {
   public void runMotor(double power) {
     smartMotor.setDutyCycle(power);
   }
-
-  /**
-   * Calculate the angle the turret needs to turn to face the target tag.
-   * @return The angle the turret needs to rotate to to face the target tag.
-   */
-  public double getAngleToFaceTag(){
-    // The current angular offset of the tag, relative to the turret camera.
-    double tagYaw = visionSystem.getHubTagYawFromTurretCam();
-    SmartDashboard.putNumber("Target Yaw", tagYaw);
-    // if the target tag is seen,
-    if(tagYaw != 157357){
-      // Subtract the camera-to-tag angle from the turret angle
-      // to find our new setpoint angle to face the tag.
-      double finalAngle = getScaledPosAngleYAMS() - tagYaw;
-      return finalAngle;
-    } else {
-      // If no tag seen, don't move turret.
-      return getScaledPosAngleYAMS();
-    }
-  }
-
 
   /**
    * Get the raw position of the turret's encoder.
@@ -185,6 +172,26 @@ public class TurretSystem extends SubsystemBase {
    */
   public double getVelocity() {
     return smartMotor.getMechanismVelocity().in(DegreesPerSecond);
+  }
+
+  /**
+   * Calculate the angle the turret needs to turn to face the target tag.
+   * @return The angle the turret needs to rotate to to face the target tag.
+   */
+  public double getAngleToFaceTag(){
+    // The current angular offset of the tag, relative to the turret camera.
+    double tagYaw = visionSystem.getHubTagYawFromTurretCam();
+    SmartDashboard.putNumber("Target Yaw", tagYaw);
+    // if the target tag is seen,
+    if(tagYaw != 157357){
+      // Subtract the camera-to-tag angle from the turret angle
+      // to find our new setpoint angle to face the tag.
+      double finalAngle = getScaledPosAngleYAMS() - tagYaw;
+      return finalAngle;
+    } else {
+      // If no tag seen, don't move turret.
+      return getScaledPosAngleYAMS();
+    }
   }
 
   @Override
