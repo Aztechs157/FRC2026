@@ -129,7 +129,7 @@ public class RobotContainer {
         driverController.povRight().whileTrue(turret.set(0.1));
         driverController.x().whileTrue(turret.set(0));
 
-        driverController.y().whileTrue(turret.trackHubTag());
+        driverController.y().toggleOnTrue(turret.trackHubTag());
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

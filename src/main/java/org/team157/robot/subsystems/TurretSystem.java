@@ -12,6 +12,8 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.Supplier;
+
 import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.utilities.PosUtils;
@@ -91,6 +93,15 @@ public class TurretSystem extends SubsystemBase {
     return turret.setAngle(angle);
   }
 
+    /**
+   * Set the target angle of the turret.
+   * @param angle A supplier to obtain the desired angle to go to.
+   */
+  public Command setAngle(Supplier<Angle> angle) { 
+    return turret.setAngle(angle);
+  }
+
+  
   /**
    * Move the arm up and down.
    * @param dutycycle [-1, 1] speed to set the arm too.
@@ -111,13 +122,7 @@ public class TurretSystem extends SubsystemBase {
    * @return Command either setting the turret angle to face the tag, or setting the turret power to 0 if the tag isn't present.
    */
   public Command trackHubTag() {
-    if(getAngleToFaceTag() != 157357){
-      return setAngle(Degrees.of(getAngleToFaceTag()));
-    } else {
-      // If no tag seen, don't move turret.
-      return set(0);
-    }
-
+    return turret.setAngle(this::getAngleToFaceTag);
   }
 
      /////////////////////
@@ -178,7 +183,7 @@ public class TurretSystem extends SubsystemBase {
    * Calculate the angle the turret needs to turn to face the target tag.
    * @return The angle the turret needs to rotate to to face the target tag.
    */
-  public double getAngleToFaceTag(){
+  public Angle getAngleToFaceTag(){
     // The current angular offset of the tag, relative to the turret camera.
     double tagYaw = visionSystem.getHubTagYawFromTurretCam();
     SmartDashboard.putNumber("Target Yaw", tagYaw);
@@ -187,10 +192,10 @@ public class TurretSystem extends SubsystemBase {
       // Subtract the camera-to-tag angle from the turret angle
       // to find our new setpoint angle to face the tag.
       double finalAngle = getScaledPosAngleYAMS() - tagYaw;
-      return finalAngle;
+      return Degrees.of(finalAngle);
     } else {
       // If no tag seen, don't move turret.
-      return getScaledPosAngleYAMS();
+      return Degrees.of(getScaledPosAngleYAMS());
     }
   }
 
