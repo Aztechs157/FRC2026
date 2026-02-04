@@ -61,10 +61,12 @@ public class VisionSystem extends SubsystemBase {
   PhotonCamera frontRightCamera;
   PhotonCamera frontLeftCamera;
   PhotonCamera topBackCamera;
+  PhotonCamera turretCamera;
   public static AprilTagFieldLayout fieldLayout;
   PhotonPoseEstimator poseEstimatorFrontRight;
   PhotonPoseEstimator poseEstimatorFrontLeft;
   PhotonPoseEstimator poseEstimatorTopBack;
+  PhotonPoseEstimator poseEstimatorTurret;
   // EstimatedRobotPose currentEstimatedPose = new EstimatedRobotPose(new Pose3d(), getTimeStamp(), new ArrayList<>(),
   //     poseStrategy);
   PhotonPipelineResult latestResult;
@@ -93,6 +95,7 @@ public class VisionSystem extends SubsystemBase {
       frontRightCamera.close();
       frontLeftCamera.close();
       topBackCamera.close();
+      turretCamera.close();
       throw new RuntimeException(exception);
     }
   
@@ -128,7 +131,7 @@ public class VisionSystem extends SubsystemBase {
    *
    * @param swerveDrive {@link SwerveDrive} instance.
    */
-  public void updatePoseEstimation(CommandSwerveDrivetrain swerveDrive) {
+  public void updatePoseEstimation(DriveSystem swerveDrive) {
     for (Cameras camera : Cameras.values()) {
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent()) {
@@ -154,7 +157,7 @@ public class VisionSystem extends SubsystemBase {
    *
    * @param swerveDrive {@link SwerveDrive} instance.
    */
-  public void resetPoseEstimation(CommandSwerveDrivetrain swerveDrive) {
+  public void resetPoseEstimation(DriveSystem swerveDrive) {
     for (Cameras camera : Cameras.values()) {
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent()) {
