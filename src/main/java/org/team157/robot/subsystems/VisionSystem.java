@@ -46,6 +46,8 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.Constants.VisionConstants;
 import org.team157.robot.Robot;
 
@@ -133,6 +135,10 @@ public class VisionSystem extends SubsystemBase {
    */
   public void updatePoseEstimation(DriveSystem swerveDrive) {
     for (Cameras camera : Cameras.values()) {
+       // ignore turretCamera for global positioning
+      if(!camera.useForPositioning) {
+        continue;
+      }
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent()) {
         Optional<EstimatedRobotPose> filteredPose = filterPose(poseEst);
@@ -159,6 +165,10 @@ public class VisionSystem extends SubsystemBase {
    */
   public void resetPoseEstimation(DriveSystem swerveDrive) {
     for (Cameras camera : Cameras.values()) {
+      // ignore turretCamera for global positioning
+      if(!camera.useForPositioning) { 
+        continue;
+      }
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent()) {
         Optional<EstimatedRobotPose> filteredPose = filterPose(poseEst);
@@ -266,9 +276,13 @@ public class VisionSystem extends SubsystemBase {
   public void updateVisionField() {
 
     List<PhotonTrackedTarget> targets = new ArrayList<PhotonTrackedTarget>();
-    for (Cameras c : Cameras.values()) {
-      if (!c.resultsList.isEmpty()) {
-        PhotonPipelineResult latest = c.resultsList.get(0);
+    for (Cameras camera : Cameras.values()) {
+       // ignore turretCamera for global positioning
+      if(!camera.useForPositioning) {
+        continue;
+      }
+      if (!camera.resultsList.isEmpty()) {
+        PhotonPipelineResult latest = camera.resultsList.get(0);
         if (latest.hasTargets()) {
           targets.addAll(latest.targets);
         }
@@ -285,7 +299,21 @@ public class VisionSystem extends SubsystemBase {
 
     field2d.getObject("tracked targets").setPoses(poses);
   }
+    /**
+   * Update the pose estimation inside of {@link SwerveDrive} with all of the given poses.
+   *
+   * @param swerveDrive {@link SwerveDrive} instance.
+   */
+  public double getHubTagYawFromTurretCam() {
+    Cameras.TURRET_CAM.updateUnreadResults();
+    PhotonTrackedTarget target = getTargetFromId(26, Cameras.TURRET_CAM);
+    if(target == null) {
+      return 157357;
+    }
+    // what happens if target returns null
 
+    return target.yaw;
+  }
 
  /**
    * Camera Enum to select each camera
@@ -311,7 +339,19 @@ public class VisionSystem extends SubsystemBase {
     BACK_CAM(VisionConstants.BACK_CAMERA_NICKNAME,
                VisionConstants.BACK_CAMERA_ROTATION,
                VisionConstants.BACK_CAMERA_TRANSLATION,
+               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+    /**
+     * Turret Camera
+     */
+    TURRET_CAM(VisionConstants.TURRET_CAMERA_NICKNAME,
+               VisionConstants.TURRET_CAMERA_ROTATION,
+               VisionConstants.TURRET_CAMERA_TRANSLATION,
                VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+
+      /**
+     * flag to ignore the turret cam for positioning
+     */        
+    private boolean useForPositioning = true;
 
     /**
      * Latency alert to use when high latency is detected.
@@ -382,6 +422,10 @@ public class VisionSystem extends SubsystemBase {
                                               PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                                               robotToCamTransform);
       poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+
+      if(name.equals(VisionConstants.TURRET_CAMERA_NICKNAME)) {
+        this.useForPositioning = false;
+      } 
 
       this.singleTagStdDevs = singleTagStdDevs;
       this.multiTagStdDevs = multiTagStdDevsMatrix;

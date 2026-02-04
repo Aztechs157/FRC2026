@@ -40,24 +40,19 @@ public class RobotContainer {
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
+   public final VisionSystem visionSystem;
+
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController driverController = new CommandXboxController(0);
 
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
-    public final TurretSystem turret = new TurretSystem();
+    public final TurretSystem turret;
 
     private final SendableChooser<Command> autoChooser;
 
-    // public Command turretCW(){
-    //     return new moveTurret(turret, 0.1);
-    // }
-
-    // public Command turretCCW(){
-    //     return new moveTurret(turret, -0.1);
-    // }
-    public final VisionSystem visionSystem;
+ 
 
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
@@ -69,6 +64,7 @@ public class RobotContainer {
         }
 
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
+        turret = new TurretSystem(visionSystem);
 
         configureBindings();
 
@@ -132,6 +128,8 @@ public class RobotContainer {
         driverController.povLeft().whileTrue(turret.set(-0.1));
         driverController.povRight().whileTrue(turret.set(0.1));
         driverController.x().whileTrue(turret.set(0));
+
+        driverController.y().whileTrue(turret.trackHubTag());
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

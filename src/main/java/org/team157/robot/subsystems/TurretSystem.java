@@ -43,6 +43,7 @@ import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class TurretSystem extends SubsystemBase {
+  private VisionSystem visionSystem;
   private TalonFX motor = new TalonFX(TurretConstants.MOTOR_ID, TunerConstants.kCANBus);
   private DutyCycleEncoder encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
 
@@ -71,7 +72,8 @@ public class TurretSystem extends SubsystemBase {
   private Pivot turret = new Pivot(turretConfig);
 
   /** Creates a new TurretSystem. */
-  public TurretSystem() {
+  public TurretSystem(VisionSystem visionSystem) {
+    this.visionSystem = visionSystem;
     var configurator = motor.getConfigurator();
     configurator.refresh(new SoftwareLimitSwitchConfigs().withForwardSoftLimitEnable(true).withReverseSoftLimitEnable(true));
     configurator.refresh(new ClosedLoopGeneralConfigs().withContinuousWrap(false));
@@ -100,6 +102,21 @@ public class TurretSystem extends SubsystemBase {
   public Command sysId() { 
     return turret.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
   }
+
+  public Command trackHubTag() {
+    double tagYaw = visionSystem.getHubTagYawFromTurretCam();
+    SmartDashboard.putNumber("Target Yaw", tagYaw);
+    if(tagYaw != 157357){
+      double finalAngle = getScaledPosAngleYAMS() - tagYaw;
+      return setAngle(Degrees.of(finalAngle));
+    } else {
+      // If no tag seen, don't move turret.
+      return set(0);
+    }
+
+  }
+
+
 
   /**
    * Set the duty cycle output of the turret motor.
