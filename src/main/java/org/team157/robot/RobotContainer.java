@@ -26,6 +26,8 @@ import org.team157.robot.Constants.ControllerConstants;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.DriveSystem;
+import org.team157.robot.subsystems.FlywheelSystem;
+
 import org.team157.robot.subsystems.TurretSystem;
 import org.team157.robot.subsystems.VisionSystem;
 
@@ -46,6 +48,7 @@ public class RobotContainer {
 
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
+    public final FlywheelSystem flywheelSystem = new FlywheelSystem();
     public final TurretSystem turret = new TurretSystem();
 
     private final SendableChooser<Command> autoChooser;
@@ -119,6 +122,8 @@ public class RobotContainer {
         driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
+
+
         // Reset the field-centric heading on start button press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
         
@@ -134,6 +139,14 @@ public class RobotContainer {
         driverController.x().whileTrue(turret.set(0));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+        
+        ////////////////////////////////////////////////////////
+        /// FLYWHEEL COMMANDS
+        ///////////////////////////////////////////////////////
+        
+        flywheelSystem.setDefaultCommand(flywheelSystem.set(0));
+
+        driverController.rightTrigger().whileTrue(flywheelSystem.setVelocity(RPM.of(60)));
     }
 
     public double modifySpeed(final double speed) {
