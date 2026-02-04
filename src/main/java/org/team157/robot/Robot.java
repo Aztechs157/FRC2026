@@ -4,9 +4,25 @@
 
 package org.team157.robot;
 
-import com.ctre.phoenix6.HootAutoReplay;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.ctre.phoenix6.HootAutoReplay;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -16,7 +32,10 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
+  private String autoName, newAutoName;
+  private Optional<Alliance> alliance, newAlliance;
   private Command m_autonomousCommand;
+  public static final Field2d m_field = new Field2d();
 
   private final RobotContainer m_robotContainer;
 
@@ -32,6 +51,8 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+
+    SmartDashboard.putData("Field", m_field);
   }
 
   /**
@@ -49,14 +70,21 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_robotContainer.visionSystem.updatePoseEstimation(m_robotContainer.drivetrain);
+  }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() { 
+    m_robotContainer.visionSystem.resetPoseEstimation(m_robotContainer.drivetrain);
+    m_robotContainer.visionSystem.updatePoseEstimation(m_robotContainer.drivetrain);
+    
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
@@ -86,7 +114,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    m_robotContainer.visionSystem.updatePoseEstimation(m_robotContainer.drivetrain);
+  }
 
   @Override
   public void testInit() {
