@@ -46,6 +46,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import yams.mechanisms.swerve.SwerveDrive;
 
 import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.Constants.VisionConstants;
@@ -313,6 +314,21 @@ public class VisionSystem extends SubsystemBase {
     // what happens if target returns null
 
     return target.yaw;
+  }
+
+  /**
+   * Get a tag's 3d location on the field
+   * @param id the tag ID
+   * @return
+   */
+  public double getAngleToTarget(int id, DriveSystem swerveDrive) {
+    Pose2d tagPose = fieldLayout.getTagPose(id).get().toPose2d();
+    Pose2d robotPose = swerveDrive.getPose();
+    // Java example
+    double distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, tagPose);
+    double angleToTarget = PhotonUtils.getYawToPose(robotPose, tagPose).getDegrees();
+
+    return angleToTarget;
   }
 
  /**

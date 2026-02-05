@@ -130,6 +130,7 @@ public class RobotContainer {
         driverController.x().whileTrue(turret.set(0));
 
         driverController.y().toggleOnTrue(turret.trackHubTag());
+        driverController.rightBumper().toggleOnTrue(turret.trackTagGlobalRelative());
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

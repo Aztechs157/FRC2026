@@ -5,6 +5,7 @@
 package org.team157.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
@@ -22,6 +23,7 @@ import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
@@ -48,6 +50,7 @@ public class TurretSystem extends SubsystemBase {
   private VisionSystem visionSystem;
   private TalonFX motor = new TalonFX(TurretConstants.MOTOR_ID, TunerConstants.kCANBus);
   private DutyCycleEncoder encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
+  public Angle trackingAngle = Degrees.of(0);
 
   // Configure the turret motor controller for use with YAMS.
   private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
@@ -122,7 +125,11 @@ public class TurretSystem extends SubsystemBase {
    * @return Command either setting the turret angle to face the tag, or setting the turret power to 0 if the tag isn't present.
    */
   public Command trackHubTag() {
-    return turret.setAngle(this::getAngleToFaceTag);
+    return turret.setAngle(this::getAngleToHubFaceTag);
+  }
+
+  public Command trackTagGlobalRelative() {
+    return turret.setAngle(this::getTrackingAngle);
   }
 
      /////////////////////
@@ -144,6 +151,10 @@ public class TurretSystem extends SubsystemBase {
    */
   public double getPos() {
     return encoder.get();
+  }
+
+  public Angle getTrackingAngle() {
+    return trackingAngle;
   }
 
   /**
@@ -183,7 +194,7 @@ public class TurretSystem extends SubsystemBase {
    * Calculate the angle the turret needs to turn to face the target tag.
    * @return The angle the turret needs to rotate to to face the target tag.
    */
-  public Angle getAngleToFaceTag(){
+  public Angle getAngleToHubFaceTag(){
     // The current angular offset of the tag, relative to the turret camera.
     double tagYaw = visionSystem.getHubTagYawFromTurretCam();
     SmartDashboard.putNumber("Target Yaw", tagYaw);
@@ -199,6 +210,17 @@ public class TurretSystem extends SubsystemBase {
     }
   }
 
+  /**
+   * Calculate the angle the turret needs to turn to face the target tag.
+   * @return The angle the turret needs to rotate to to face the target tag.
+   */
+  public void updateRelativeAngleToTag(int tagID, DriveSystem swerveDrive){
+    // The current angular offset of the tag, relative to the turret camera.
+    double angleToTarget = visionSystem.getAngleToTarget(tagID, swerveDrive);
+    double turretToRobotAngleOffset = angleToTarget + 90;
+    trackingAngle = Degrees.of(turretToRobotAngleOffset);
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -211,6 +233,7 @@ public class TurretSystem extends SubsystemBase {
     SmartDashboard.putNumber("Scaled Turret Pos", getScaledPos());
     SmartDashboard.putNumber("Turret Angle (YAMS)", getScaledPosAngleYAMS());
     SmartDashboard.putNumber("Turret Angle (Encoder)", getScaledPosAngleEncoder());
+    SmartDashboard.putNumber("where me going", trackingAngle.magnitude());
     turret.updateTelemetry();
   }
 

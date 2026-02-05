@@ -116,6 +116,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     m_robotContainer.visionSystem.updatePoseEstimation(m_robotContainer.drivetrain);
+    m_robotContainer.turret.updateRelativeAngleToTag(26, m_robotContainer.drivetrain);
   }
 
   @Override
