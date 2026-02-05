@@ -45,6 +45,9 @@ public final class Constants {
 
   public static class UptakeConstants {
     public static final int MOTOR_ID = 22;
+    public static final MechanismGearing GEARING = null;
+    public static final double FORWARD_SPEED = 0.157; //TODO: find correct value
+    public static final double REVERSE_SPEED = -0.157; //TODO: find correct value
   }
 
   public static class TurretConstants {
