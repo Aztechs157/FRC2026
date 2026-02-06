@@ -50,6 +50,10 @@ public final class Constants {
     public static final double REVERSE_SPEED = -0.157; //TODO: find correct value
   }
 
+  public static class HopperConstants {
+    public static final int MOTOR_ID = 67; // TODO: fill in actual id here
+  }
+
   public static class TurretConstants {
     public static final int MOTOR_ID = 21;
     public static final int ENCODER_ID = 0;

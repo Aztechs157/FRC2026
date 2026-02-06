@@ -156,6 +156,13 @@ public class RobotContainer {
         driverController.a().toggleOnTrue(uptake.set(UptakeConstants.FORWARD_SPEED));
         driverController.y().toggleOnTrue(uptake.set(UptakeConstants.REVERSE_SPEED));
 
+
+        ////////////////////////////////////////////////////
+        /// HOPPER COMMANDS
+        ///////////////////////////////////////////////////
+        uptake.setDefaultCommand(uptake.set(0));
+        //TODO: add button bindings here
+
     }
 
     public double modifySpeed(final double speed) {
