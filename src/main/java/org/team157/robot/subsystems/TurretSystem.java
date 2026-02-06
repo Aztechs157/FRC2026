@@ -7,6 +7,7 @@ package org.team157.robot.subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -15,6 +16,8 @@ import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.utilities.PosUtils;
 
+import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -46,29 +49,22 @@ public class TurretSystem extends SubsystemBase {
   // Configure the turret motor controller for use with YAMS.
   private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(1, 0, 0) //TODO: tune this PID
+      .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, DegreesPerSecond.of(TurretConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(TurretConstants.ANGULAR_ACCELERATION))
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(false)
-      .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 5)))
+      .withGearing(TurretConstants.GEARING)
       .withTelemetry("Turret Motor", TelemetryVerbosity.HIGH) 
-      .withStatorCurrentLimit(Amps.of(30))
-      .withClosedLoopRampRate(Seconds.of(0.25));
-      // .withExternalEncoder(encoder)
-      // .withExternalEncoderInverted(false)
-      // .withExternalEncoderGearing(1)
-      // .withExternalEncoderZeroOffset(Degrees.of(180))
-      // .withUseExternalFeedbackEncoder(true);
-      // TODO: add .withMOI() for simulation
+      .withStatorCurrentLimit(Amps.of(TurretConstants.CURRENT_LIMIT))
+      .withClosedLoopRampRate(Seconds.of(TurretConstants.RAMP_RATE))
+      .withSoftLimit(Degrees.of(TurretConstants.LOWER_SOFT_LIMIT), Degrees.of(TurretConstants.UPPER_SOFT_LIMIT));
 
   // Create the turret's motor controller with the above configuration.
   private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), turretMotorConfig);
 
   // Configure the physical characteristics of the turret.
-  private PivotConfig turretConfig= new PivotConfig(smartMotor)
-      .withStartingPosition(Degrees.of(0))
-      .withWrapping(Degrees.of(-180), Degrees.of(180))
-      .withHardLimit(Degrees.of(-135), Degrees.of(135))
-      .withSoftLimits(Degrees.of(-120), Degrees.of(120))
+  private PivotConfig turretConfig = new PivotConfig(smartMotor)
+      .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
+      .withHardLimit(Degrees.of(TurretConstants.LOWER_HARD_LIMIT), Degrees.of(TurretConstants.UPPER_HARD_LIMIT))
       .withTelemetry("Turret", TelemetryVerbosity.HIGH);
 
   // Create the turret pivot system with the above configuration.
@@ -76,7 +72,9 @@ public class TurretSystem extends SubsystemBase {
 
   /** Creates a new TurretSystem. */
   public TurretSystem() {
-
+    var configurator = motor.getConfigurator();
+    configurator.refresh(new SoftwareLimitSwitchConfigs().withForwardSoftLimitEnable(true).withReverseSoftLimitEnable(true));
+    configurator.refresh(new ClosedLoopGeneralConfigs().withContinuousWrap(false));
   }
   
   /**
@@ -97,6 +95,7 @@ public class TurretSystem extends SubsystemBase {
 
   /**
    * Run sysId on the {@link TurretSystem}.
+   * To be used for tuning
    */
   public Command sysId() { 
     return turret.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
@@ -142,7 +141,7 @@ public class TurretSystem extends SubsystemBase {
   }
   /**
    * Get the current angle of the turret, directly from the encoder value.
-   * @return The angle of the turret, in degrees, from -180 to 180, using the encoder directly.
+   * @return The angle of the turret, in degrees, from -135 to 135, using the encoder directly.
    */
   public double getScaledPosAngleEncoder() {
     return PosUtils.mapRange(getPos(), TurretConstants.MIN_POSITION, TurretConstants.MAX_POSITION, -135,

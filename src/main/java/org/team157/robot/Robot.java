@@ -21,6 +21,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -33,8 +35,7 @@ public class Robot extends TimedRobot {
   private String autoName, newAutoName;
   private Optional<Alliance> alliance, newAlliance;
   private Command m_autonomousCommand;
-
-  public final Field2d m_field = new Field2d();
+  public static final Field2d m_field = new Field2d();
 
   private final RobotContainer m_robotContainer;
 
@@ -50,6 +51,8 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+
+    SmartDashboard.putData("Field", m_field);
   }
 
   /**
@@ -67,37 +70,20 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_robotContainer.visionSystem.updatePoseEstimation(m_robotContainer.drivetrain);
+  }
 
   @Override
-  public void disabledPeriodic() {
-    newAlliance = DriverStation.getAlliance();
-    newAutoName = m_robotContainer.getAutonomousCommand().getName();
-    if (autoName != newAutoName || alliance != newAlliance) {
-      autoName = newAutoName;
-      alliance = newAlliance;
-      if (AutoBuilder.getAllAutoNames().contains(autoName)) {
-        try {
-          List<PathPlannerPath> pathPlannerPaths = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
-          List<Pose2d> poses = new ArrayList<>();
-          for (PathPlannerPath path : pathPlannerPaths) {
-            if (alliance.isPresent() && alliance.get() == Alliance.Red) {
-              path = path.flipPath();
-            }
-            poses.addAll(path.getAllPathPoints().stream()
-                .map(point -> new Pose2d(point.position.getX(), point.position.getY(), new Rotation2d()))
-                .collect(Collectors.toList()));
-          }
-          m_field.getObject("path").setPoses(poses);
-        } catch (IOException | org.json.simple.parser.ParseException e) {
-          e.printStackTrace();
-        }
-      }
-    }
+  public void disabledPeriodic() { 
+    m_robotContainer.visionSystem.resetPoseEstimation(m_robotContainer.drivetrain);
+    m_robotContainer.visionSystem.updatePoseEstimation(m_robotContainer.drivetrain);
+    
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -128,7 +114,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    m_robotContainer.visionSystem.updatePoseEstimation(m_robotContainer.drivetrain);
+  }
 
   @Override
   public void testInit() {
