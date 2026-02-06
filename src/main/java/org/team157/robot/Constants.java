@@ -7,6 +7,7 @@ package org.team157.robot;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DutyCycle;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
 
@@ -41,6 +42,9 @@ public final class Constants {
 
   public static class IntakeConstants {
     public static final int MOTOR_ID = 21;
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromReductionStages(3, 5)); //TODO: Find correct values
+    public static final double MIN_POSITION = 0; //TODO: Find correct values
+    public static final double MAX_POSITION = 0; //TODO: Find correct values
   }
 
   public static class UptakeConstants {
@@ -63,6 +67,7 @@ public final class Constants {
   public static class HoodConstants {
     public static final int MOTOR_ID = 33;
     public static final int POT_ID = 34;
+    public static final DutyCycle ENCODER_ID = null;
   }
   
   public static class FlywheelConstants {
