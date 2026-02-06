@@ -149,7 +149,7 @@ public class RobotContainer {
         driverController.rightTrigger().whileTrue(flywheelSystem.setVelocity(RPM.of(60)));
 
         ////////////////////////////////////////////////////
-        /// TURRET COMMANDS
+        /// UPTAKE COMMANDS
         ///////////////////////////////////////////////////
         uptake.setDefaultCommand(uptake.set(0));
 
