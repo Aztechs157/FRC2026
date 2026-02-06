@@ -56,6 +56,7 @@ public final class Constants {
 
   public static class HopperConstants {
     public static final int MOTOR_ID = 67; // TODO: fill in actual id here
+    public static final double FORWARD_SPEED = 0.157;
   }
 
   public static class TurretConstants {

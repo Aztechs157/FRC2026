@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import org.team157.robot.Constants.ControllerConstants;
+import org.team157.robot.Constants.HopperConstants;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.Constants.UptakeConstants;
 import org.team157.robot.generated.TunerConstants;
@@ -172,8 +173,8 @@ public class RobotContainer {
         ////////////////////////////////////////////////////
         /// HOPPER COMMANDS
         ///////////////////////////////////////////////////
-        hopper.setDefaultCommand(uptake.set(0));
-        //TODO: add button bindings here
+        hopper.setDefaultCommand(hopper.set(0));
+        driverController.rightBumper().toggleOnTrue(hopper.set(HopperConstants.FORWARD_SPEED));
 
     }
 
