@@ -30,6 +30,7 @@ import org.team157.robot.subsystems.DriveSystem;
 import org.team157.robot.subsystems.FlywheelSystem;
 import org.team157.robot.subsystems.IntakeSystem;
 import org.team157.robot.subsystems.HoodSystem;
+import org.team157.robot.subsystems.HopperSystem;
 import org.team157.robot.subsystems.TurretSystem;
 import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
@@ -54,6 +55,8 @@ public class RobotContainer {
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
     public final FlywheelSystem flywheelSystem = new FlywheelSystem();
+
+    public final HopperSystem hopper = new HopperSystem();
 
     public final TurretSystem turret;
     public final IntakeSystem intake = new IntakeSystem();
@@ -169,7 +172,7 @@ public class RobotContainer {
         ////////////////////////////////////////////////////
         /// HOPPER COMMANDS
         ///////////////////////////////////////////////////
-        uptake.setDefaultCommand(uptake.set(0));
+        hopper.setDefaultCommand(uptake.set(0));
         //TODO: add button bindings here
 
     }
