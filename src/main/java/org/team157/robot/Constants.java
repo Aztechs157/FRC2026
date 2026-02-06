@@ -67,7 +67,16 @@ public final class Constants {
   
   public static class FlywheelConstants {
     public static final int MOTOR_ID = 35;
-    // public static final int MOTOR2_ID = 36; if we end up having 2 flywheels
+    public static final int MOTOR_ID_FOLLOWER = 36;
+    // TODO: do actual tuning
+    public static final double P = 50, I = 0, D = 0;
+    public static final double KS = 0, KV = 0, KA = 0;
+    public static final double GEARING = 0.7;
+    //TODO: put real values here and not made up ones
+    public static final double FLYWHEEL_DIAMETER = 4;
+    public static final double FLYWHEEL_MASS = 1;
+    public static final double FLYWHEEL_RPM_LIMIT_UPPER = 1000;
+
   }
 
   public static class VisionConstants {
