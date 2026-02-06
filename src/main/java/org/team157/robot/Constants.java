@@ -65,9 +65,9 @@ public final class Constants {
   }
 
   public static class HoodConstants {
-    public static final int MOTOR_ID = 33;
-    public static final int POT_ID = 34;
-    public static final DutyCycle ENCODER_ID = null;
+    public static final int MOTOR_ID = 27;
+    public static final int ENCODER_ID = 27;
+    public static final double MIN_POSITION = 0.118, MAX_POSITION = 0.846;
   }
   
   public static class FlywheelConstants {

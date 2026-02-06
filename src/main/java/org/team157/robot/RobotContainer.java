@@ -28,6 +28,7 @@ import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.DriveSystem;
 import org.team157.robot.subsystems.FlywheelSystem;
 import org.team157.robot.subsystems.IntakeSystem;
+import org.team157.robot.subsystems.HoodSystem;
 import org.team157.robot.subsystems.TurretSystem;
 import org.team157.robot.subsystems.VisionSystem;
 
@@ -53,6 +54,8 @@ public class RobotContainer {
     public final FlywheelSystem flywheelSystem = new FlywheelSystem();
     public final TurretSystem turret;
     public final IntakeSystem intake = new IntakeSystem();
+
+    public final HoodSystem hood = new HoodSystem();
 
     private final SendableChooser<Command> autoChooser;
 
