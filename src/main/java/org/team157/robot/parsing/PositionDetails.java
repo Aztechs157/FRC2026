@@ -8,7 +8,9 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,6 +24,10 @@ public class PositionDetails {
     public Location redPassingZone1Location;
     public Location blueHubLocation;
     public Location redHubLocation;
+	public Rectangle2d redZone;
+	public Rectangle2d blueZone;
+	public Rectangle2d neutralLowZone;
+	public Rectangle2d neutralHighZone;
     
     public class Location {
         private double x;
@@ -51,13 +57,29 @@ public class PositionDetails {
             this.redPassingZone2Location = new Location(root.get("red").get("passingZoneDepot"));
             this.bluePassingZone1Location = new Location(root.get("blue").get("passingZoneHP"));
             this.bluePassingZone2Location = new Location(root.get("blue").get("passingZoneDepot"));
+            
+            this.redZone = new Rectangle2d(
+                new Translation2d(root.get("zones").get("red").get("xMin").asDouble(), root.get("zones").get("red").get("yMin").asDouble()),
+                new Translation2d(root.get("zones").get("red").get("xMax").asDouble(), root.get("zones").get("red").get("yMax").asDouble())
+            );
+            this.blueZone = new Rectangle2d(
+                new Translation2d(root.get("zones").get("blue").get("xMin").asDouble(), root.get("zones").get("blue").get("yMin").asDouble()),
+                new Translation2d(root.get("zones").get("blue").get("xMax").asDouble(), root.get("zones").get("blue").get("yMax").asDouble())
+            );
+            this.neutralLowZone = new Rectangle2d(
+                new Translation2d(root.get("zones").get("neutralLow").get("xMin").asDouble(), root.get("zones").get("neutralLow").get("yMin").asDouble()),
+                new Translation2d(root.get("zones").get("neutralLow").get("xMax").asDouble(), root.get("zones").get("neutralLow").get("yMax").asDouble())
+            );
+            this.neutralHighZone = new Rectangle2d(
+                new Translation2d(root.get("zones").get("neutralHigh").get("xMin").asDouble(), root.get("zones").get("neutralHigh").get("yMin").asDouble()),
+                new Translation2d(root.get("zones").get("neutralHigh").get("xMax").asDouble(), root.get("zones").get("neutralHigh").get("yMax").asDouble())
+            );
 
         } catch(IOException e) {
             System.out.println("Error reading position details JSON: " + e.getMessage());
             e.printStackTrace();
             return;
         }
-
 
 
     }
