@@ -76,6 +76,7 @@ public final class Constants {
     public static final double FLYWHEEL_DIAMETER = 4;
     public static final double FLYWHEEL_MASS = 1;
     public static final double FLYWHEEL_RPM_LIMIT_UPPER = 1000;
+    public static final double HEIGHT = 2.5;
 
   }
 
