@@ -58,7 +58,6 @@ public class PositionDetails {
             this.bluePassingZoneHighLocation = new Location(root.get("blue").get("passingZoneHigh"));
             this.bluePassingZoneLowLocation = new Location(root.get("blue").get("passingZoneLow"));
             
-            
             this.redZone = new Rectangle2d(
                 new Translation2d(root.get("zones").get("red").get("xMin").asDouble(), root.get("zones").get("red").get("yMin").asDouble()),
                 new Translation2d(root.get("zones").get("red").get("xMax").asDouble(), root.get("zones").get("red").get("yMax").asDouble())
@@ -85,18 +84,8 @@ public class PositionDetails {
 
     }
 
-    public Pose2d targetPose2d(Pose2d currentPose, boolean isRed) {
-       if(isRed) {
-            if(redZone.contains(currentPose.getTranslation())) {
-                return redHubLocation.getPose();
-            } else if(neutralLowZone.contains(currentPose.getTranslation())) {
-                return redPassingZoneLowLocation.getPose();
-            } else if(neutralHighZone.contains(currentPose.getTranslation())) {
-                return redPassingZoneHighLocation.getPose();
-            } else {
-                return redHubLocation.getPose();
-            }
-       } else {
+    public Pose2d targetPose2d(Pose2d currentPose, boolean isBlue) {
+       if(isBlue) {
             if(blueZone.contains(currentPose.getTranslation())) {
                 return blueHubLocation.getPose();
             } else if(neutralLowZone.contains(currentPose.getTranslation())) {
@@ -105,6 +94,16 @@ public class PositionDetails {
                 return bluePassingZoneHighLocation.getPose();
             } else {
                 return blueHubLocation.getPose();
+            }
+       } else {
+            if(redZone.contains(currentPose.getTranslation())) {
+                return redHubLocation.getPose();
+            } else if(neutralLowZone.contains(currentPose.getTranslation())) {
+                return redPassingZoneLowLocation.getPose();
+            } else if(neutralHighZone.contains(currentPose.getTranslation())) {
+                return redPassingZoneHighLocation.getPose();
+            } else {
+                return redHubLocation.getPose();
             }
        }
     }

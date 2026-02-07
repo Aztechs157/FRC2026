@@ -49,6 +49,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.mechanisms.swerve.SwerveDrive;
 
+import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.Constants.VisionConstants;
 import org.team157.robot.Robot;
@@ -84,7 +85,7 @@ public class VisionSystem extends SubsystemBase {
   private double longDistangePoseEstimationCount = 0;
   private Supplier<Pose2d> currentPose;
 
-  boolean blueAlliance = true;
+  boolean isBlueAlliance = true;
 
   /** Creates a new vision. */
   public VisionSystem(Supplier<Pose2d> currentPose, Field2d field) {
@@ -111,14 +112,14 @@ public class VisionSystem extends SubsystemBase {
   public Command getDefaultCommand(DriveSystem drivetrain, TurretSystem turret) {
     return run(() -> {
       updatePoseEstimation(drivetrain);
-      turret.updateRelativeAngleToTag(26, drivetrain.getPose());
+      turret.updateRelativeAngleToTag(FieldConstants.positionDetails.targetPose2d(drivetrain.getPose(), isBlueAlliance), drivetrain.getPose());
     });
     
   }
 
   public void updateAlliance() {
     var alliance = DriverStation.getAlliance();
-    blueAlliance = alliance.get() == DriverStation.Alliance.Blue;
+    isBlueAlliance = alliance.get() == DriverStation.Alliance.Blue;
   }
 
     /**
