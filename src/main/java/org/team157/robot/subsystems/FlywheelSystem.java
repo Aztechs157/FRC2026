@@ -23,6 +23,7 @@ import yams.motorcontrollers.SmartMotorController;
 
 
 import org.team157.robot.Constants.FlywheelConstants;
+import org.team157.robot.Constants.HoodConstants;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -97,8 +98,8 @@ public class FlywheelSystem extends SubsystemBase {
     }
 
   public void setShotParams(double height, double distance) {
-    double lowerBound = 20;
-    double upperBound = 80;
+    double lowerBound = HoodConstants.SOFT_MIN_ANGLE;
+    double upperBound = HoodConstants.SOFT_MAX_ANGLE;
     double steps = 1000;
     double stepSize = (upperBound - lowerBound) / steps;
     
@@ -118,8 +119,37 @@ public class FlywheelSystem extends SubsystemBase {
     azimuth = Radians.of(theta);
   }
 
-  public AngularVelocity getBallVelocity() {
-    return RPM.of(ballVelocity);
+    public void setBETTERShotParams(double height, double distance) {
+    double lowerBound = HoodConstants.SOFT_MIN_ANGLE;
+    double upperBound = HoodConstants.SOFT_MAX_ANGLE;
+    double steps = 1000;
+    double stepSize = (upperBound - lowerBound) / steps;
+    
+    double theta = lowerBound;
+    double velocity = velocityFunction(distance, height, lowerBound);
+    double previousVelocityDifference = -1;
+
+    for (int i = 1; i <= steps; i++) {
+        double x = lowerBound + i * stepSize;
+        double y = velocityFunction(distance, height, x);
+        double velocityDifference = Math.abs(ballVelocity - y);
+        if (previousVelocityDifference < 0 || (velocityDifference < previousVelocityDifference && x < 157)) {
+            previousVelocityDifference = velocityDifference;
+            velocity = y;
+            theta = x;
+        }
+    }
+    // System.out.println("Min found at x = " + theta + ", f(x) = " + velocity);
+    ballVelocity = velocity;
+    azimuth = Radians.of(theta);
+  }
+
+  public AngularVelocity getDesiredVelocity() {
+    return RPM.of(2 * ballVelocity / (FlywheelConstants.FLYWHEEL_DIAMETER * Math.PI) + lossFunction());
+  }
+
+  public double lossFunction() {
+    return 0 * azimuth.magnitude();
   }
 
   public Angle getAzimuth() {
@@ -127,7 +157,7 @@ public class FlywheelSystem extends SubsystemBase {
   }
 
   public Command setDynamicVelocity () {
-    return flyWheel.setSpeed(this::getBallVelocity);
+    return flyWheel.setSpeed(this::getDesiredVelocity);
   }
 
   /**

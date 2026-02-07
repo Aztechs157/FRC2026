@@ -63,6 +63,8 @@ public final class Constants {
   public static class HoodConstants {
     public static final int MOTOR_ID = 33;
     public static final int POT_ID = 34;
+    public static final double SOFT_MAX_ANGLE = 80;
+    public static final double SOFT_MIN_ANGLE = 30;
   }
   
   public static class FlywheelConstants {
