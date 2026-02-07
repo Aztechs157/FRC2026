@@ -6,6 +6,8 @@ package org.team157.robot;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import org.team157.robot.parsing.PositionDetails;
+
 import edu.wpi.first.units.measure.Distance;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
@@ -107,6 +109,15 @@ public final class Constants {
     // How close the robot can be (bumper to tag, in meters) before losing the
     // ability to auto-align.
     public static final double MIN_DISTANCE_TO_TAG = 0.8;
+  }
+
+  public static class FieldConstants {
+    public static final Distance FIELD_LENGTH = Meters.of(16.54175);
+    public static final Distance FIELD_WIDTH = Meters.of(8.0137);
+    
+    public static final PositionDetails positionDetails = new PositionDetails();
+    
+
   }
 
 
