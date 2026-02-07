@@ -92,6 +92,18 @@ public final class Constants {
 
   }
 
+  public static class LEDConstants {
+      //TODO: put actual values here
+        // The PMW port the strip is plugged into on the RIO.
+        public static final int PMW_PORT = 9;
+        // The amount of diodes per section of the strip (not the total amount).
+        public static final int STRIP_LENGTH = 18;
+        // Distance between each diode in millimeters (60led/m strip)
+        public static final double DISTANCE_PER_LED = 15;
+        // The voltage at which the battery warning lights will flash.
+        public static final double BATTERY_WARNING_VOLTAGE = 11.5;
+    }
+
   public static class VisionConstants {
     public static final String FRONTLEFT_CAMERA_NICKNAME = "frontLeftCam";
     public static final Rotation3d FRONTLEFT_CAMERA_ROTATION = new Rotation3d(0, -0.0523599, -0.139626);

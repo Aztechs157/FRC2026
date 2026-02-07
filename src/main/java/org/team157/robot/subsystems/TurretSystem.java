@@ -28,6 +28,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -62,7 +63,9 @@ public class TurretSystem extends SubsystemBase {
       .withTelemetry("Turret Motor", TelemetryVerbosity.HIGH) 
       .withStatorCurrentLimit(Amps.of(TurretConstants.CURRENT_LIMIT))
       .withClosedLoopRampRate(Seconds.of(TurretConstants.RAMP_RATE))
-      .withSoftLimit(Degrees.of(TurretConstants.LOWER_SOFT_LIMIT), Degrees.of(TurretConstants.UPPER_SOFT_LIMIT));
+      .withSoftLimit(Degrees.of(TurretConstants.LOWER_SOFT_LIMIT), Degrees.of(TurretConstants.UPPER_SOFT_LIMIT))
+      .withMomentOfInertia(5);
+        
 
   // Create the turret's motor controller with the above configuration.
   private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), turretMotorConfig);
