@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.team157.robot.Constants.LEDConstants;
+
 import com.ctre.phoenix6.HootAutoReplay;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -19,6 +21,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,6 +39,10 @@ public class Robot extends TimedRobot {
   private Optional<Alliance> alliance, newAlliance;
   private Command m_autonomousCommand;
   public static final Field2d m_field = new Field2d();
+
+  public static boolean isFMS = false;
+  public static boolean isEStop = false;
+  public static boolean isBatteryLow = false;
 
   private final RobotContainer m_robotContainer;
 
@@ -70,6 +77,25 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+     if (!isFMS && DriverStation.isFMSAttached()) {
+      isFMS = true;
+      RobotContainer.led.isFMS();
+    }
+
+    if (!isEStop && DriverStation.isEStopped()) {
+      isEStop = true;
+      RobotContainer.led.isEStop();
+    }
+
+    if (RobotController.getBatteryVoltage() < LEDConstants.BATTERY_WARNING_VOLTAGE) {
+      isBatteryLow = true;
+    } else {
+      isBatteryLow = false;
+    }
+    // this one is outside so that the pattern can be removed once the voltage goes
+    // back up
+    RobotContainer.led.batteryLow(isBatteryLow);
+
 
   }
 

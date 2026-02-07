@@ -1,0 +1,52 @@
+led thingy:
+
+intakealgae:
+LEDPattern intakeRunning = LEDPattern.solid(Color.kPurple).blink(Seconds.of(0.25));
+    RobotContainer.prettyLights.addMidPattern("Intake Running (Algae)", 11, intakeRunning);
+
+
+
+placecoral:
+RobotContainer.prettyLights.removeMidPattern("Has Coral");
+    RobotContainer.prettyLights.removeMidPattern("Has Algae");
+
+    LEDPattern outtaking = LEDPattern.solid(Color.kCyan).blink(Seconds.of(0.25));
+    RobotContainer.prettyLights.addMidPattern("Outtaking", 10, outtaking)
+
+intake system peroidc : 
+
+    // hopefully will remove the pattern if the coral sensor drops
+    if(!hasCoral()){
+      RobotContainer.prettyLights.removeMidPattern("Has Coral");
+    }
+  
+
+
+  uppies perodic : 
+
+    if (getScaledPos() >= 1.0 - UppiesConstants.LIMIT_MARGIN) {
+      LEDPattern uppy = LEDPattern.solid(Color.kWhiteSmoke);
+      RobotContainer.prettyLights.addMidPattern("Uppies Deployed", 7, uppy);
+    } else {
+      RobotContainer.prettyLights.removeMidPattern("Uppies Deployed");
+    }
+  
+
+
+  vision periodic: 
+
+   if (hasTag) {
+        // Flashing green pattern when the robot is too close to auto align.
+        if(getDistanceToTag() <= VisionConstants.MIN_DISTANCE_TO_TAG) {
+          prettyLights.removeTopPattern("Has Tag");
+          prettyLights.addTopPattern("Has Tag Too Close", 9, tooClose);
+        } else {
+          // Solid green pattern when the robot is at a far enough distance to auto align
+          prettyLights.removeTopPattern("Has Tag Too Close");
+          prettyLights.addTopPattern("Has Tag", 10, tagSeen);
+          
+        }
+    } else {
+      prettyLights.removeTopPattern("Has Tag Too Close");
+      prettyLights.removeTopPattern("Has Tag");
+    }

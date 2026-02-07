@@ -30,6 +30,7 @@ import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.DriveSystem;
 import org.team157.robot.subsystems.FlywheelSystem;
 import org.team157.robot.subsystems.IntakeSystem;
+import org.team157.robot.subsystems.LEDSystem;
 import org.team157.robot.subsystems.HoodSystem;
 import org.team157.robot.subsystems.HopperSystem;
 import org.team157.robot.subsystems.TurretSystem;
@@ -47,7 +48,9 @@ public class RobotContainer {
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-   public final VisionSystem visionSystem;
+    public final VisionSystem visionSystem;
+
+    public static final LEDSystem led = new LEDSystem();
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -55,17 +58,17 @@ public class RobotContainer {
 
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
-    public final FlywheelSystem flywheelSystem = new FlywheelSystem();
-
+    public final IntakeSystem intake = new IntakeSystem();
+    
     public final HopperSystem hopper = new HopperSystem();
 
-    public final TurretSystem turret;
-    public final IntakeSystem intake = new IntakeSystem();
-
-    public final HoodSystem hood = new HoodSystem();
-
     public final UptakeSystem uptake = new UptakeSystem();
+    
+    public final TurretSystem turret;
 
+    public final FlywheelSystem flywheelSystem = new FlywheelSystem();
+    
+    public final HoodSystem hood = new HoodSystem();
 
     private final SendableChooser<Command> autoChooser;
 
