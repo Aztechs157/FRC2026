@@ -115,8 +115,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    m_robotContainer.visionSystem.updatePoseEstimation(m_robotContainer.drivetrain);
-    m_robotContainer.turret.updateRelativeAngleToTag(26, m_robotContainer.drivetrain);
+   
   }
 
   @Override

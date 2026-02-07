@@ -45,6 +45,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.mechanisms.swerve.SwerveDrive;
 
@@ -104,6 +105,15 @@ public class VisionSystem extends SubsystemBase {
   
     PortForwarder.add(5800, "photonvision1.local", 5800);
     PortForwarder.add(5800, "photonvision2.local", 5800);
+    setDefaultCommand(getDefaultCommand());
+  }
+
+  public Command getDefaultCommand(DriveSystem drivetrain, TurretSystem turret) {
+    return run(() -> {
+      updatePoseEstimation(drivetrain);
+      turret.updateRelativeAngleToTag(26, drivetrain.getPose());
+    });
+    
   }
 
   public void updateAlliance() {
@@ -321,12 +331,23 @@ public class VisionSystem extends SubsystemBase {
    * @param id the tag ID
    * @return
    */
-  public double getAngleToTarget(int id, DriveSystem swerveDrive) {
+  public double getAngleToTarget(int id, Pose2d robotPose) {
     Pose2d tagPose = fieldLayout.getTagPose(id).get().toPose2d();
-    Pose2d robotPose = swerveDrive.getPose();
     // Java example
     double distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, tagPose);
     double angleToTarget = PhotonUtils.getYawToPose(robotPose, tagPose).getDegrees();
+
+    return angleToTarget;
+  }
+  /**
+   * wawawawawawa
+   * @param id the tag ID
+   * @return
+   */
+  public double getAngleToTarget(Pose2d targetPose, Pose2d robotPose) {
+    // Java example
+    double distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, targetPose);
+    double angleToTarget = PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();
 
     return angleToTarget;
   }

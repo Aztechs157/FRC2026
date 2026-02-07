@@ -23,6 +23,7 @@ import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -214,12 +215,24 @@ public class TurretSystem extends SubsystemBase {
    * Calculate the angle the turret needs to turn to face the target tag.
    * @return The angle the turret needs to rotate to to face the target tag.
    */
-  public void updateRelativeAngleToTag(int tagID, DriveSystem swerveDrive){
+  public void updateRelativeAngleToTag(int tagID, Pose2d robotPose){
     // The current angular offset of the tag, relative to the turret camera.
-    double angleToTarget = visionSystem.getAngleToTarget(tagID, swerveDrive);
+    double angleToTarget = visionSystem.getAngleToTarget(tagID, robotPose);
     double turretToRobotAngleOffset = angleToTarget + 90;
     trackingAngle = Degrees.of(turretToRobotAngleOffset);
   }
+
+  /**
+   * Calculate the angle the turret needs to turn to face the target tag.
+   * @return The angle the turret needs to rotate to to face the target tag.
+   */
+  public void updateRelativeAngleToTag(Pose2d targetPose, Pose2d robotPose){
+    // The current angular offset of the tag, relative to the turret camera.
+    double angleToTarget = visionSystem.getAngleToTarget(targetPose, robotPose);
+    double turretToRobotAngleOffset = angleToTarget + 90;
+    trackingAngle = Degrees.of(turretToRobotAngleOffset);
+  }
+
 
   @Override
   public void periodic() {
