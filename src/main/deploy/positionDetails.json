@@ -4,13 +4,13 @@
             "x": 4.674902,
             "y": 4.123531
         },
-        "passingZoneHP": {
-            "x": 2.134902,
-            "y": 1.583531
-        },
-        "passingZoneDepot": {
+        "passingZoneLow": {
             "x": 2.134902,
             "y": 6.663531
+        },
+        "passingZoneHigh": {
+            "x": 2.134902,
+            "y": 1.583531
         }
     },
     "red": {
@@ -18,11 +18,11 @@
             "x": 11.964702,
             "y": 4.123531
         },
-        "passingZoneDepot": {
+        "passingZoneLow": {
             "x": 14.504702,
             "y": 1.583531
         },
-        "passingZoneHP": {
+        "passingZoneHigh": {
             "x": 14.504702,
             "y": 6.663531
         }

@@ -18,10 +18,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class PositionDetails {
     private final String jsonPath = "/positionDetails.json";
-    public Location bluePassingZone1Location;
-    public Location bluePassingZone2Location;
-    public Location redPassingZone2Location;
-    public Location redPassingZone1Location;
+    public Location bluePassingZoneLowLocation;
+    public Location bluePassingZoneHighLocation;
+    public Location redPassingZoneLowLocation;
+    public Location redPassingZoneHighLocation;
     public Location blueHubLocation;
     public Location redHubLocation;
 	public Rectangle2d redZone;
@@ -53,10 +53,11 @@ public class PositionDetails {
             JsonNode root = objectMapper.readTree(file);
             this.redHubLocation = new Location(root.get("red").get("hub"));
             this.blueHubLocation = new Location(root.get("blue").get("hub"));
-            this.redPassingZone1Location = new Location(root.get("red").get("passingZoneHP"));
-            this.redPassingZone2Location = new Location(root.get("red").get("passingZoneDepot"));
-            this.bluePassingZone1Location = new Location(root.get("blue").get("passingZoneHP"));
-            this.bluePassingZone2Location = new Location(root.get("blue").get("passingZoneDepot"));
+            this.redPassingZoneHighLocation = new Location(root.get("red").get("passingZoneHigh"));
+            this.redPassingZoneLowLocation = new Location(root.get("red").get("passingZoneLow"));
+            this.bluePassingZoneHighLocation = new Location(root.get("blue").get("passingZoneHigh"));
+            this.bluePassingZoneLowLocation = new Location(root.get("blue").get("passingZoneLow"));
+            
             
             this.redZone = new Rectangle2d(
                 new Translation2d(root.get("zones").get("red").get("xMin").asDouble(), root.get("zones").get("red").get("yMin").asDouble()),
@@ -82,5 +83,29 @@ public class PositionDetails {
         }
 
 
+    }
+
+    public Pose2d targetPose2d(Pose2d currentPose, boolean isRed) {
+       if(isRed) {
+            if(redZone.contains(currentPose.getTranslation())) {
+                return redHubLocation.getPose();
+            } else if(neutralLowZone.contains(currentPose.getTranslation())) {
+                return redPassingZoneLowLocation.getPose();
+            } else if(neutralHighZone.contains(currentPose.getTranslation())) {
+                return redPassingZoneHighLocation.getPose();
+            } else {
+                return redHubLocation.getPose();
+            }
+       } else {
+            if(blueZone.contains(currentPose.getTranslation())) {
+                return blueHubLocation.getPose();
+            } else if(neutralLowZone.contains(currentPose.getTranslation())) {
+                return bluePassingZoneLowLocation.getPose();
+            } else if(neutralHighZone.contains(currentPose.getTranslation())) {
+                return bluePassingZoneHighLocation.getPose();
+            } else {
+                return blueHubLocation.getPose();
+            }
+       }
     }
 }
