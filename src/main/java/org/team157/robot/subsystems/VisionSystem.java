@@ -38,7 +38,9 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTablesJNI;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -56,6 +58,9 @@ import org.team157.robot.Robot;
 
 @Logged(strategy = Strategy.OPT_OUT)
 public class VisionSystem extends SubsystemBase {
+
+  // Publishes the turret's target point to NT for field zoning testing.
+  public StructPublisher<Pose2d> targetPosePublisher = NetworkTableInstance.getDefault().getStructTopic("Target Pose", Pose2d.struct).publish();
 
   public boolean hasTag = false;
 
@@ -115,6 +120,13 @@ public class VisionSystem extends SubsystemBase {
       turret.updateRelativeAngleToTag(FieldConstants.positionDetails.targetPose2d(drivetrain.getPose(), isBlueAlliance), drivetrain.getPose());
     });
     
+  }
+  /** 
+   * Gets the aiming target of the turret, based on the current alliance, and the robot's current location on the field.
+   * @return the target point on the field the turret should be aiming at, as a Pose2d.
+   */
+  public Pose2d getDesiredPose() {
+    return FieldConstants.positionDetails.targetPose2d(currentPose.get(), isBlueAlliance);
   }
 
   public void updateAlliance() {
@@ -611,5 +623,12 @@ public class VisionSystem extends SubsystemBase {
     }
 
 
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    // Publish the turret's target point to NT for field zoning testing.
+    targetPosePublisher.set(getDesiredPose());
   }
 }
