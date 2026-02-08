@@ -47,6 +47,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.mechanisms.swerve.SwerveDrive;
@@ -132,6 +133,7 @@ public class VisionSystem extends SubsystemBase {
   public void updateAlliance() {
     var alliance = DriverStation.getAlliance();
     isBlueAlliance = alliance.get() == DriverStation.Alliance.Blue;
+    SmartDashboard.putBoolean("Is Blue Alliance", isBlueAlliance);
   }
 
     /**
@@ -630,5 +632,6 @@ public class VisionSystem extends SubsystemBase {
     // This method will be called once per scheduler run
     // Publish the turret's target point to NT for field zoning testing.
     targetPosePublisher.set(getDesiredPose());
+    updateAlliance();
   }
 }

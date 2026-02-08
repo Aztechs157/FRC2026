@@ -4,11 +4,11 @@
             "x": 4.674902,
             "y": 4.123531
         },
-        "passingZoneLow": {
+        "passingZoneHigh": {
             "x": 2.134902,
             "y": 6.663531
         },
-        "passingZoneHigh": {
+        "passingZoneLow": {
             "x": 2.134902,
             "y": 1.583531
         }
