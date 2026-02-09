@@ -131,8 +131,8 @@ public class VisionSystem extends SubsystemBase {
   }
 
   public void updateAlliance() {
-    var alliance = DriverStation.getAlliance();
-    isBlueAlliance = alliance.get() == DriverStation.Alliance.Blue;
+    isBlueAlliance = DriverStation.getAlliance()
+      .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
     SmartDashboard.putBoolean("Is Blue Alliance", isBlueAlliance);
   }
 
