@@ -43,15 +43,15 @@
             "yMax": 7.98703
         },
         "neutralLow": {
-            "xMin": 5.22006,
+            "xMin": 0,
             "yMin": 0,
             "xMax": 11.3167,
             "yMax": 4.040981
         },
         "neutralHigh": {
-            "xMin": 5.22006,
+            "xMin": 0,
             "yMin": 4.040981,
-            "xMax": 11.3167,
+            "xMax": 16.535400,
             "yMax": 7.98703
         }
     }
