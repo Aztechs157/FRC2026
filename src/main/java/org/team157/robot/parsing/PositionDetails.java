@@ -86,7 +86,6 @@ public class PositionDetails {
 
     public Pose2d targetPose2d(Pose2d currentPose, boolean isBlue) {
        if(isBlue) {
-            System.out.println("Blue");
             if(blueZone.contains(currentPose.getTranslation())) {
                 return blueHubLocation.getPose();
             } else if(neutralLowZone.contains(currentPose.getTranslation())) {
@@ -97,7 +96,6 @@ public class PositionDetails {
                 return blueHubLocation.getPose();
             }
        } else {
-            System.out.println("Red");
             if(redZone.contains(currentPose.getTranslation())) {
                 return redHubLocation.getPose();
             } else if(neutralLowZone.contains(currentPose.getTranslation())) {
