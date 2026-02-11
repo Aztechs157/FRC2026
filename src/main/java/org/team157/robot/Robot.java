@@ -16,7 +16,10 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -35,6 +38,15 @@ public class Robot extends TimedRobot {
   private String autoName, newAutoName;
   private Optional<Alliance> alliance, newAlliance;
   private Command m_autonomousCommand;
+
+  public static Pose3d[] zeroArray = new Pose3d[4];
+  public static Pose3d[] finalArray = new Pose3d[4];
+  // creates a publisher to send zeroed Pose3d values to NT for model calibration.
+  public static StructArrayPublisher<Pose3d> zeroedPoses = NetworkTableInstance.getDefault()
+      .getStructArrayTopic("ZeroedComponentPoses", Pose3d.struct).publish();
+  public static StructArrayPublisher<Pose3d> finalPoses = NetworkTableInstance.getDefault()
+      .getStructArrayTopic("FinalComponentPoses", Pose3d.struct).publish();
+
   public static final Field2d m_field = new Field2d();
 
   private final RobotContainer m_robotContainer;
@@ -71,6 +83,10 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
+    // these are just for model calibration
+    zeroArray = new Pose3d[] { new Pose3d(), new Pose3d(),
+    new Pose3d(), new Pose3d() };
+    zeroedPoses.set(zeroArray);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

@@ -1,5 +1,5 @@
 {
-    "name": "Mantis II Deployed",
+    "name": "Mantis II Articulated",
     "isFTC": "false",
     "rotations": [
         {
@@ -72,5 +72,70 @@
         "position": [-0.301, 0, 0.351], 
         "resolution": [640, 480], 
         "fov": 55 
+    }],
+    "components": [
+    {
+        "zeroedRotations": [
+            {
+            "axis": "x",
+            "degrees": 90
+        },
+        {
+            "axis": "y",
+            "degrees": 0
+        },
+        {
+            "axis": "z",
+            "degrees": 90
+        }],
+        "zeroedPosition": [0.171, 0, -0.460]
+    },
+    {
+        "zeroedRotations": [
+            {
+            "axis": "x",
+            "degrees": 90
+        },
+        {
+            "axis": "y",
+            "degrees": 0
+        },
+        {
+            "axis": "z",
+            "degrees": 90
+        }],
+        "zeroedPosition": [0.0465, 0, -0.530]
+    },
+    {
+        "zeroedRotations": [
+            {
+            "axis": "x",
+            "degrees": 90
+        },
+        {
+            "axis": "y",
+            "degrees": 0
+        },
+        {
+            "axis": "z",
+            "degrees": 90
+        }],
+        "zeroedPosition": [0, 0, 0]
+    },
+    {
+        "zeroedRotations": [
+            {
+            "axis": "x",
+            "degrees": 90
+        },
+        {
+            "axis": "y",
+            "degrees": 0
+        },
+        {
+            "axis": "z",
+            "degrees": 90
+        }],
+        "zeroedPosition": [0, 0, 0]
     }]
   }
