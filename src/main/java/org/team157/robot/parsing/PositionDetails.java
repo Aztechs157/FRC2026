@@ -32,16 +32,23 @@ public class PositionDetails {
     public class Location {
         private double x;
         private double y;
+        private double z;
+
         private Pose2d pose;
 
         public Location(JsonNode locationJSON) {
             this.x = locationJSON.get("x").asDouble();
             this.y = locationJSON.get("y").asDouble();
+            this.z = locationJSON.get("z").asDouble();
             this.pose = new Pose2d(x, y, new Rotation2d(0)); 
         }
 
         public Pose2d getPose() {
             return this.pose;
+        }
+        
+        public double getZ() {
+            return this.z;
         }
     }
 
