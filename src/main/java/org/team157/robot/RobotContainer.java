@@ -111,9 +111,7 @@ public class RobotContainer {
         );
 
         driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
-        driverController.a().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX()))
-        ));
+
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -146,8 +144,8 @@ public class RobotContainer {
         
         flywheelSystem.setDefaultCommand(flywheelSystem.set(0));
 
-        driverController.rightTrigger().whileTrue(flywheelSystem.setVelocity(RPM.of(60)));
-        driverController.leftTrigger().whileTrue(flywheelSystem.setDynamicVelocity());
+        driverController.y().whileTrue(flywheelSystem.setVelocity(RPM.of(60)));
+        driverController.a().whileTrue(flywheelSystem.setDynamicVelocity());
     }
 
     public double modifySpeed(final double speed) {

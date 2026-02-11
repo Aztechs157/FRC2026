@@ -75,8 +75,8 @@ public final class Constants {
     public static final double KS = 0, KV = 0, KA = 0;
     public static final double GEARING = 0.7;
     //TODO: put real values here and not made up ones
-    public static final double FLYWHEEL_DIAMETER = 4;
-    public static final double FLYWHEEL_MASS = 1;
+    public static final double FLYWHEEL_DIAMETER = 3.75;
+    public static final double FLYWHEEL_MASS = 4;
     public static final double FLYWHEEL_RPM_LIMIT_UPPER = 1000;
     public static final double HEIGHT = 2.5;
 

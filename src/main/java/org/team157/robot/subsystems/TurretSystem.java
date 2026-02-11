@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -65,7 +67,8 @@ public class TurretSystem extends SubsystemBase {
   private PivotConfig turretConfig = new PivotConfig(smartMotor)
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
       .withHardLimit(Degrees.of(TurretConstants.LOWER_HARD_LIMIT), Degrees.of(TurretConstants.UPPER_HARD_LIMIT))
-      .withTelemetry("Turret", TelemetryVerbosity.HIGH);
+      .withTelemetry("Turret", TelemetryVerbosity.HIGH)
+      .withMOI(Meters.of(0.1), Kilograms.of(4));
 
   // Create the turret pivot system with the above configuration.
   private Pivot turret = new Pivot(turretConfig);

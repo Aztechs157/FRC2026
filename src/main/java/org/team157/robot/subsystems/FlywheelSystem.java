@@ -104,19 +104,23 @@ public class FlywheelSystem extends SubsystemBase {
     double stepSize = (upperBound - lowerBound) / steps;
     
     double theta = lowerBound;
-    double velocity = velocityFunction(distance, height, lowerBound);
+    double velocity = velocityFunction(distance, height, Math.toRadians(lowerBound));
+
+    System.out.println("Starting optimization with initial velocity: " + velocity);
 
     for (int i = 1; i <= steps; i++) {
         double x = lowerBound + i * stepSize;
-        double y = velocityFunction(distance, height, x);
+        double y = velocityFunction(distance, height, Math.toRadians(x));
         if (y < velocity) {
             velocity = y;
             theta = x;
         }
     }
-    // System.out.println("Min found at x = " + theta + ", f(x) = " + velocity);
+    System.out.println("Min found at x = " + theta + ", f(x) = " + velocity);
     ballVelocity = velocity;
     azimuth = Radians.of(theta);
+    System.out.println("Ball Velocity: " + ballVelocity);
+    System.out.println("Azimuth: " + azimuth);
   }
 
     public void setBETTERShotParams(double height, double distance) {
@@ -145,7 +149,12 @@ public class FlywheelSystem extends SubsystemBase {
   }
 
   public AngularVelocity getDesiredVelocity() {
-    return RPM.of(2 * ballVelocity / (FlywheelConstants.FLYWHEEL_DIAMETER * Math.PI) + lossFunction());
+    setShotParams(6, 8);
+    // double desiredVelocity = 2 * ballVelocity / (FlywheelConstants.FLYWHEEL_DIAMETER * Math.PI) + lossFunction();
+    double desiredVelocity = 2 * ballVelocity + lossFunction();
+    System.out.println("Ball Velocity: " + ballVelocity);
+    System.out.println("Desired Velocity: " + desiredVelocity);
+    return RPM.of(desiredVelocity);
   }
 
   public double lossFunction() {
@@ -166,6 +175,7 @@ public class FlywheelSystem extends SubsystemBase {
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
   public Command setVelocity (AngularVelocity speed) {
+    System.out.println("Setting velocity to: " + speed);
     return flyWheel.setSpeed(speed); 
   }
 
