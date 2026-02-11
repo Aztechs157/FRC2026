@@ -28,6 +28,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
@@ -192,6 +193,10 @@ public class IntakeSystem extends SubsystemBase {
 
   public Command setDefault() {
     return setRoller(0).alongWith(setPivot(0));
+  }
+
+  public Command intakeOn(double power) {
+    return new RunCommand(()-> runMotor(power)).alongWith(); //TODO: Finish this
   }
 
 }

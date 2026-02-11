@@ -1,3 +1,20 @@
+lights stuff
+
+targeting low pass zone:
+targeting high pass zone:
+targeting hub:
+hub active (track match time and check if won auto):
+some metric of hopper capacity?:
+flywheel at idle speed:
+flywheel at shooting speed:
+intake on:
+intake deployed?:
+climb???????????:
+
+
+
+
+
 led thingy:
 
 intakealgae:
