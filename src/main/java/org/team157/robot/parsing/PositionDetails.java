@@ -28,6 +28,7 @@ public class PositionDetails {
 	public Rectangle2d blueZone;
 	public Rectangle2d neutralLowZone;
 	public Rectangle2d neutralHighZone;
+    public static double height = 0.0;
     
     public class Location {
         private double x;
@@ -83,7 +84,6 @@ public class PositionDetails {
             );
 
         } catch(IOException e) {
-            System.out.println("Error reading position details JSON: " + e.getMessage());
             e.printStackTrace();
             return;
         }
@@ -94,24 +94,36 @@ public class PositionDetails {
     public Pose2d targetPose2d(Pose2d currentPose, boolean isBlue) {
        if(isBlue) {
             if(blueZone.contains(currentPose.getTranslation())) {
+                height = blueHubLocation.getZ();
                 return blueHubLocation.getPose();
             } else if(neutralLowZone.contains(currentPose.getTranslation())) {
+                height = bluePassingZoneLowLocation.getZ();
                 return bluePassingZoneLowLocation.getPose();
             } else if(neutralHighZone.contains(currentPose.getTranslation())) {
+                height = bluePassingZoneHighLocation.getZ();
                 return bluePassingZoneHighLocation.getPose();
             } else {
                 return blueHubLocation.getPose();
             }
        } else {
             if(redZone.contains(currentPose.getTranslation())) {
+                height = redHubLocation.getZ();
                 return redHubLocation.getPose();
             } else if(neutralLowZone.contains(currentPose.getTranslation())) {
+                height = redPassingZoneLowLocation.getZ();
                 return redPassingZoneLowLocation.getPose();
             } else if(neutralHighZone.contains(currentPose.getTranslation())) {
+                height = redPassingZoneHighLocation.getZ();
                 return redPassingZoneHighLocation.getPose();
             } else {
                 return redHubLocation.getPose();
             }
        }
     }
+
+    public double getTargetHeight() {
+        return height;
+    }
+    
+    
 }
