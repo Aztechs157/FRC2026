@@ -202,7 +202,7 @@ public class TurretSystem extends SubsystemBase {
     // The current angular offset of the tag, relative to the turret camera.
     double tagYaw = visionSystem.getHubTagYawFromTurretCam();
     SmartDashboard.putNumber("Target Yaw", tagYaw);
-    // if the target tag is seen,
+    // if the target tag is seen, at an arbitrary number indicating no target,
     if(tagYaw != 157357){
       // Subtract the camera-to-tag angle from the turret angle
       // to find our new setpoint angle to face the tag.
