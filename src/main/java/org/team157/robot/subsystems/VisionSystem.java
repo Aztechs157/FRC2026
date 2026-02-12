@@ -319,6 +319,7 @@ public class VisionSystem extends SubsystemBase {
     Cameras.TURRET_CAM.updateUnreadResults();
     PhotonTrackedTarget target = getTargetFromId(26, Cameras.TURRET_CAM);
     if(target == null) {
+      // arbitrary number indicating no target
       return 157357;
     }
     // what happens if target returns null
