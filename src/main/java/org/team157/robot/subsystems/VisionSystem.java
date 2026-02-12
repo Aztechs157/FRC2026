@@ -322,15 +322,14 @@ public class VisionSystem extends SubsystemBase {
       // arbitrary number indicating no target
       return 157357;
     }
-    // what happens if target returns null
 
     return target.yaw;
   }
 
   /**
-   * Get a tag's 3d location on the field
-   * @param id the tag ID
-   * @return
+   * Get a tag's 2d location on the field, and calculate the angle to it from the robot's pose.
+   * @param id the tag ID to extract a Pose2d from
+   * @return The angle from the robot to the target tag in degrees
    */
   public double getAngleToTarget(int id, Pose2d robotPose) {
     Pose2d tagPose = fieldLayout.getTagPose(id).get().toPose2d();
@@ -341,9 +340,9 @@ public class VisionSystem extends SubsystemBase {
     return angleToTarget;
   }
   /**
-   * wawawawawawa
-   * @param id the tag ID
-   * @return
+   * Calculate the angle to a certain from the robot's pose.
+   * @param targetPose the target Pose2d to calculate angle to
+   * @return The angle from the robot to the target tag in degrees
    */
   public double getAngleToTarget(Pose2d targetPose, Pose2d robotPose) {
     // Java example
