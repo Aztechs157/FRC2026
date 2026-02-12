@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -72,7 +74,8 @@ public class TurretSystem extends SubsystemBase {
   private PivotConfig turretConfig = new PivotConfig(smartMotor)
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
       .withHardLimit(Degrees.of(TurretConstants.LOWER_HARD_LIMIT), Degrees.of(TurretConstants.UPPER_HARD_LIMIT))
-      .withTelemetry("Turret", TelemetryVerbosity.HIGH);
+      .withTelemetry("Turret", TelemetryVerbosity.HIGH)
+      .withMOI(Meters.of(0.1), Kilograms.of(4));
 
   // Create the turret pivot system with the above configuration.
   private Pivot turret = new Pivot(turretConfig);
@@ -217,8 +220,8 @@ public class TurretSystem extends SubsystemBase {
    */
   public void updateRelativeAngleToTag(int tagID, Pose2d robotPose){
     // The current angular offset of the tag, relative to the turret camera.
-    double angleToTarget = visionSystem.getAngleToTarget(tagID, robotPose);
-    double turretToRobotAngleOffset = angleToTarget + 90;
+    visionSystem.setTargetParams(tagID, robotPose);
+    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 90;
     trackingAngle = Degrees.of(turretToRobotAngleOffset);
   }
 
@@ -228,8 +231,9 @@ public class TurretSystem extends SubsystemBase {
    */
   public void updateRelativeAngleToTag(Pose2d targetPose, Pose2d robotPose){
     // The current angular offset of the tag, relative to the turret camera.
-    double angleToTarget = visionSystem.getAngleToTarget(targetPose, robotPose);
-    double turretToRobotAngleOffset = angleToTarget + 90;
+    visionSystem.setTargetParams(targetPose, robotPose);
+    //TODO: remove 90° offset on real robot
+    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 90;
     trackingAngle = Degrees.of(turretToRobotAngleOffset);
   }
 
