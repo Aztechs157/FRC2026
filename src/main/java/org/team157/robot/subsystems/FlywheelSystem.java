@@ -9,7 +9,10 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Feet;
+import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
@@ -149,12 +152,13 @@ public class FlywheelSystem extends SubsystemBase {
   }
 
   public AngularVelocity getDesiredVelocity() {
-    setShotParams(6, 8);
-    // double desiredVelocity = 2 * ballVelocity / (FlywheelConstants.FLYWHEEL_DIAMETER * Math.PI) + lossFunction();
-    double desiredVelocity = 2 * ballVelocity + lossFunction();
-    System.out.println("Ball Velocity: " + ballVelocity);
-    System.out.println("Desired Velocity: " + desiredVelocity);
-    return RPM.of(desiredVelocity);
+    setShotParams(0, 10);
+    //double desiredVelocity = 2 * ballVelocity / (FlywheelConstants.FLYWHEEL_DIAMETER / 12 * Math.PI) + lossFunction();
+    // double desiredVelocity = 2 * ballVelocity + lossFunction();
+    double desiredRPM = 60 / (Inches.of(FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters) * Math.PI) * FeetPerSecond.of(ballVelocity).in(MetersPerSecond);
+    System.out.println("Desired Ball Velocity (ft/sec): " + ballVelocity);
+    System.out.println("Desired Flywheel Velocity (rpm): " + desiredRPM);
+    return RPM.of(desiredRPM);
   }
 
   public double lossFunction() {

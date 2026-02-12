@@ -144,9 +144,9 @@ public class RobotContainer {
         
         flywheelSystem.setDefaultCommand(flywheelSystem.set(0));
 
-        driverController.y().whileTrue(flywheelSystem.setVelocity(RPM.of(60)));
+        driverController.y().whileTrue(flywheelSystem.setVelocity(RPM.of(127)));
         driverController.a().whileTrue(flywheelSystem.setDynamicVelocity());
-    }
+    } 
 
     public double modifySpeed(final double speed) {
         final var modifier = 1 - driverController.getRightTriggerAxis() * ModifierConstants.PRECISION_DRIVE_MODIFIER;
