@@ -84,9 +84,32 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     // these are just for model calibration
-    zeroArray = new Pose3d[] { new Pose3d(), new Pose3d(),
-    new Pose3d(), new Pose3d() };
+    zeroArray = new Pose3d[] {
+      // turret base 
+      new Pose3d(), 
+      // turret hood
+      new Pose3d(),
+      // intake pivot
+      new Pose3d(), 
+      // hopper walls
+      new Pose3d() 
+    };
     zeroedPoses.set(zeroArray);
+    
+     finalArray = new Pose3d[] {
+      // turret base 
+      m_robotContainer.turret.getBasePose(), 
+      // turret hood
+      // TODO: put this on hood system once it exists
+      // m_robotContainer.hood.getHoodPose(),
+      // intake pivot
+      // TODO: put this on intake system once it exists
+      // m_robotContainer.intake.getIntakePivotPose(), 
+      // hopper walls
+      // TODO: put this on intake system once it exists
+      // m_robotContainer.intake.getHopperWallsPose() 
+    };
+    finalPoses.set(finalArray);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

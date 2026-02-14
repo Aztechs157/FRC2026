@@ -259,4 +259,9 @@ public class TurretSystem extends SubsystemBase {
     // Updates the turret simulation's values,
     turret.simIterate();
   }
+
+  public Pose3d getBasePose() {
+	// TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getBasePose'");
+  }
 }
