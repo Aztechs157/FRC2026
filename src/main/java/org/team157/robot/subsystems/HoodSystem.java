@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class HoodSystem extends SubsystemBase {
 
   private SparkMax motor = new SparkMax(HoodConstants.MOTOR_ID, MotorType.kBrushless);
-  private AnalogInput pot = new AnalogInput(HoodConstants.POT_ID);
+  private AnalogInput pot = new AnalogInput(HoodConstants.ENCODER_ID);
   
   /** Creates a new azmimuth. */
   public HoodSystem() {}
