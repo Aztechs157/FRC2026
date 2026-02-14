@@ -24,13 +24,12 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import org.team157.robot.Constants.ControllerConstants;
 import org.team157.robot.Constants.ModifierConstants;
-import org.team157.robot.Constants.UptakeConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.DriveSystem;
 import org.team157.robot.subsystems.FlywheelSystem;
+import org.team157.robot.subsystems.HopperSystem;
 import org.team157.robot.subsystems.IntakeSystem;
 import org.team157.robot.subsystems.TurretSystem;
-import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
 
 public class RobotContainer {
@@ -52,8 +51,8 @@ public class RobotContainer {
 
     public final FlywheelSystem flywheelSystem = new FlywheelSystem();
     public final TurretSystem turret = new TurretSystem();
-    public final UptakeSystem uptake = new UptakeSystem();
     public final IntakeSystem intake = new IntakeSystem();
+    public final HopperSystem hopper = new HopperSystem();
 
     private final SendableChooser<Command> autoChooser;
 
@@ -156,6 +155,11 @@ public class RobotContainer {
         driverController.y().toggleOnTrue(intake.retractIntake());
         driverController.rightBumper().toggleOnTrue(intake.setRoller(1));
 
+        ////////////////////////////////////////////////////////
+        /// HOPPER COMMANDS
+        ///////////////////////////////////////////////////////
+        hopper.setDefaultCommand(hopper.setDefault());
+        driverController.leftBumper().toggleOnTrue(hopper.setRoller(1));
 
     }
 

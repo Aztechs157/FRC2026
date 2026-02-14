@@ -61,15 +61,9 @@ public final class Constants {
     public static final int ROLLER_MOTOR_ID = 15;
   }
 
-  public static class UptakeConstants {
-    public static final int MOTOR_ID = 17;
-    public static final MechanismGearing GEARING = null;
-    public static final double FORWARD_SPEED = 0.157; //TODO: find correct value
-    public static final double REVERSE_SPEED = -0.157; //TODO: find correct value
-  }
-
   public static class HopperConstants {
-    public static final int MOTOR_ID = 67; // TODO: fill in actual id here
+    public static final int MOTOR_ID = 16;
+    public static final double CURRENT_LIMIT = 40;
   }
 
   public static class TurretConstants {
