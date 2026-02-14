@@ -28,7 +28,7 @@ import org.team157.robot.Constants.UptakeConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.DriveSystem;
 import org.team157.robot.subsystems.FlywheelSystem;
-
+import org.team157.robot.subsystems.IntakeSystem;
 import org.team157.robot.subsystems.TurretSystem;
 import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
@@ -53,6 +53,7 @@ public class RobotContainer {
     public final FlywheelSystem flywheelSystem = new FlywheelSystem();
     public final TurretSystem turret = new TurretSystem();
     public final UptakeSystem uptake = new UptakeSystem();
+    public final IntakeSystem intake = new IntakeSystem();
 
     private final SendableChooser<Command> autoChooser;
 
@@ -143,27 +144,21 @@ public class RobotContainer {
         ////////////////////////////////////////////////////////
         /// FLYWHEEL COMMANDS
         ///////////////////////////////////////////////////////
-        
         flywheelSystem.setDefaultCommand(flywheelSystem.set(0));
 
         driverController.rightTrigger().whileTrue(flywheelSystem.setVelocity(RPM.of(60)));
 
-        ////////////////////////////////////////////////////
-        /// UPTAKE COMMANDS
-        ///////////////////////////////////////////////////
-        uptake.setDefaultCommand(uptake.set(0));
+        ////////////////////////////////////////////////////////
+        /// INTAKE COMMANDS
+        ///////////////////////////////////////////////////////
+        intake.setDefaultCommand(intake.setDefault());
+        driverController.a().toggleOnTrue(intake.deployIntake());
+        driverController.y().toggleOnTrue(intake.retractIntake());
+        driverController.rightBumper().toggleOnTrue(intake.setRoller(1));
 
-        driverController.a().toggleOnTrue(uptake.set(UptakeConstants.FORWARD_SPEED));
-        driverController.y().toggleOnTrue(uptake.set(UptakeConstants.REVERSE_SPEED));
-
-
-        ////////////////////////////////////////////////////
-        /// HOPPER COMMANDS
-        ///////////////////////////////////////////////////
-        uptake.setDefaultCommand(uptake.set(0));
-        //TODO: add button bindings here
 
     }
+
 
     public double modifySpeed(final double speed) {
         final var modifier = 1 - driverController.getRightTriggerAxis() * ModifierConstants.PRECISION_DRIVE_MODIFIER;

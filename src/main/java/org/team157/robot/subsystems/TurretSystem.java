@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import org.team157.robot.Constants;
 import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.utilities.PosUtils;
@@ -43,7 +44,7 @@ import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class TurretSystem extends SubsystemBase {
-  private TalonFX motor = new TalonFX(TurretConstants.MOTOR_ID, TunerConstants.kCANBus);
+  private TalonFX motor = new TalonFX(TurretConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
   private DutyCycleEncoder encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
 
   // Configure the turret motor controller for use with YAMS.
@@ -128,7 +129,7 @@ public class TurretSystem extends SubsystemBase {
    * @return The position of the turret scaled from 0 to 1.
    */
   public double getScaledPos() {
-    return PosUtils.mapRange(getPos(), TurretConstants.MIN_POSITION, TurretConstants.MAX_POSITION, 0.0,
+    return PosUtils.mapRange(getPos(), TurretConstants.MIN_ENCODER_POSITION, TurretConstants.MAX_ENCODER_POSITION, 0.0,
         1.0);
   }
 
@@ -144,7 +145,7 @@ public class TurretSystem extends SubsystemBase {
    * @return The angle of the turret, in degrees, from -135 to 135, using the encoder directly.
    */
   public double getScaledPosAngleEncoder() {
-    return PosUtils.mapRange(getPos(), TurretConstants.MIN_POSITION, TurretConstants.MAX_POSITION, -135,
+    return PosUtils.mapRange(getPos(), TurretConstants.MIN_ENCODER_POSITION, TurretConstants.MAX_ENCODER_POSITION, -135,
         135);
   }
 
