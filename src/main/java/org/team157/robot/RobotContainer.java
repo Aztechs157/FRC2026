@@ -107,9 +107,9 @@ public class RobotContainer {
         );
 
         driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
-        // driverController.a().whileTrue(drivetrain.applyRequest(() ->
-        //     point.withModuleDirection(new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX()))
-        // ));
+        driverController.a().whileTrue(drivetrain.applyRequest(() ->
+            point.withModuleDirection(new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX()))
+        ));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -126,16 +126,16 @@ public class RobotContainer {
         ////////////////////////////////////////////////////
         /// TURRET COMMANDS
         ///////////////////////////////////////////////////
-        turret.setDefaultCommand(turret.set(0));
+        // turret.setDefaultCommand(turret.set(0));
 
-        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-30)));
-        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(70)));
-        driverController.povLeft().whileTrue(turret.set(-0.1));
-        driverController.povRight().whileTrue(turret.set(0.1));
-        driverController.povCenter().whileTrue(turret.set(0));
+        // driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-30)));
+        // driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(70)));
+        // driverController.povLeft().whileTrue(turret.set(-1));
+        // driverController.povRight().whileTrue(turret.set(1));
+        // driverController.x().whileTrue(turret.set(0));
 
-        driverController.y().toggleOnTrue(turret.trackHubTag());
-        driverController.x().toggleOnTrue(turret.trackTagGlobalRelative());
+        // driverController.y().toggleOnTrue(turret.trackHubTag());
+        // driverController.rightBumper().toggleOnTrue(turret.trackTagGlobalRelative());
 
         drivetrain.registerTelemetry(logger::telemeterize);
         

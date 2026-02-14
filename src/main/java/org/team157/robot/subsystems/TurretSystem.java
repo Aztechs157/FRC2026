@@ -17,6 +17,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Supplier;
 
+import org.team157.robot.Constants;
 import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.utilities.PosUtils;
@@ -51,103 +52,106 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class TurretSystem extends SubsystemBase {
   private VisionSystem visionSystem;
-  private TalonFX motor = new TalonFX(TurretConstants.MOTOR_ID, TunerConstants.kCANBus);
+  // private TalonFX motor = new TalonFX(TurretConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
   private DutyCycleEncoder encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
   public Angle trackingAngle = Degrees.of(0);
 
-  // Configure the turret motor controller for use with YAMS.
-  private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
-      .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, DegreesPerSecond.of(TurretConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(TurretConstants.ANGULAR_ACCELERATION))
-      .withIdleMode(MotorMode.BRAKE)
-      .withMotorInverted(false)
-      .withGearing(TurretConstants.GEARING)
-      .withTelemetry("Turret Motor", TelemetryVerbosity.HIGH) 
-      .withStatorCurrentLimit(Amps.of(TurretConstants.CURRENT_LIMIT))
-      .withClosedLoopRampRate(Seconds.of(TurretConstants.RAMP_RATE))
-      .withSoftLimit(Degrees.of(TurretConstants.LOWER_SOFT_LIMIT), Degrees.of(TurretConstants.UPPER_SOFT_LIMIT));
+  private double lastTrackedPos = 0;
+  private int wrapped = 0;
 
-  // Create the turret's motor controller with the above configuration.
-  private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), turretMotorConfig);
+  // // Configure the turret motor controller for use with YAMS.
+  // private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
+  //     .withControlMode(ControlMode.CLOSED_LOOP)
+  //     .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, DegreesPerSecond.of(TurretConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(TurretConstants.ANGULAR_ACCELERATION))
+  //     .withIdleMode(MotorMode.BRAKE)
+  //     .withMotorInverted(false)
+  //     .withGearing(TurretConstants.GEARING)
+  //     .withTelemetry("Turret Motor", TelemetryVerbosity.HIGH) 
+  //     .withStatorCurrentLimit(Amps.of(TurretConstants.CURRENT_LIMIT))
+  //     .withClosedLoopRampRate(Seconds.of(TurretConstants.RAMP_RATE))
+  //     .withSoftLimit(Degrees.of(TurretConstants.LOWER_SOFT_LIMIT), Degrees.of(TurretConstants.UPPER_SOFT_LIMIT));
 
-  // Configure the physical characteristics of the turret.
-  private PivotConfig turretConfig = new PivotConfig(smartMotor)
-      .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
-      .withHardLimit(Degrees.of(TurretConstants.LOWER_HARD_LIMIT), Degrees.of(TurretConstants.UPPER_HARD_LIMIT))
-      .withTelemetry("Turret", TelemetryVerbosity.HIGH)
-      .withMOI(Meters.of(0.1), Kilograms.of(4));
+  // // Create the turret's motor controller with the above configuration.
+  // private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), turretMotorConfig);
+
+  // // Configure the physical characteristics of the turret.
+  // private PivotConfig turretConfig = new PivotConfig(smartMotor)
+  //     .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
+  //     .withHardLimit(Degrees.of(TurretConstants.LOWER_HARD_LIMIT), Degrees.of(TurretConstants.UPPER_HARD_LIMIT))
+  //     .withTelemetry("Turret", TelemetryVerbosity.HIGH)
+  //     .withMOI(Meters.of(0.1), Kilograms.of(4));
 
   // Create the turret pivot system with the above configuration.
-  private Pivot turret = new Pivot(turretConfig);
+  // private Pivot turret = new Pivot(turretConfig);
 
   /** Creates a new TurretSystem. */
   public TurretSystem(VisionSystem visionSystem) {
     this.visionSystem = visionSystem;
-    var configurator = motor.getConfigurator();
-    configurator.refresh(new SoftwareLimitSwitchConfigs().withForwardSoftLimitEnable(true).withReverseSoftLimitEnable(true));
-    configurator.refresh(new ClosedLoopGeneralConfigs().withContinuousWrap(false));
+    // var configurator = motor.getConfigurator();
+    // configurator.refresh(new SoftwareLimitSwitchConfigs().withForwardSoftLimitEnable(true).withReverseSoftLimitEnable(true));
+    // configurator.refresh(new ClosedLoopGeneralConfigs().withContinuousWrap(false));
   }
   
      //////////////////////
    /// TURRET COMMANDS ///
   //////////////////////
   
-  /**
-   * Set the target angle of the turret.
-   * @param angle Angle to go to.
-   */
-  public Command setAngle(Angle angle) { 
-    return turret.setAngle(angle);
-  }
+  // /**
+  //  * Set the target angle of the turret.
+  //  * @param angle Angle to go to.
+  //  */
+  // public Command setAngle(Angle angle) { 
+  //   return turret.setAngle(angle);
+  // }
 
-    /**
-   * Set the target angle of the turret.
-   * @param angle A supplier to obtain the desired angle to go to.
-   */
-  public Command setAngle(Supplier<Angle> angle) { 
-    return turret.setAngle(angle);
-  }
+  //   /**
+  //  * Set the target angle of the turret.
+  //  * @param angle A supplier to obtain the desired angle to go to.
+  //  */
+  // public Command setAngle(Supplier<Angle> angle) { 
+  //   return turret.setAngle(angle);
+  // }
 
   
-  /**
-   * Move the arm up and down.
-   * @param dutycycle [-1, 1] speed to set the arm too.
-   */
-  public Command set(double dutycycle) { 
-    return turret.set(dutycycle);
-  }
+  // /**
+  //  * Move the arm up and down.
+  //  * @param dutycycle [-1, 1] speed to set the arm too.
+  //  */
+  // public Command set(double dutycycle) { 
+  //   return turret.set(dutycycle);
+  // }
 
-  /**
-   * Run sysId on the {@link TurretSystem}.
-   * To be used for tuning
-   */
-  public Command sysId() { 
-    return turret.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
-  }
-  /**
-   * Track the hub tag using the turret's camera.
-   * @return Command either setting the turret angle to face the tag, or setting the turret power to 0 if the tag isn't present.
-   */
-  public Command trackHubTag() {
-    return turret.setAngle(this::getAngleToHubFaceTag);
-  }
+  // /**
+  //  * Run sysId on the {@link TurretSystem}.
+  //  * To be used for tuning
+  //  */
+  // public Command sysId() { 
+  //   return turret.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
+  // }
+  // /**
+  //  * Track the hub tag using the turret's camera.
+  //  * @return Command either setting the turret angle to face the tag, or setting the turret power to 0 if the tag isn't present.
+  //  */
+  // public Command trackHubTag() {
+  //   return turret.setAngle(this::getAngleToHubFaceTag);
+  // }
 
-  public Command trackTagGlobalRelative() {
-    return turret.setAngle(this::getTrackingAngle);
-  }
+  // public Command trackTagGlobalRelative() {
+  //   return turret.setAngle(this::getTrackingAngle);
+  // }
 
-     /////////////////////
-   /// TURRET METHODS ///
-  /////////////////////
+  //    /////////////////////
+  //  /// TURRET METHODS ///
+  // /////////////////////
 
-  /**
-   * Set the duty cycle output of the turret motor.
-   * Primarily used for manual control
-   * @param power The power to be applied to the motor.
-   */
-  public void runMotor(double power) {
-    smartMotor.setDutyCycle(power);
-  }
+  // /**
+  //  * Set the duty cycle output of the turret motor.
+  //  * Primarily used for manual control
+  //  * @param power The power to be applied to the motor.
+  //  */
+  // public void runMotor(double power) {
+  //   smartMotor.setDutyCycle(power);
+  // }
 
   /**
    * Get the raw position of the turret's encoder.
@@ -166,64 +170,74 @@ public class TurretSystem extends SubsystemBase {
    * @return The position of the turret scaled from 0 to 1.
    */
   public double getScaledPos() {
-    return PosUtils.mapRange(getPos(), TurretConstants.MIN_POSITION, TurretConstants.MAX_POSITION, 0.0,
-        1.0);
+    if (lastTrackedPos > 1 && getPos() > 0.9 || lastTrackedPos < 1 && getPos() < 0.1) {
+      wrapped = 0;
+    }
+    if (wrapped == 0) {
+      wrapped = lastTrackedPos > 0.9 && getPos() < 0.1 ? 1 : lastTrackedPos < 0.1 && getPos() > 0.9 ? -1 : 0;
+    }
+
+    return PosUtils.mapRange(getPos() + wrapped, TurretConstants.MIN_ENCODER_POSITION, TurretConstants.MAX_ENCODER_POSITION, TurretConstants.MIN_ANGLE,
+        TurretConstants.MAX_ANGLE);
   }
+
+  // encoder 0 = -92 deg
+  // 0.1 = -60
+  // 0.12 = -20
 
   /**
    * Get the current angle of the turret, based on the YAMS pivot system.
    * @return The angle of the turret, in degrees, from -180 to 180, using the YAMS pivot system.
    */
-  public double getScaledPosAngleYAMS() {
-    return turret.getAngle().in(Degrees);
-  }
+  // public double getScaledPosAngleYAMS() {
+  //   return turret.getAngle().in(Degrees);
+  // }
   /**
    * Get the current angle of the turret, directly from the encoder value.
    * @return The angle of the turret, in degrees, from -135 to 135, using the encoder directly.
    */
   public double getScaledPosAngleEncoder() {
-    return PosUtils.mapRange(getPos(), TurretConstants.MIN_POSITION, TurretConstants.MAX_POSITION, -135,
-        135);
+    return PosUtils.mapRange(getScaledPos(), TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE, -67, 395);
   }
 
   /**
    * Get the current velocity of the turret.
    * @return The velocity of the turret, in degrees per second.
    */
-  public double getVelocity() {
-    return smartMotor.getMechanismVelocity().in(DegreesPerSecond);
-  }
+  // public double getVelocity() {
+  //   return smartMotor.getMechanismVelocity().in(DegreesPerSecond);
+  // }
 
   /**
    * Calculate the angle the turret needs to turn to face the target tag.
    * @return The angle the turret needs to rotate to to face the target tag.
    */
-  public Angle getAngleToHubFaceTag(){
-    // The current angular offset of the tag, relative to the turret camera.
-    double tagYaw = visionSystem.getHubTagYawFromTurretCam();
-    SmartDashboard.putNumber("Target Yaw", tagYaw);
-    // if the target tag is seen, at an arbitrary number indicating no target,
-    if(tagYaw != 157357){
-      // Subtract the camera-to-tag angle from the turret angle
-      // to find our new setpoint angle to face the tag.
-      double finalAngle = getScaledPosAngleYAMS() - tagYaw;
-      return Degrees.of(finalAngle);
-    } else {
-      // If no tag seen, don't move turret.
-      return Degrees.of(getScaledPosAngleYAMS());
-    }
-  }
+  // public Angle getAngleToHubFaceTag(){
+  //   // The current angular offset of the tag, relative to the turret camera.
+  //   double tagYaw = visionSystem.getHubTagYawFromTurretCam();
+  //   SmartDashboard.putNumber("Target Yaw", tagYaw);
+  //   // if the target tag is seen, at an arbitrary number indicating no target,
+  //   if(tagYaw != 157357){
+  //     // Subtract the camera-to-tag angle from the turret angle
+  //     // to find our new setpoint angle to face the tag.
+  //     double finalAngle = getScaledPosAngleYAMS() - tagYaw;
+  //     return Degrees.of(finalAngle);
+  //   } else {
+  //     // If no tag seen, don't move turret.
+  //     return Degrees.of(getScaledPosAngleYAMS());
+  //   }
+  // }
 
   /**
    * Calculate the angle the turret needs to turn to face the target tag.
    * @return The angle the turret needs to rotate to to face the target tag.
    */
-  public void updateRelativeAngleToTag(int tagID, Pose2d robotPose){
-    // The current angular offset of the tag, relative to the turret camera.
-    visionSystem.setTargetParams(tagID, robotPose);
-    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 90;
-    trackingAngle = Degrees.of(turretToRobotAngleOffset);
-  }
+  // public void updateRelativeAngleToTag(int tagID, Pose2d robotPose){
+  //   // The current angular offset of the tag, relative to the turret camera.
+  //   visionSystem.setTargetParams(tagID, robotPose);
+  //   double turretToRobotAngleOffset = VisionSystem.angleToTarget + 90;
+  //   trackingAngle = Degrees.of(turretToRobotAngleOffset);
+  // }
 
   /**
    * Calculate the angle the turret needs to turn to face the target tag.
@@ -237,7 +251,6 @@ public class TurretSystem extends SubsystemBase {
     trackingAngle = Degrees.of(turretToRobotAngleOffset);
   }
 
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -248,16 +261,17 @@ public class TurretSystem extends SubsystemBase {
      */
     SmartDashboard.putNumber("Turret Pos", getPos());
     SmartDashboard.putNumber("Scaled Turret Pos", getScaledPos());
-    SmartDashboard.putNumber("Turret Angle (YAMS)", getScaledPosAngleYAMS());
+    // SmartDashboard.putNumber("Turret Angle (YAMS)", getScaledPosAngleYAMS());
     SmartDashboard.putNumber("Turret Angle (Encoder)", getScaledPosAngleEncoder());
     SmartDashboard.putNumber("where me going", trackingAngle.magnitude());
-    turret.updateTelemetry();
+    // turret.updateTelemetry();
+    lastTrackedPos = getScaledPos();
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
     // Updates the turret simulation's values,
-    turret.simIterate();
+    // turret.simIterate();
   }
 }
