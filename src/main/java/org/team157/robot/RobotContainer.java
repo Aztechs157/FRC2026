@@ -30,6 +30,7 @@ import org.team157.robot.subsystems.FlywheelSystem;
 import org.team157.robot.subsystems.HopperSystem;
 import org.team157.robot.subsystems.IntakeSystem;
 import org.team157.robot.subsystems.TurretSystem;
+import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
 
 public class RobotContainer {
@@ -53,6 +54,7 @@ public class RobotContainer {
     public final TurretSystem turret = new TurretSystem();
     public final IntakeSystem intake = new IntakeSystem();
     public final HopperSystem hopper = new HopperSystem();
+    public final UptakeSystem uptake = new UptakeSystem();
 
     private final SendableChooser<Command> autoChooser;
 
@@ -159,7 +161,12 @@ public class RobotContainer {
         /// HOPPER COMMANDS
         ///////////////////////////////////////////////////////
         hopper.setDefaultCommand(hopper.setDefault());
-        driverController.leftBumper().toggleOnTrue(hopper.setRoller(1));
+        driverController.leftBumper().toggleOnTrue(hopper.setRoller(1).alongWith(uptake.setRoller(1)));
+
+        ////////////////////////////////////////////////////////
+        /// UPTAKE COMMANDS
+        ///////////////////////////////////////////////////////
+        uptake.setDefaultCommand(uptake.setDefault());
 
     }
 

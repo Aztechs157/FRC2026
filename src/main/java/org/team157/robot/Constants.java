@@ -66,6 +66,11 @@ public final class Constants {
     public static final double CURRENT_LIMIT = 40;
   }
 
+  public static class UptakeConstants {
+    public static final int MOTOR_ID = 17;
+    public static final double CURRENT_LIMIT = 40;
+  }
+
   public static class TurretConstants {
     public static final int MOTOR_ID = 18;
     public static final int ENCODER_ID = 0;
