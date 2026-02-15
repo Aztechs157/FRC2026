@@ -27,8 +27,10 @@ import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.DriveSystem;
 import org.team157.robot.subsystems.FlywheelSystem;
-
+import org.team157.robot.subsystems.HopperSystem;
+import org.team157.robot.subsystems.IntakeSystem;
 import org.team157.robot.subsystems.TurretSystem;
+import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
 
 public class RobotContainer {
@@ -50,6 +52,9 @@ public class RobotContainer {
 
     public final FlywheelSystem flywheelSystem = new FlywheelSystem();
     public final TurretSystem turret = new TurretSystem();
+    public final IntakeSystem intake = new IntakeSystem();
+    public final HopperSystem hopper = new HopperSystem();
+    public final UptakeSystem uptake = new UptakeSystem();
 
     private final SendableChooser<Command> autoChooser;
 
@@ -112,7 +117,6 @@ public class RobotContainer {
 
         driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
 
-
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
         driverController.back().and(driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
@@ -141,12 +145,31 @@ public class RobotContainer {
         ////////////////////////////////////////////////////////
         /// FLYWHEEL COMMANDS
         ///////////////////////////////////////////////////////
-        
         flywheelSystem.setDefaultCommand(flywheelSystem.set(0));
 
-        driverController.y().whileTrue(flywheelSystem.setVelocity(RPM.of(127)));
-        driverController.a().whileTrue(flywheelSystem.setDynamicVelocity());
-    } 
+        driverController.rightTrigger().whileTrue(flywheelSystem.setVelocity(RPM.of(60)));
+
+        ////////////////////////////////////////////////////////
+        /// INTAKE COMMANDS
+        ///////////////////////////////////////////////////////
+        intake.setDefaultCommand(intake.setDefault());
+        driverController.a().toggleOnTrue(intake.deployIntake());
+        driverController.y().toggleOnTrue(intake.retractIntake());
+        driverController.rightBumper().toggleOnTrue(intake.setRoller(1));
+
+        ////////////////////////////////////////////////////////
+        /// HOPPER COMMANDS
+        ///////////////////////////////////////////////////////
+        hopper.setDefaultCommand(hopper.setDefault());
+        driverController.leftBumper().toggleOnTrue(hopper.setRoller(1).alongWith(uptake.setRoller(1)));
+
+        ////////////////////////////////////////////////////////
+        /// UPTAKE COMMANDS
+        ///////////////////////////////////////////////////////
+        uptake.setDefaultCommand(uptake.setDefault());
+
+    }
+
 
     public double modifySpeed(final double speed) {
         final var modifier = 1 - driverController.getRightTriggerAxis() * ModifierConstants.PRECISION_DRIVE_MODIFIER;
