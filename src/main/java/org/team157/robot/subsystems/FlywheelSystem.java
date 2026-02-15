@@ -5,10 +5,8 @@
 package org.team157.robot.subsystems;
 // import the stuff 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
@@ -16,8 +14,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Seconds;
-
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
@@ -33,7 +29,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import yams.mechanisms.SmartMechanism;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorControllerConfig;
@@ -67,8 +62,6 @@ public class FlywheelSystem extends SubsystemBase {
     .withIdleMode(MotorMode.COAST)
     .withStatorCurrentLimit(Amps.of(40))
     .withFollowers(Pair.of(motor_follower, false));
-    // vendor motor controller object
-
 
   private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX60(1),flywheelSystemConfig);
  // private SmartMotorController smartMotorFollower = new TalonFXWrapper(motor_follower, DCMotor.getKrakenX60(1),flywheelSystemConfig);
@@ -101,8 +94,8 @@ public class FlywheelSystem extends SubsystemBase {
     }
 
   public void setShotParams(double height, double distance) {
-    double lowerBound = HoodConstants.SOFT_MIN_ANGLE;
-    double upperBound = HoodConstants.SOFT_MAX_ANGLE;
+    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT;
+    double upperBound = HoodConstants.UPPER_SOFT_LIMIT;
     double steps = 1000;
     double stepSize = (upperBound - lowerBound) / steps;
     
@@ -127,8 +120,8 @@ public class FlywheelSystem extends SubsystemBase {
   }
 
     public void setBETTERShotParams(double height, double distance) {
-    double lowerBound = HoodConstants.SOFT_MIN_ANGLE;
-    double upperBound = HoodConstants.SOFT_MAX_ANGLE;
+    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT;
+    double upperBound = HoodConstants.UPPER_SOFT_LIMIT;
     double steps = 1000;
     double stepSize = (upperBound - lowerBound) / steps;
     

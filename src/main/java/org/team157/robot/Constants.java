@@ -88,6 +88,8 @@ public final class Constants {
   public static class HoodConstants {
     public static final int MOTOR_ID = 19;
     public static final int ENCODER_ID = 2;
+    public static final double LOWER_SOFT_LIMIT = 0, UPPER_SOFT_LIMIT = 78;
+    public static final double LOWER_HARD_LIMIT = 0, UPPER_HARD_LIMIT = 78;
   }
   
   public static class FlywheelConstants {
