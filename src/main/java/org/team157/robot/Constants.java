@@ -61,8 +61,14 @@ public final class Constants {
     public static final int ROLLER_MOTOR_ID = 15;
   }
 
+  public static class HopperConstants {
+    public static final int MOTOR_ID = 16;
+    public static final double CURRENT_LIMIT = 40;
+  }
+
   public static class UptakeConstants {
     public static final int MOTOR_ID = 17;
+    public static final double CURRENT_LIMIT = 40;
   }
 
   public static class TurretConstants {
