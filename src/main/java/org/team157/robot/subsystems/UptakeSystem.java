@@ -5,6 +5,9 @@
 package org.team157.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Kilograms;
+
 import org.team157.robot.Constants;
 import org.team157.robot.Constants.UptakeConstants;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -40,7 +43,9 @@ public class UptakeSystem extends SubsystemBase {
   private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX44(1), uptakeRollerMotorConfig);
 
   private final FlyWheelConfig uptakeRollerConfig = new FlyWheelConfig(smartRollerMotor)
-  .withTelemetry("Uptake", TelemetryVerbosity.HIGH);
+  .withTelemetry("Uptake", TelemetryVerbosity.HIGH)
+  .withMass(Kilograms.of(0.5)) //TODO: measure mass of the uptake roller and update this constant
+  .withDiameter(Inches.of(2));
 
   // flywheel mechanism
   private FlyWheel uptakeRollers = new FlyWheel(uptakeRollerConfig);

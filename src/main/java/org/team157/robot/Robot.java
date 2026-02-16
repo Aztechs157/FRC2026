@@ -100,14 +100,15 @@ public class Robot extends TimedRobot {
       // turret base 
       m_robotContainer.turret.getBasePose(), 
       // turret hood
-      // TODO: put this on hood system once it exists
+      m_robotContainer.turret.getBasePose()
+      .transformBy(m_robotContainer.turret.getHoodPivotLocation()),
+
+
       // m_robotContainer.hood.getHoodPose(),
       // intake pivot
-      // TODO: put this on intake system once it exists
-      // m_robotContainer.intake.getIntakePivotPose(), 
+      m_robotContainer.intake.getIntakePivotPose(), 
       // hopper walls
-      // TODO: put this on intake system once it exists
-      // m_robotContainer.intake.getHopperWallsPose() 
+      m_robotContainer.intake.getHopperWallsPose() 
     };
     finalPoses.set(finalArray);
   }

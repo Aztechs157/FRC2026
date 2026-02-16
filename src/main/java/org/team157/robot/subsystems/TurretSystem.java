@@ -18,6 +18,7 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.function.Supplier;
 
 import org.team157.robot.Constants;
+import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.utilities.PosUtils;
@@ -28,6 +29,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
@@ -60,6 +63,7 @@ public class TurretSystem extends SubsystemBase {
   private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
       .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, DegreesPerSecond.of(TurretConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(TurretConstants.ANGULAR_ACCELERATION))
+      .withSimClosedLoopController(10, 0, 0, DegreesPerSecond.of(TurretConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(TurretConstants.ANGULAR_ACCELERATION)) //TODO: tune this PID for the simulation  
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(false)
       .withGearing(TurretConstants.GEARING)
@@ -262,7 +266,10 @@ public class TurretSystem extends SubsystemBase {
   }
 
   public Pose3d getBasePose() {
-	// TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getBasePose'");
+    return new Pose3d(ModelConstants.ORIGIN_TO_TURRET_BASE_OFFSET, new Rotation3d(0, 0, Math.toRadians(getScaledPosAngleYAMS())));
   }
+  public Transform3d getHoodPivotLocation() {
+    return new Transform3d(0.1245 * Math.cos(Math.toRadians(getScaledPosAngleYAMS())), 0.1245 * Math.sin(Math.toRadians(getScaledPosAngleYAMS())), 0.070, new Rotation3d());
+  }
+
 }

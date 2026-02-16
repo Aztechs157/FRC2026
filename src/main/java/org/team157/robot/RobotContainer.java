@@ -56,6 +56,7 @@ public class RobotContainer {
 
     public final VisionSystem visionSystem;
     public final TurretSystem turret;
+    public final HoodSystem hood = new HoodSystem();
     public final IntakeSystem intake = new IntakeSystem();
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
@@ -132,11 +133,11 @@ public class RobotContainer {
 
         driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-30)));
         driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(70)));
-        driverController.povLeft().whileTrue(turret.set(-0.1));
-        driverController.povRight().whileTrue(turret.set(0.1));
-        driverController.x().whileTrue(turret.set(0));
+        driverController.povLeft().whileTrue(turret.set(-0.05));
+        driverController.povRight().whileTrue(turret.set(0.05));
+        // driverController.x().whileTrue(turret.set(0));
 
-        driverController.y().toggleOnTrue(turret.trackHubTag());
+        // driverController.y().toggleOnTrue(turret.trackHubTag());
         driverController.rightBumper().toggleOnTrue(turret.trackTagGlobalRelative());
 
         drivetrain.registerTelemetry(logger::telemeterize);
@@ -154,7 +155,7 @@ public class RobotContainer {
         intake.setDefaultCommand(intake.setDefault());
         driverController.a().toggleOnTrue(intake.deployIntake());
         driverController.y().toggleOnTrue(intake.retractIntake());
-        driverController.rightBumper().toggleOnTrue(intake.setRoller(1));
+        // driverController.rightBumper().toggleOnTrue(intake.setRoller(1));
 
         ////////////////////////////////////////////////////////
         /// HOPPER COMMANDS

@@ -53,9 +53,9 @@ public final class Constants {
     public static final double KP = 157, KI = 0, KD = 0;
     public static final double ANGULAR_VELOCITY = 360, ANGULAR_ACCELERATION = 520;
     public static final double MIN_ENCODER_POSITION = 0.0157, MAX_ENCODER_POSITION = 0.9157;
-    public static final double MIN_ANGLE = 0, MAX_ANGLE = 80;
+    public static final double MIN_ANGLE = -0, MAX_ANGLE = 80;
     public static final double LOWER_SOFT_LIMIT = 0, UPPER_SOFT_LIMIT = 78;
-    public static final double LOWER_HARD_LIMIT = 0, UPPER_HARD_LIMIT = 78;
+    public static final double LOWER_HARD_LIMIT = -5, UPPER_HARD_LIMIT = 85;
     public static final double CURRENT_LIMIT = 40;
     public static final double RAMP_RATE = 0.00157;
 
@@ -158,5 +158,9 @@ public final class Constants {
 
   }
 
-
+  public static class ModelConstants {
+    public static final Translation3d ORIGIN_TO_TURRET_BASE_OFFSET = new Translation3d(-0.171, 0, 0.460);
+    public static final Translation3d ORIGIN_TO_HOOD_PIVOT_POINT_OFFSET = new Translation3d(-0.0465, 0, 0.530);
+    public static final Translation3d ORIGIN_TO_INTAKE_PIVOT_POINT_OFFSET = new Translation3d(0.146050, 0, 0.197803);
+  }
 }
