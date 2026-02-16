@@ -7,26 +7,28 @@ package org.team157.robot.subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Feet;
+import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Seconds;
-
+import static edu.wpi.first.units.Units.Radians;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import yams.motorcontrollers.SmartMotorController;
 
 
 import org.team157.robot.Constants.FlywheelConstants;
+import org.team157.robot.Constants.HoodConstants;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import yams.mechanisms.SmartMechanism;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorControllerConfig;
@@ -39,8 +41,8 @@ public class FlywheelSystem extends SubsystemBase {
 
   private TalonFX motor  = new TalonFX(FlywheelConstants.MOTOR_ID);
   private static TalonFX motor_follower = new TalonFX(FlywheelConstants.MOTOR_ID_FOLLOWER);
-
-
+  public double ballVelocity = 0; //Feet per Second for the ball to be launched
+  public Angle azimuth = Radians.of(0);
 
   private SmartMotorControllerConfig flywheelSystemConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.CLOSED_LOOP)
@@ -60,8 +62,6 @@ public class FlywheelSystem extends SubsystemBase {
     .withIdleMode(MotorMode.COAST)
     .withStatorCurrentLimit(Amps.of(40))
     .withFollowers(Pair.of(motor_follower, false));
-    // vendor motor controller object
-
 
   private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX60(1),flywheelSystemConfig);
  // private SmartMotorController smartMotorFollower = new TalonFXWrapper(motor_follower, DCMotor.getKrakenX60(1),flywheelSystemConfig);
@@ -88,12 +88,91 @@ public class FlywheelSystem extends SubsystemBase {
      */
   public AngularVelocity getVelocity() {return flyWheel.getSpeed();}
 
+  // Function to minimize: 
+  double velocityFunction(double distance, double height, double theta) {
+        return distance / Math.cos(theta) * (Math.sqrt(16 / (distance * Math.tan(theta) - (height - FlywheelConstants.HEIGHT))));
+    }
+
+  public void setShotParams(double height, double distance) {
+    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT;
+    double upperBound = HoodConstants.UPPER_SOFT_LIMIT;
+    double steps = 1000;
+    double stepSize = (upperBound - lowerBound) / steps;
+    
+    double theta = lowerBound;
+    double velocity = velocityFunction(distance, height, Math.toRadians(lowerBound));
+
+    System.out.println("Starting optimization with initial velocity: " + velocity);
+
+    for (int i = 1; i <= steps; i++) {
+        double x = lowerBound + i * stepSize;
+        double y = velocityFunction(distance, height, Math.toRadians(x));
+        if (y < velocity) {
+            velocity = y;
+            theta = x;
+        }
+    }
+    System.out.println("Min found at x = " + theta + ", f(x) = " + velocity);
+    ballVelocity = velocity;
+    azimuth = Radians.of(theta);
+    System.out.println("Ball Velocity: " + ballVelocity);
+    System.out.println("Azimuth: " + azimuth);
+  }
+
+    public void setBETTERShotParams(double height, double distance) {
+    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT;
+    double upperBound = HoodConstants.UPPER_SOFT_LIMIT;
+    double steps = 1000;
+    double stepSize = (upperBound - lowerBound) / steps;
+    
+    double theta = lowerBound;
+    double velocity = velocityFunction(distance, height, lowerBound);
+    double previousVelocityDifference = -1;
+
+    for (int i = 1; i <= steps; i++) {
+        double x = lowerBound + i * stepSize;
+        double y = velocityFunction(distance, height, x);
+        double velocityDifference = Math.abs(ballVelocity - y);
+        if (previousVelocityDifference < 0 || (velocityDifference < previousVelocityDifference && x < 157)) {
+            previousVelocityDifference = velocityDifference;
+            velocity = y;
+            theta = x;
+        }
+    }
+    // System.out.println("Min found at x = " + theta + ", f(x) = " + velocity);
+    ballVelocity = velocity;
+    azimuth = Radians.of(theta);
+  }
+
+  public AngularVelocity getDesiredVelocity() {
+    setShotParams(0, 10);
+    //double desiredVelocity = 2 * ballVelocity / (FlywheelConstants.FLYWHEEL_DIAMETER / 12 * Math.PI) + lossFunction();
+    // double desiredVelocity = 2 * ballVelocity + lossFunction();
+    double desiredRPM = 60 / (Inches.of(FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters) * Math.PI) * FeetPerSecond.of(ballVelocity).in(MetersPerSecond);
+    System.out.println("Desired Ball Velocity (ft/sec): " + ballVelocity);
+    System.out.println("Desired Flywheel Velocity (rpm): " + desiredRPM);
+    return RPM.of(desiredRPM);
+  }
+
+  public double lossFunction() {
+    return 0 * azimuth.magnitude();
+  }
+
+  public Angle getAzimuth() {
+    return azimuth;
+  }
+
+  public Command setDynamicVelocity () {
+    return flyWheel.setSpeed(this::getDesiredVelocity);
+  }
+
   /**
    * set the shooter velocity
    * @param speed speed to set
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
   public Command setVelocity (AngularVelocity speed) {
+    System.out.println("Setting velocity to: " + speed);
     return flyWheel.setSpeed(speed); 
   }
 

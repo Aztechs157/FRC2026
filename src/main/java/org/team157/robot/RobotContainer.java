@@ -122,8 +122,6 @@ public class RobotContainer {
         driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-
-
         // Reset the field-centric heading on start button press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
         
@@ -149,7 +147,7 @@ public class RobotContainer {
         flywheel.setDefaultCommand(flywheel.set(0));
 
         driverController.rightTrigger().whileTrue(flywheel.setVelocity(RPM.of(60)));
-
+        driverController.leftTrigger().whileTrue(flywheel.setVelocity(RPM.of(300)));
         ////////////////////////////////////////////////////////
         /// INTAKE COMMANDS
         ///////////////////////////////////////////////////////
