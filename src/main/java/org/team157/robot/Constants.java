@@ -104,6 +104,11 @@ public final class Constants {
 
   }
 
+  public static class ClimberConstants {
+    public static final int MOTOR_ID = 6700;
+    
+  }
+
   public static class VisionConstants {
     public static final String FRONTLEFT_CAMERA_NICKNAME = "frontLeftCam";
     public static final Rotation3d FRONTLEFT_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(25));
