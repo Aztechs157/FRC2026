@@ -45,7 +45,6 @@ public class RobotContainer {
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-   public final VisionSystem visionSystem;
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -53,8 +52,10 @@ public class RobotContainer {
 
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
-    public final FlywheelSystem flywheelSystem = new FlywheelSystem();
-    public final TurretSystem turret = new TurretSystem();
+    public final FlywheelSystem flywheel = new FlywheelSystem();
+
+    public final VisionSystem visionSystem;
+    public final TurretSystem turret;
     public final IntakeSystem intake = new IntakeSystem();
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
@@ -145,9 +146,9 @@ public class RobotContainer {
         ////////////////////////////////////////////////////////
         /// FLYWHEEL COMMANDS
         ///////////////////////////////////////////////////////
-        flywheelSystem.setDefaultCommand(flywheelSystem.set(0));
+        flywheel.setDefaultCommand(flywheel.set(0));
 
-        driverController.rightTrigger().whileTrue(flywheelSystem.setVelocity(RPM.of(60)));
+        driverController.rightTrigger().whileTrue(flywheel.setVelocity(RPM.of(60)));
 
         ////////////////////////////////////////////////////////
         /// INTAKE COMMANDS

@@ -51,6 +51,7 @@ import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class TurretSystem extends SubsystemBase {
+  private final VisionSystem visionSystem;
   private TalonFX motor = new TalonFX(TurretConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
   private DutyCycleEncoder encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
   public Angle trackingAngle = Degrees.of(0);
