@@ -136,8 +136,8 @@ public class RobotContainer {
 
         driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-30)));
         driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(70)));
-        driverController.povLeft().whileTrue(turret.set(-0.1));
-        driverController.povRight().whileTrue(turret.set(0.1));
+        driverController.povLeft().whileTrue(turret.set(-0.5));
+        driverController.povRight().whileTrue(turret.set(0.5));
         driverController.x().whileTrue(turret.set(0));
 
         drivetrain.registerTelemetry(logger::telemeterize);
@@ -155,7 +155,7 @@ public class RobotContainer {
         intake.setDefaultCommand(intake.setDefault());
         driverController.a().toggleOnTrue(intake.deployIntake());
         driverController.y().toggleOnTrue(intake.retractIntake());
-        driverController.rightBumper().toggleOnTrue(intake.setRoller(1));
+        driverController.rightBumper().toggleOnTrue(intake.setRoller(0.75));
 
         ////////////////////////////////////////////////////////
         /// HOPPER COMMANDS

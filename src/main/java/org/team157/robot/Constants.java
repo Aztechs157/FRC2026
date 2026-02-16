@@ -45,20 +45,20 @@ public final class Constants {
 
   public static class IntakeConstants {
     // Pivot
-    public static final int PIVOT_MOTOR_ID = 14;
+    public static final int PIVOT_MOTOR_ID = 15;
     public static final int PIVOT_ENCODER_ID = 1;
     // public static final MechanismGearing PIVOT_GEARING = new MechanismGearing(GearBox.fromReductionStages(1, 95.83));
     public static final MechanismGearing PIVOT_GEARING = new MechanismGearing(GearBox.fromStages("23:1", "50:12"));
     public static final double KP = 157, KI = 0, KD = 0;
-    public static final double ANGULAR_VELOCITY = 360, ANGULAR_ACCELERATION = 520;
-    public static final double MIN_ENCODER_POSITION = 0.0157, MAX_ENCODER_POSITION = 0.9157;
+    public static final double ANGULAR_VELOCITY = 360, ANGULAR_ACCELERATION = 540;
+    public static final double MIN_ENCODER_POSITION = 0.037, MAX_ENCODER_POSITION = 0.9157;
     public static final double MIN_ANGLE = 0, MAX_ANGLE = 80;
-    public static final double LOWER_SOFT_LIMIT = 0, UPPER_SOFT_LIMIT = 78;
-    public static final double LOWER_HARD_LIMIT = 0, UPPER_HARD_LIMIT = 78;
+    public static final double LOWER_SOFT_LIMIT = 0, UPPER_SOFT_LIMIT = 80;
+    public static final double LOWER_HARD_LIMIT = 0, UPPER_HARD_LIMIT = 80;
     public static final double CURRENT_LIMIT = 40;
     public static final double RAMP_RATE = 0.00157;
 
-    public static final int ROLLER_MOTOR_ID = 15;
+    public static final int ROLLER_MOTOR_ID = 14;
   }
 
   public static class HopperConstants {

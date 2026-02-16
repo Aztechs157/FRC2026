@@ -51,7 +51,7 @@ public class IntakeSystem extends SubsystemBase {
     .withStatorCurrentLimit(Amps.of(40));
 
   // vendor motor controller object
-  private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX44(1), intakeRollerMotorConfig);
+  private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX60(1), intakeRollerMotorConfig);
 
   private final FlyWheelConfig intakeRollerConfig = new FlyWheelConfig(smartRollerMotor)
   .withTelemetry("Intake", TelemetryVerbosity.HIGH);
@@ -78,7 +78,7 @@ public class IntakeSystem extends SubsystemBase {
       .withClosedLoopRampRate(Seconds.of(IntakeConstants.RAMP_RATE));
 
   // Create the hood's motor controller with the above configuration.
-  private SmartMotorController smartIntakePivotMotor = new TalonFXWrapper(pivotMotor, DCMotor.getKrakenX60(1), intakePivotMotorConfig);
+  private SmartMotorController smartIntakePivotMotor = new TalonFXWrapper(pivotMotor, DCMotor.getKrakenX44(1), intakePivotMotorConfig);
 
   // Configure the physical characteristics of the hood.
   private PivotConfig intakePivotConfig = new PivotConfig(smartIntakePivotMotor)
@@ -115,7 +115,7 @@ public class IntakeSystem extends SubsystemBase {
   }
 
   public Command setAngleThenStop(Angle angle) {
-        return setAngle(angle).until(()->PosUtils.isOscillating(angle.in(Degrees), intakePivot.getAngle().in(Degrees), 3.0 , 0.0, 1.0));
+        return setAngle(angle).until(()->PosUtils.isOscillating(angle.in(Degrees), intakePivot.getAngle().in(Degrees), 2.0 , 0.0, 1.0));
 
   }
 
@@ -124,7 +124,7 @@ public class IntakeSystem extends SubsystemBase {
   }
 
   public Command retractIntake() {
-    return setAngleThenStop(Degrees.of(80));
+    return setAngleThenStop(Degrees.of(78));
   }
 
   /**
