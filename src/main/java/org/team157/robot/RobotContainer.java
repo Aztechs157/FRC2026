@@ -29,6 +29,7 @@ import org.team157.robot.subsystems.DriveSystem;
 import org.team157.robot.subsystems.FlywheelSystem;
 import org.team157.robot.subsystems.HopperSystem;
 import org.team157.robot.subsystems.IntakeSystem;
+import org.team157.robot.subsystems.HoodSystem;
 import org.team157.robot.subsystems.TurretSystem;
 import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
@@ -55,6 +56,7 @@ public class RobotContainer {
     public final IntakeSystem intake = new IntakeSystem();
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
+    public final HoodSystem hood = new HoodSystem();
 
     private final SendableChooser<Command> autoChooser;
 
@@ -153,8 +155,8 @@ public class RobotContainer {
         /// INTAKE COMMANDS
         ///////////////////////////////////////////////////////
         intake.setDefaultCommand(intake.setDefault());
-        driverController.a().toggleOnTrue(intake.deployIntake());
-        driverController.y().toggleOnTrue(intake.retractIntake());
+        //driverController.a().toggleOnTrue(intake.deployIntake());
+       // driverController.y().toggleOnTrue(intake.retractIntake());
         driverController.rightBumper().toggleOnTrue(intake.setRoller(0.75));
 
         ////////////////////////////////////////////////////////
@@ -167,6 +169,14 @@ public class RobotContainer {
         /// UPTAKE COMMANDS
         ///////////////////////////////////////////////////////
         uptake.setDefaultCommand(uptake.setDefault());
+
+
+        ////////////////////////////////////////////////////////
+        /// HOOD COMMANDS
+        ///////////////////////////////////////////////////////
+        hood.setDefaultCommand(hood.setDefault());
+        driverController.a().toggleOnTrue(hood.setAngle(Degrees.of(57)));
+        driverController.y().toggleOnTrue(hood.setAngle(Degrees.of(47)));
 
     }
 
