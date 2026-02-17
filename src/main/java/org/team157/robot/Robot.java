@@ -18,6 +18,8 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -100,8 +102,7 @@ public class Robot extends TimedRobot {
       // turret base 
       m_robotContainer.turret.getBasePose(), 
       // turret hood
-      m_robotContainer.turret.getBasePose()
-      .transformBy(m_robotContainer.turret.getHoodPivotLocation()),
+      m_robotContainer.turret.getHoodPivotPose(new Transform3d(0,0,0, new Rotation3d(0, Math.toRadians(40), 0))),
 
 
       // m_robotContainer.hood.getHoodPose(),

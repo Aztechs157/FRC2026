@@ -268,8 +268,15 @@ public class TurretSystem extends SubsystemBase {
   public Pose3d getBasePose() {
     return new Pose3d(ModelConstants.ORIGIN_TO_TURRET_BASE_OFFSET, new Rotation3d(0, 0, Math.toRadians(getScaledPosAngleYAMS())));
   }
+
   public Transform3d getHoodPivotLocation() {
-    return new Transform3d(0.1245 * Math.cos(Math.toRadians(getScaledPosAngleYAMS())), 0.1245 * Math.sin(Math.toRadians(getScaledPosAngleYAMS())), 0.070, new Rotation3d());
+    return new Transform3d(0.1245 * Math.cos(Math.toRadians(getScaledPosAngleYAMS())), 0.1245 * Math.sin(Math.toRadians(getScaledPosAngleYAMS())), 0.070, new Rotation3d(0, 0, Math.toRadians(getScaledPosAngleYAMS())));
   }
 
+  public Pose3d getHoodPivotPose(Transform3d rotation) {
+    return new Pose3d(ModelConstants.ORIGIN_TO_TURRET_BASE_OFFSET, new Rotation3d())
+    .transformBy(getHoodPivotLocation())
+    .transformBy(rotation);
+
+  }
 }
