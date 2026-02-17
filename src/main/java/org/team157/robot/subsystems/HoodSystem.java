@@ -14,9 +14,9 @@ import static edu.wpi.first.units.Units.Volts;
 
 import org.team157.robot.Constants;
 import org.team157.robot.Constants.HoodConstants;
-import org.team157.robot.Constants.IntakeConstants;
 import org.team157.utilities.PosUtils;
 
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 
@@ -40,30 +40,31 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 public class HoodSystem extends SubsystemBase {
 
     ////////////////////
-   /// INTAKE PIVOT ///
+   /// HOOD PIVOT ///
   ////////////////////
   private TalonFX motor = new TalonFX(HoodConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
   private DutyCycleEncoder encoder = new DutyCycleEncoder(HoodConstants.ENCODER_ID);
 
   // Configure the hood motor controller for use with YAMS.
-  private SmartMotorControllerConfig intakePivotMotorConfig = new SmartMotorControllerConfig(this)
+  private SmartMotorControllerConfig hoodPivotMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
       .withClosedLoopController(HoodConstants.KP, HoodConstants.KI, HoodConstants.KD, DegreesPerSecond.of(HoodConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(HoodConstants.ANGULAR_ACCELERATION)) //TODO: tune this PID
       .withIdleMode(MotorMode.COAST) //TODO: evaluate if coast or brake is better for this mechanism
-      .withMotorInverted(true) //TODO: verify motor inversion
+      .withMotorInverted(false) //TODO: verify motor inversion
       .withGearing(HoodConstants.GEARING)
       .withTelemetry("Hood Motor", TelemetryVerbosity.HIGH) 
+      .withSoftLimit(Degrees.of(HoodConstants.LOWER_SOFT_LIMIT), Degrees.of(HoodConstants.UPPER_SOFT_LIMIT))
       .withStatorCurrentLimit(Amps.of(HoodConstants.CURRENT_LIMIT)) // TODO: Evaluate constant types (ie doubles or correct units)
       .withClosedLoopRampRate(Seconds.of(HoodConstants.RAMP_RATE));
 
   // Create the hood's motor controller with the above configuration.
-  private SmartMotorController smartHoodMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX60(1), intakePivotMotorConfig);
+  private SmartMotorController smartHoodMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), hoodPivotMotorConfig);
 
   // Configure the physical characteristics of the hood.
   private PivotConfig hoodConfig = new PivotConfig(smartHoodMotor)
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
       .withHardLimit(Degrees.of(HoodConstants.LOWER_HARD_LIMIT), Degrees.of(HoodConstants.UPPER_HARD_LIMIT))
-      .withSoftLimits(Degrees.of(HoodConstants.LOWER_SOFT_LIMIT), Degrees.of(HoodConstants.UPPER_SOFT_LIMIT))
+      //.withSoftLimits(Degrees.of(HoodConstants.LOWER_SOFT_LIMIT), Degrees.of(HoodConstants.UPPER_SOFT_LIMIT))
       .withTelemetry("Hood", TelemetryVerbosity.HIGH);
 
   // Create the hood pivot system with the above configuration.
@@ -71,9 +72,14 @@ public class HoodSystem extends SubsystemBase {
   
   /** Creates a new HoodSystem */
   public HoodSystem() {
+    var configurator = motor.getConfigurator();
+    configurator.refresh(new SoftwareLimitSwitchConfigs().withForwardSoftLimitEnable(true).withReverseSoftLimitEnable(true));
     
   }
-
+  public Command setDefault() {
+    // return setRoller(0).
+    return setHood(0);
+  }
   /**
    * Set the target angle of the hood.
    * @param angle Angle to go to.
@@ -87,19 +93,12 @@ public class HoodSystem extends SubsystemBase {
 
   }
 
-  // public Command deployIntake() {
-  //   return setAngleThenStop(Degrees.of(0));
-  // }
-
-  // public Command retractIntake() {
-  //   return setAngleThenStop(Degrees.of(80));
-  // }
 
   /**
    * Move the hood up and down.
    * @param dutycycle [-1, 1] speed to set the hood too.
    */
-  public Command setPivot(double dutycycle) { 
+  public Command setHood(double dutycycle) { 
     return hood.set(dutycycle);
   }
 
@@ -132,7 +131,7 @@ public class HoodSystem extends SubsystemBase {
    * @return The position of the hood scaled from 0 to 1.
    */
   public double getScaledPos() {
-    return PosUtils.mapRange(getPos(), IntakeConstants.MIN_ENCODER_POSITION, IntakeConstants.MAX_ENCODER_POSITION, 0.0,
+    return PosUtils.mapRange(getPos(), HoodConstants.MIN_ENCODER_POSITION, HoodConstants.MAX_ENCODER_POSITION, 0.0,
         1.0);
   }
 
@@ -148,8 +147,8 @@ public class HoodSystem extends SubsystemBase {
    * @return The angle of the hood, in degrees, from -180 to 180, using the encoder directly.
    */
   public double getScaledPosAngleEncoder() {
-    return PosUtils.mapRange(getPos(), IntakeConstants.MIN_ENCODER_POSITION, IntakeConstants.MAX_ENCODER_POSITION, IntakeConstants.MIN_ANGLE,
-        IntakeConstants.MAX_ANGLE);
+    return PosUtils.mapRange(getPos(), HoodConstants.MIN_ENCODER_POSITION, HoodConstants.MAX_ENCODER_POSITION, HoodConstants.MIN_ANGLE,
+        HoodConstants.MAX_ANGLE);
   }
 
   /**
