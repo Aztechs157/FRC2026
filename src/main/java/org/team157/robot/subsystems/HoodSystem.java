@@ -43,9 +43,6 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class HoodSystem extends SubsystemBase {
 
-    ////////////////////
-   /// INTAKE PIVOT ///
-  ////////////////////
   private TalonFX motor = new TalonFX(HoodConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
   private DutyCycleEncoder encoder = new DutyCycleEncoder(HoodConstants.ENCODER_ID);
 
@@ -53,7 +50,7 @@ public class HoodSystem extends SubsystemBase {
   private SmartMotorControllerConfig intakePivotMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
       .withClosedLoopController(HoodConstants.KP, HoodConstants.KI, HoodConstants.KD, DegreesPerSecond.of(HoodConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(HoodConstants.ANGULAR_ACCELERATION)) //TODO: tune this PID
-      .withIdleMode(MotorMode.COAST) //TODO: evaluate if coast or brake is better for this mechanism
+      .withIdleMode(MotorMode.BRAKE) //TODO: evaluate if coast or brake is better for this mechanism
       .withMotorInverted(true) //TODO: verify motor inversion
       .withGearing(HoodConstants.GEARING)
       .withTelemetry("Hood Motor", TelemetryVerbosity.HIGH) 
@@ -180,6 +177,13 @@ public class HoodSystem extends SubsystemBase {
     hood.updateTelemetry();
   }
 
+  @Override
+  public void simulationPeriodic() {
+    // This method will be called once per scheduler run during simulation
+    // Updates the intake pivot simulation's values,
+    hood.simIterate();
+  }
+  
   public Pose3d getHoodPose() {
     return new Pose3d(ModelConstants.ORIGIN_TO_HOOD_PIVOT_POINT_OFFSET, new Rotation3d(0, -getScaledPosAngleYAMS(), 0));
   }

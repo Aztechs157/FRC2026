@@ -63,7 +63,7 @@ public class TurretSystem extends SubsystemBase {
   private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
       .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, DegreesPerSecond.of(TurretConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(TurretConstants.ANGULAR_ACCELERATION))
-      .withSimClosedLoopController(10, 0, 0, DegreesPerSecond.of(TurretConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(TurretConstants.ANGULAR_ACCELERATION)) //TODO: tune this PID for the simulation  
+      .withSimClosedLoopController(7, 0, 0, DegreesPerSecond.of(TurretConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(TurretConstants.ANGULAR_ACCELERATION)) //TODO: tune this PID for the simulation  
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(false)
       .withGearing(TurretConstants.GEARING)

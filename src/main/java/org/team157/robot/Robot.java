@@ -102,7 +102,7 @@ public class Robot extends TimedRobot {
       // turret base 
       m_robotContainer.turret.getBasePose(), 
       // turret hood
-      m_robotContainer.turret.getHoodPivotPose(new Transform3d(0,0,0, new Rotation3d(0, Math.toRadians(40), 0))),
+      m_robotContainer.turret.getHoodPivotPose(new Transform3d(0,0,0, new Rotation3d(0, Math.toRadians(m_robotContainer.hood.getScaledPosAngleYAMS()), 0))),
 
 
       // m_robotContainer.hood.getHoodPose(),

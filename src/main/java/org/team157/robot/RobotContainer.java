@@ -131,14 +131,14 @@ public class RobotContainer {
         ///////////////////////////////////////////////////
         turret.setDefaultCommand(turret.set(0));
 
-        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-120)));
-        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(120)));
+        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-100)));
+        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(100)));
         driverController.povLeft().whileTrue(turret.set(-0.05));
         driverController.povRight().whileTrue(turret.set(0.05));
         // driverController.x().whileTrue(turret.set(0));
 
         // driverController.y().toggleOnTrue(turret.trackHubTag());
-        driverController.rightBumper().toggleOnTrue(turret.trackTagGlobalRelative());
+        // driverController.rightBumper().toggleOnTrue(turret.trackTagGlobalRelative());
 
         drivetrain.registerTelemetry(logger::telemeterize);
         
@@ -161,12 +161,17 @@ public class RobotContainer {
         /// HOPPER COMMANDS
         ///////////////////////////////////////////////////////
         hopper.setDefaultCommand(hopper.setDefault());
-        driverController.leftBumper().toggleOnTrue(hopper.setRoller(1).alongWith(uptake.setRoller(1)));
+        // driverController.leftBumper().toggleOnTrue(hopper.setRoller(1).alongWith(uptake.setRoller(1)));
 
         ////////////////////////////////////////////////////////
         /// UPTAKE COMMANDS
         ///////////////////////////////////////////////////////
         uptake.setDefaultCommand(uptake.setDefault());
+          /////////////////////
+         /// HOOD COMMANDS ///
+        /////////////////////
+        driverController.leftBumper().toggleOnTrue(hood.setAngleThenStop(Degrees.of(40)));
+        driverController.rightBumper().toggleOnTrue(hood.setAngleThenStop(Degrees.of(0)));
 
     }
 
