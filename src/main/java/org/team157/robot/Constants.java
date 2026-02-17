@@ -106,14 +106,15 @@ public final class Constants {
     public static final int MOTOR_ID = 20;
     public static final int MOTOR_ID_FOLLOWER = 21;
     // TODO: do actual tuning
-    public static final double P = 1, I = 0, D = 0;
+    public static final double P = 50, I = 0, D = 0;
     public static final double KS = 0, KV = 0, KA = 0;
-    public static final double GEARING = 0.7;
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("14:20"));
     //TODO: put real values here and not made up ones
     public static final double FLYWHEEL_DIAMETER = 3.75; // inches
     public static final double FLYWHEEL_MASS = 4; // pounds
     public static final double FLYWHEEL_RPM_LIMIT_UPPER = 1000; 
     public static final double HEIGHT = 2.5;
+    public static final double RAMP_RATE = 0.00157;
 
   }
 

@@ -51,7 +51,7 @@ public class RobotContainer {
 
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
-    public final FlywheelSystem flywheelSystem = new FlywheelSystem();
+    public final FlywheelSystem flywheel = new FlywheelSystem();
     public final TurretSystem turret = new TurretSystem();
     public final IntakeSystem intake = new IntakeSystem();
     public final HopperSystem hopper = new HopperSystem();
@@ -145,10 +145,10 @@ public class RobotContainer {
         ////////////////////////////////////////////////////////
         /// FLYWHEEL COMMANDS
         ///////////////////////////////////////////////////////
-        flywheelSystem.setDefaultCommand(flywheelSystem.set(0));
+        flywheel.setDefaultCommand(flywheel.set(0));
 
-        driverController.rightTrigger().whileTrue(flywheelSystem.setVelocity(RPM.of(60)));
-        driverController.leftTrigger().whileTrue(flywheelSystem.setVelocity(RPM.of(300)));
+        driverController.rightTrigger().whileTrue(flywheel.setVelocity(RPM.of(60)));
+        driverController.leftTrigger().whileTrue(flywheel.setVelocity(RPM.of(300)));
         ////////////////////////////////////////////////////////
         /// INTAKE COMMANDS
         ///////////////////////////////////////////////////////

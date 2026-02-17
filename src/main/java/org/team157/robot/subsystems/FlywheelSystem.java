@@ -14,13 +14,16 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Seconds;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import yams.motorcontrollers.SmartMotorController;
 
-
+import org.team157.robot.Constants;
 import org.team157.robot.Constants.FlywheelConstants;
 import org.team157.robot.Constants.HoodConstants;
 
@@ -39,8 +42,8 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class FlywheelSystem extends SubsystemBase {
 
-  private TalonFX motor  = new TalonFX(FlywheelConstants.MOTOR_ID);
-  private static TalonFX motor_follower = new TalonFX(FlywheelConstants.MOTOR_ID_FOLLOWER);
+  private TalonFX motor  = new TalonFX(FlywheelConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
+  private TalonFX motor_follower = new TalonFX(FlywheelConstants.MOTOR_ID_FOLLOWER, Constants.RIO_CAN_BUS);
   public double ballVelocity = 0; //Feet per Second for the ball to be launched
   public Angle azimuth = Radians.of(0);
 
@@ -61,9 +64,10 @@ public class FlywheelSystem extends SubsystemBase {
     .withMotorInverted(false)
     .withIdleMode(MotorMode.COAST)
     .withStatorCurrentLimit(Amps.of(40))
-    .withFollowers(Pair.of(motor_follower, false));
+    .withClosedLoopRampRate(Seconds.of(FlywheelConstants.RAMP_RATE))
+    .withFollowers(Pair.of(motor_follower, true));
 
-  private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX60(1),flywheelSystemConfig);
+  private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX60(2),flywheelSystemConfig);
  // private SmartMotorController smartMotorFollower = new TalonFXWrapper(motor_follower, DCMotor.getKrakenX60(1),flywheelSystemConfig);
 
   private final FlyWheelConfig flyWheelConfig = new FlyWheelConfig(smartMotor)
@@ -172,7 +176,6 @@ public class FlywheelSystem extends SubsystemBase {
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
   public Command setVelocity (AngularVelocity speed) {
-    System.out.println("Setting velocity to: " + speed);
     return flyWheel.setSpeed(speed); 
   }
 
@@ -191,6 +194,8 @@ public class FlywheelSystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Flywheel Velocity", getVelocity().magnitude());
+    SmartDashboard.putNumber("Flywheel RPM", getVelocity().in(RPM));
     flyWheel.updateTelemetry();
   }
 
