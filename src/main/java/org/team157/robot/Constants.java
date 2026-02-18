@@ -106,6 +106,15 @@ public final class Constants {
 
   public static class ClimberConstants {
     public static final int MOTOR_ID = 6700;
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromReductionStages(25));
+    public static final double KP = 157, KI = 0, KD = 0;
+    public static final double DRUM_RADIUS = 0.25; // inches
+    public static final double RAMP_RATE = 0.0157;
+    public static final double STARTING_HEIGHT = 0;
+    public static final double UPPER_HARD_LIMIT = 157, LOWER_HARD_LIMIT = 157;
+    public static final double UPPER_SOFT_LIMIT = 157, LOWER_SOFT_LIMIT = 157;
+    public static final double MAX_ACCELERATION = 0.5;
+    public static final double MAX_VELOCITY = 0.5;
     
   }
 
