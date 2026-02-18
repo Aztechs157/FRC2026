@@ -25,6 +25,7 @@ import org.team157.robot.subsystems.DriveSystem;
 import org.team157.robot.subsystems.FlywheelSystem;
 import org.team157.robot.subsystems.HopperSystem;
 import org.team157.robot.subsystems.IntakeSystem;
+import org.team157.robot.subsystems.HoodSystem;
 import org.team157.robot.subsystems.TurretSystem;
 import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
@@ -46,11 +47,12 @@ public class RobotContainer {
 
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
-    public final FlywheelSystem flywheelSystem = new FlywheelSystem();
+    public final FlywheelSystem flywheel = new FlywheelSystem();
     public final TurretSystem turret = new TurretSystem();
     public final IntakeSystem intake = new IntakeSystem();
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
+    public final HoodSystem hood = new HoodSystem();
 
     private final SendableChooser<Command> autoChooser;
 
@@ -120,8 +122,6 @@ public class RobotContainer {
         driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-
-
         // Reset the field-centric heading on start button press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
         
@@ -141,16 +141,16 @@ public class RobotContainer {
         ////////////////////////////////////////////////////////
         /// FLYWHEEL COMMANDS
         ///////////////////////////////////////////////////////
-        flywheelSystem.setDefaultCommand(flywheelSystem.set(0));
+        flywheel.setDefaultCommand(flywheel.set(0));
 
-        driverController.rightTrigger().whileTrue(flywheelSystem.setVelocity(RPM.of(60)));
-
+        driverController.rightTrigger().whileTrue(flywheel.setVelocity(RPM.of(6000)));
+        driverController.leftTrigger().whileTrue(flywheel.setVelocity(RPM.of(4500)));
         ////////////////////////////////////////////////////////
         /// INTAKE COMMANDS
         ///////////////////////////////////////////////////////
         intake.setDefaultCommand(intake.setDefault());
-        driverController.a().toggleOnTrue(intake.deployIntake());
-        driverController.y().toggleOnTrue(intake.retractIntake());
+        //driverController.a().toggleOnTrue(intake.deployIntake());
+       // driverController.y().toggleOnTrue(intake.retractIntake());
         driverController.rightBumper().toggleOnTrue(intake.setRoller(0.75));
 
         ////////////////////////////////////////////////////////
@@ -163,6 +163,14 @@ public class RobotContainer {
         /// UPTAKE COMMANDS
         ///////////////////////////////////////////////////////
         uptake.setDefaultCommand(uptake.setDefault());
+
+
+        ////////////////////////////////////////////////////////
+        /// HOOD COMMANDS
+        ///////////////////////////////////////////////////////
+        hood.setDefaultCommand(hood.setDefault());
+        driverController.a().toggleOnTrue(hood.setAngle(Degrees.of(57)));
+        driverController.y().toggleOnTrue(hood.setAngle(Degrees.of(47)));
 
     }
 
