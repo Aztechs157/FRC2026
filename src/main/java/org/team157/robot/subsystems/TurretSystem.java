@@ -4,10 +4,8 @@
 
 package org.team157.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
@@ -45,14 +43,14 @@ public class TurretSystem extends SubsystemBase {
   // Configure the turret motor controller for use with YAMS.
   private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, DegreesPerSecond.of(TurretConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(TurretConstants.ANGULAR_ACCELERATION))
+      .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(false)
       .withGearing(TurretConstants.GEARING)
       .withTelemetry("Turret Motor", TelemetryVerbosity.HIGH) 
-      .withStatorCurrentLimit(Amps.of(TurretConstants.CURRENT_LIMIT))
-      .withClosedLoopRampRate(Seconds.of(TurretConstants.RAMP_RATE))
-      .withSoftLimit(Degrees.of(TurretConstants.LOWER_SOFT_LIMIT), Degrees.of(TurretConstants.UPPER_SOFT_LIMIT));
+      .withStatorCurrentLimit((TurretConstants.CURRENT_LIMIT))
+      .withClosedLoopRampRate((TurretConstants.RAMP_RATE))
+      .withSoftLimit((TurretConstants.LOWER_SOFT_LIMIT), (TurretConstants.UPPER_SOFT_LIMIT));
 
   // Create the turret's motor controller with the above configuration.
   private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), turretMotorConfig);
@@ -60,7 +58,7 @@ public class TurretSystem extends SubsystemBase {
   // Configure the physical characteristics of the turret.
   private PivotConfig turretConfig = new PivotConfig(smartMotor)
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
-      .withHardLimit(Degrees.of(TurretConstants.LOWER_HARD_LIMIT), Degrees.of(TurretConstants.UPPER_HARD_LIMIT))
+      .withHardLimit((TurretConstants.LOWER_HARD_LIMIT), (TurretConstants.UPPER_HARD_LIMIT))
       .withTelemetry("Turret", TelemetryVerbosity.HIGH)
       .withMOI(Meters.of(0.1), Kilograms.of(4));
 
