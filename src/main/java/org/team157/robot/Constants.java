@@ -74,23 +74,23 @@ public final class Constants {
   public static class TurretConstants {
     public static final int MOTOR_ID = 18;
     public static final int ENCODER_ID = 0;
-    public static final double MIN_ENCODER_POSITION = 0.1, MAX_ENCODER_POSITION = 1.2;
-    public static final double MIN_ANGLE = -32, MAX_ANGLE = 430;
+    public static final double MIN_ENCODER_POSITION = 0.006, MAX_ENCODER_POSITION = 0.99;
+    public static final double MIN_ANGLE = -179, MAX_ANGLE = 179;
     public static final double KP = 157, KI = 0, KD = 0;
-    public static final double ANGULAR_VELOCITY = 360, ANGULAR_ACCELERATION = 2880;
-    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromReductionStages(3, 5));
+    public static final double ANGULAR_VELOCITY = 360, ANGULAR_ACCELERATION = 360;
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("28:1"));
+    // public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("12:32", "10:105"));
     public static final double CURRENT_LIMIT = 30;
     public static final double RAMP_RATE = 0.00157;
-    public static final double LOWER_SOFT_LIMIT = -120, UPPER_SOFT_LIMIT = 120;
-    public static final double LOWER_HARD_LIMIT = -135, UPPER_HARD_LIMIT = 135;
+    public static final double LOWER_SOFT_LIMIT = -179, UPPER_SOFT_LIMIT = 179;
+    public static final double LOWER_HARD_LIMIT = -179, UPPER_HARD_LIMIT = 179;
   }
 
   public static class HoodConstants {
     // TODO: update these constants when testing on actual robot
     public static final int MOTOR_ID = 19;
     public static final int ENCODER_ID = 2;
-    public static final double MIN_ENCODER_POSITION = 0.309, MAX_ENCODER_POSITION = 0.975
-    ;
+    public static final double MIN_ENCODER_POSITION = 0.13, MAX_ENCODER_POSITION = 0.7;
     public static final double MIN_ANGLE = 40, MAX_ANGLE = 65;
     public static final double LOWER_SOFT_LIMIT = 45, UPPER_SOFT_LIMIT = 60;
     public static final double LOWER_HARD_LIMIT = 40, UPPER_HARD_LIMIT = 65;

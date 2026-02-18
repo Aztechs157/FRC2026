@@ -183,8 +183,7 @@ public class TurretSystem extends SubsystemBase {
    * @return The angle of the turret, in degrees, from -135 to 135, using the encoder directly.
    */
   public double getScaledPosAngleEncoder() {
-    return PosUtils.mapRange(getPos(), TurretConstants.MIN_ENCODER_POSITION, TurretConstants.MAX_ENCODER_POSITION, -135,
-        135);
+    return PosUtils.mapRange(getPos(), TurretConstants.MIN_ENCODER_POSITION, TurretConstants.MAX_ENCODER_POSITION, TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
   }
 
   /**
@@ -222,7 +221,7 @@ public class TurretSystem extends SubsystemBase {
   public void updateRelativeAngleToTag(int tagID, Pose2d robotPose){
     // The current angular offset of the tag, relative to the turret camera.
     visionSystem.setTargetParams(tagID, robotPose);
-    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 90;
+    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 157; //158
     trackingAngle = Degrees.of(turretToRobotAngleOffset);
   }
 
@@ -233,8 +232,7 @@ public class TurretSystem extends SubsystemBase {
   public void updateRelativeAngleToTag(Pose2d targetPose, Pose2d robotPose){
     // The current angular offset of the tag, relative to the turret camera.
     visionSystem.setTargetParams(targetPose, robotPose);
-    //TODO: remove 90° offset on real robot
-    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 90;
+    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 157; //158
     trackingAngle = Degrees.of(turretToRobotAngleOffset);
   }
 

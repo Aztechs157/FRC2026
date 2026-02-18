@@ -128,16 +128,18 @@ public class RobotContainer {
         ////////////////////////////////////////////////////
         /// TURRET COMMANDS
         ///////////////////////////////////////////////////
-        // turret.setDefaultCommand(turret.set(0));
+        turret.setDefaultCommand(turret.set(0));
 
         driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-30)));
         driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(70)));
-        driverController.povLeft().whileTrue(turret.set(-0.5));
-        driverController.povRight().whileTrue(turret.set(0.5));
+        driverController.povLeft().whileTrue(turret.set(-0.1));
+        driverController.povRight().whileTrue(turret.set(0.1));
         driverController.x().whileTrue(turret.set(0));
 
         drivetrain.registerTelemetry(logger::telemeterize);
         
+        
+
         ////////////////////////////////////////////////////////
         /// FLYWHEEL COMMANDS
         ///////////////////////////////////////////////////////
@@ -169,8 +171,8 @@ public class RobotContainer {
         /// HOOD COMMANDS
         ///////////////////////////////////////////////////////
         hood.setDefaultCommand(hood.setDefault());
-        driverController.a().toggleOnTrue(hood.setAngle(Degrees.of(57)));
-        driverController.y().toggleOnTrue(hood.setAngle(Degrees.of(47)));
+        driverController.a().toggleOnTrue(hood.setAngle(Degrees.of(60)));
+        driverController.y().toggleOnTrue(hood.setAngle(Degrees.of(48)));
 
     }
 
