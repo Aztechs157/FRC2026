@@ -51,7 +51,7 @@ public class RobotContainer {
 
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
-    public final FlywheelSystem flywheelSystem = new FlywheelSystem();
+    public final FlywheelSystem flywheel = new FlywheelSystem();
     public final TurretSystem turret = new TurretSystem();
     public final IntakeSystem intake = new IntakeSystem();
     public final HopperSystem hopper = new HopperSystem();
@@ -126,8 +126,6 @@ public class RobotContainer {
         driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-
-
         // Reset the field-centric heading on start button press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
         
@@ -147,10 +145,10 @@ public class RobotContainer {
         ////////////////////////////////////////////////////////
         /// FLYWHEEL COMMANDS
         ///////////////////////////////////////////////////////
-        flywheelSystem.setDefaultCommand(flywheelSystem.set(0));
+        flywheel.setDefaultCommand(flywheel.set(0));
 
-        driverController.rightTrigger().whileTrue(flywheelSystem.setVelocity(RPM.of(60)));
-
+        driverController.rightTrigger().whileTrue(flywheel.setVelocity(RPM.of(6000)));
+        driverController.leftTrigger().whileTrue(flywheel.setVelocity(RPM.of(4500)));
         ////////////////////////////////////////////////////////
         /// INTAKE COMMANDS
         ///////////////////////////////////////////////////////
