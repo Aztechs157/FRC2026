@@ -5,16 +5,14 @@
 package org.team157.robot.subsystems;
 // import the stuff 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.FeetPerSecond;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
-
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
@@ -48,7 +46,7 @@ public class FlywheelSystem extends SubsystemBase {
   private SmartMotorControllerConfig flywheelSystemConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.CLOSED_LOOP)
     // feedback constant (pid constants)
-    .withClosedLoopController(FlywheelConstants.P, FlywheelConstants.I, FlywheelConstants.D, RPM.of(6000), RotationsPerSecondPerSecond.of(3000))
+    .withClosedLoopController(FlywheelConstants.P, FlywheelConstants.I, FlywheelConstants.D, RPM.of(6000), RotationsPerSecondPerSecond.of(3000)) // TODO: move to constants
     .withSimClosedLoopController(FlywheelConstants.P, FlywheelConstants.I, FlywheelConstants.D, RPM.of(6000), RotationsPerSecondPerSecond.of(3000))
     // telemetry name and verbosity level
     .withTelemetry("FlywheelMotor", TelemetryVerbosity.HIGH)
@@ -57,7 +55,7 @@ public class FlywheelSystem extends SubsystemBase {
     .withMotorInverted(false)
     .withIdleMode(MotorMode.COAST)
     .withStatorCurrentLimit(Amps.of(40))
-    .withClosedLoopRampRate(Seconds.of(FlywheelConstants.RAMP_RATE))
+    .withClosedLoopRampRate((FlywheelConstants.RAMP_RATE))
     .withFollowers(Pair.of(motor_follower, true));
 
   private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX60(1),flywheelSystemConfig);
@@ -65,9 +63,9 @@ public class FlywheelSystem extends SubsystemBase {
 
   private final FlyWheelConfig flyWheelConfig = new FlyWheelConfig(smartMotor)
   // diameter of the flywheel 
-  .withDiameter(Inches.of(FlywheelConstants.FLYWHEEL_DIAMETER))
+  .withDiameter((FlywheelConstants.FLYWHEEL_DIAMETER))
   // mass of the flywheel
-  .withMass(Pounds.of(FlywheelConstants.FLYWHEEL_MASS))
+  .withMass((FlywheelConstants.FLYWHEEL_MASS))
   // maximum speed of the shooter
   .withSoftLimit(RPM.of(-6000), RPM.of(6000))
   // .withUpperSoftLimit(RPM.of(FlywheelConstants.FLYWHEEL_RPM_LIMIT_UPPER))
@@ -88,12 +86,12 @@ public class FlywheelSystem extends SubsystemBase {
 
   // Function to minimize: 
   double velocityFunction(double distance, double height, double theta) {
-        return distance / Math.cos(theta) * (Math.sqrt(16 / (distance * Math.tan(theta) - (height - FlywheelConstants.HEIGHT))));
+        return distance / Math.cos(theta) * (Math.sqrt(16 / (distance * Math.tan(theta) - (height - FlywheelConstants.HEIGHT.in(Feet)))));
     }
 
   public void setShotParams(double height, double distance) {
-    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT;
-    double upperBound = HoodConstants.UPPER_SOFT_LIMIT;
+    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT.in(Degrees);
+    double upperBound = HoodConstants.UPPER_SOFT_LIMIT.in(Degrees);
     double steps = 1000;
     double stepSize = (upperBound - lowerBound) / steps;
     
@@ -118,8 +116,8 @@ public class FlywheelSystem extends SubsystemBase {
   }
 
     public void setBETTERShotParams(double height, double distance) {
-    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT;
-    double upperBound = HoodConstants.UPPER_SOFT_LIMIT;
+    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT.in(Degrees);
+    double upperBound = HoodConstants.UPPER_SOFT_LIMIT.in(Degrees);
     double steps = 1000;
     double stepSize = (upperBound - lowerBound) / steps;
     
@@ -146,7 +144,7 @@ public class FlywheelSystem extends SubsystemBase {
     setShotParams(0, 10);
     //double desiredVelocity = 2 * ballVelocity / (FlywheelConstants.FLYWHEEL_DIAMETER / 12 * Math.PI) + lossFunction();
     // double desiredVelocity = 2 * ballVelocity + lossFunction();
-    double desiredRPM = 60 / (Inches.of(FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters) * Math.PI) * FeetPerSecond.of(ballVelocity).in(MetersPerSecond);
+    double desiredRPM = 60 / ((FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters) * Math.PI) * FeetPerSecond.of(ballVelocity).in(MetersPerSecond);
     System.out.println("Desired Ball Velocity (ft/sec): " + ballVelocity);
     System.out.println("Desired Flywheel Velocity (rpm): " + desiredRPM);
     return RPM.of(desiredRPM);
