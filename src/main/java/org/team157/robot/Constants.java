@@ -4,11 +4,8 @@
 
 package org.team157.robot;
 
-import static edu.wpi.first.units.Units.Meters;
-
 import com.ctre.phoenix6.CANBus;
 
-import edu.wpi.first.units.measure.Distance;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
 
