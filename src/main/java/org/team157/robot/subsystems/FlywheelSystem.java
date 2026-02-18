@@ -14,6 +14,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -50,16 +51,11 @@ public class FlywheelSystem extends SubsystemBase {
   private SmartMotorControllerConfig flywheelSystemConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.CLOSED_LOOP)
     // feedback constant (pid constants)
-    .withClosedLoopController(FlywheelConstants.P, FlywheelConstants.I, FlywheelConstants.D, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
-    .withSimClosedLoopController(FlywheelConstants.P, FlywheelConstants.I, FlywheelConstants.D, DegreesPerSecond.of(90), DegreesPerSecondPerSecond.of(45))
-    // feedforward constants
-    .withFeedforward(new SimpleMotorFeedforward(FlywheelConstants.KS, FlywheelConstants.KV, FlywheelConstants.KA))
-    .withSimFeedforward(new SimpleMotorFeedforward(FlywheelConstants.KS, FlywheelConstants.KV, FlywheelConstants.KA))
+    .withClosedLoopController(FlywheelConstants.P, FlywheelConstants.I, FlywheelConstants.D, RPM.of(6000), RotationsPerSecondPerSecond.of(3000))
+    .withSimClosedLoopController(FlywheelConstants.P, FlywheelConstants.I, FlywheelConstants.D, RPM.of(6000), RotationsPerSecondPerSecond.of(3000))
     // telemetry name and verbosity level
     .withTelemetry("FlywheelMotor", TelemetryVerbosity.HIGH)
     // gearing from the motor rotor to final shaft
-    // In this example GearBox.fromReductionStages(3,4) is the same as GearBox.fromStages("3:1","4:1") which corresponds to the gearbox attached to your motor.
-    // You could also use .withGearing(12) which does the same thing.
     .withGearing(FlywheelConstants.GEARING)
     .withMotorInverted(false)
     .withIdleMode(MotorMode.COAST)
@@ -67,7 +63,7 @@ public class FlywheelSystem extends SubsystemBase {
     .withClosedLoopRampRate(Seconds.of(FlywheelConstants.RAMP_RATE))
     .withFollowers(Pair.of(motor_follower, true));
 
-  private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX60(2),flywheelSystemConfig);
+  private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX60(1),flywheelSystemConfig);
  // private SmartMotorController smartMotorFollower = new TalonFXWrapper(motor_follower, DCMotor.getKrakenX60(1),flywheelSystemConfig);
 
   private final FlyWheelConfig flyWheelConfig = new FlyWheelConfig(smartMotor)
@@ -76,7 +72,8 @@ public class FlywheelSystem extends SubsystemBase {
   // mass of the flywheel
   .withMass(Pounds.of(FlywheelConstants.FLYWHEEL_MASS))
   // maximum speed of the shooter
-  .withUpperSoftLimit(RPM.of(FlywheelConstants.FLYWHEEL_RPM_LIMIT_UPPER))
+  .withSoftLimit(RPM.of(-6000), RPM.of(6000))
+  // .withUpperSoftLimit(RPM.of(FlywheelConstants.FLYWHEEL_RPM_LIMIT_UPPER))
   // telemetry name and verbosity
   .withTelemetry("FlywheelDynamics", TelemetryVerbosity.HIGH);
 

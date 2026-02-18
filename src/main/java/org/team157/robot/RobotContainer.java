@@ -147,8 +147,8 @@ public class RobotContainer {
         ///////////////////////////////////////////////////////
         flywheel.setDefaultCommand(flywheel.set(0));
 
-        driverController.rightTrigger().whileTrue(flywheel.setVelocity(RPM.of(60)));
-        driverController.leftTrigger().whileTrue(flywheel.setVelocity(RPM.of(300)));
+        driverController.rightTrigger().whileTrue(flywheel.setVelocity(RPM.of(6000)));
+        driverController.leftTrigger().whileTrue(flywheel.setVelocity(RPM.of(4500)));
         ////////////////////////////////////////////////////////
         /// INTAKE COMMANDS
         ///////////////////////////////////////////////////////
