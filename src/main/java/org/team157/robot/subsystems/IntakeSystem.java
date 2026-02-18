@@ -23,6 +23,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.config.PivotConfig;
@@ -36,6 +37,7 @@ import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class IntakeSystem extends SubsystemBase {
+  
     //////////////////////
    /// INTAKE ROLLER ///
   /////////////////////
@@ -89,6 +91,25 @@ public class IntakeSystem extends SubsystemBase {
   // Create the hood pivot system with the above configuration.
   private Pivot intakePivot = new Pivot(intakePivotConfig);
   
+  public boolean deployState = false;
+
+  public boolean getDeployState(){
+      return deployState;
+
+  }
+
+
+  /**
+   * 
+   * 
+   * 
+   * @param 
+   * @return
+   */
+  public Command invertDeployState(){
+    return new InstantCommand(() -> deployState = !deployState);
+  }
+
 
   /**
    * Set the dutycycle of the intake.
