@@ -42,6 +42,8 @@ public class RobotContainer {
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
+   public final VisionSystem visionSystem;
+
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController driverController = new CommandXboxController(0);
@@ -49,15 +51,13 @@ public class RobotContainer {
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
     public final FlywheelSystem flywheel = new FlywheelSystem();
-    public final TurretSystem turret = new TurretSystem();
+    public final TurretSystem turret;
     public final IntakeSystem intake = new IntakeSystem();
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
     public final HoodSystem hood = new HoodSystem();
 
     private final SendableChooser<Command> autoChooser;
-
-    public final VisionSystem visionSystem;
 
     public final Trigger intakeDeployTrigger = new Trigger(() -> intake.getDeployState());
     public RobotContainer() {
@@ -70,6 +70,7 @@ public class RobotContainer {
         }
 
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
+        turret = new TurretSystem(visionSystem);
 
         configureBindings();
 
@@ -127,12 +128,14 @@ public class RobotContainer {
 
         driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-30)));
         driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(70)));
-        driverController.povLeft().whileTrue(turret.set(-0.5));
-        driverController.povRight().whileTrue(turret.set(0.5));
+        driverController.povLeft().whileTrue(turret.set(-0.1));
+        driverController.povRight().whileTrue(turret.set(0.1));
         driverController.x().whileTrue(turret.set(0));
 
         drivetrain.registerTelemetry(logger::telemeterize);
         
+        
+
         ////////////////////////////////////////////////////////
         /// FLYWHEEL COMMANDS
         ///////////////////////////////////////////////////////
@@ -166,8 +169,8 @@ public class RobotContainer {
         /// HOOD COMMANDS
         ///////////////////////////////////////////////////////
         hood.setDefaultCommand(hood.setDefault());
-        driverController.a().toggleOnTrue(hood.setAngle(Degrees.of(57)));
-        driverController.y().toggleOnTrue(hood.setAngle(Degrees.of(47)));
+        driverController.a().toggleOnTrue(hood.setAngle(Degrees.of(60)));
+        driverController.y().toggleOnTrue(hood.setAngle(Degrees.of(48)));
 
     }
 
