@@ -4,10 +4,8 @@
 
 package org.team157.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -26,10 +24,8 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.config.PivotConfig;
 import yams.mechanisms.positional.Pivot;
-import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
@@ -48,13 +44,13 @@ public class HoodSystem extends SubsystemBase {
   // Configure the hood motor controller for use with YAMS.
   private SmartMotorControllerConfig hoodPivotMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(HoodConstants.KP, HoodConstants.KI, HoodConstants.KD, DegreesPerSecond.of(HoodConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(HoodConstants.ANGULAR_ACCELERATION)) //TODO: tune this PID
+      .withClosedLoopController(HoodConstants.KP, HoodConstants.KI, HoodConstants.KD, (HoodConstants.ANGULAR_VELOCITY), (HoodConstants.ANGULAR_ACCELERATION)) //TODO: tune this PID
       .withIdleMode(MotorMode.BRAKE) 
       .withGearing(HoodConstants.GEARING)
       .withTelemetry("Hood Motor", TelemetryVerbosity.HIGH) 
-      .withSoftLimit(Degrees.of(HoodConstants.LOWER_SOFT_LIMIT), Degrees.of(HoodConstants.UPPER_SOFT_LIMIT))
-      .withStatorCurrentLimit(Amps.of(HoodConstants.CURRENT_LIMIT)) // TODO: Evaluate constant types (ie doubles or correct units)
-      .withClosedLoopRampRate(Seconds.of(HoodConstants.RAMP_RATE));
+      .withSoftLimit((HoodConstants.LOWER_SOFT_LIMIT), (HoodConstants.UPPER_SOFT_LIMIT))
+      .withStatorCurrentLimit(HoodConstants.CURRENT_LIMIT) // TODO: Evaluate constant types (ie doubles or correct units)
+      .withClosedLoopRampRate((HoodConstants.RAMP_RATE));
 
   // Create the hood's motor controller with the above configuration.
   private SmartMotorController smartHoodMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), hoodPivotMotorConfig);
@@ -62,7 +58,7 @@ public class HoodSystem extends SubsystemBase {
   // Configure the physical characteristics of the hood.
   private PivotConfig hoodConfig = new PivotConfig(smartHoodMotor)
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
-      .withHardLimit(Degrees.of(HoodConstants.LOWER_HARD_LIMIT), Degrees.of(HoodConstants.UPPER_HARD_LIMIT))
+      .withHardLimit((HoodConstants.LOWER_HARD_LIMIT), (HoodConstants.UPPER_HARD_LIMIT))
       //.withSoftLimits(Degrees.of(HoodConstants.LOWER_SOFT_LIMIT), Degrees.of(HoodConstants.UPPER_SOFT_LIMIT))
       .withTelemetry("Hood", TelemetryVerbosity.HIGH);
 

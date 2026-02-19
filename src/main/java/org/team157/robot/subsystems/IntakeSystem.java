@@ -7,7 +7,6 @@ package org.team157.robot.subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -24,6 +23,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.config.PivotConfig;
@@ -37,6 +37,7 @@ import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class IntakeSystem extends SubsystemBase {
+  
     //////////////////////
    /// INTAKE ROLLER ///
   /////////////////////
@@ -69,13 +70,13 @@ public class IntakeSystem extends SubsystemBase {
   // Configure the hood motor controller for use with YAMS.
   private SmartMotorControllerConfig intakePivotMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(IntakeConstants.KP, IntakeConstants.KI, IntakeConstants.KD, DegreesPerSecond.of(IntakeConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(IntakeConstants.ANGULAR_ACCELERATION)) //TODO: tune this PID
+      .withClosedLoopController(IntakeConstants.KP, IntakeConstants.KI, IntakeConstants.KD, IntakeConstants.ANGULAR_VELOCITY, IntakeConstants.ANGULAR_ACCELERATION) //TODO: tune this PID
       .withIdleMode(MotorMode.COAST)
       .withMotorInverted(true)
       .withGearing(IntakeConstants.PIVOT_GEARING)
       .withTelemetry("Intake Pivot Motor", TelemetryVerbosity.HIGH) 
-      .withStatorCurrentLimit(Amps.of(IntakeConstants.CURRENT_LIMIT)) // TODO: Evaluate constant types
-      .withClosedLoopRampRate(Seconds.of(IntakeConstants.RAMP_RATE));
+      .withStatorCurrentLimit(IntakeConstants.CURRENT_LIMIT)
+      .withClosedLoopRampRate(IntakeConstants.RAMP_RATE);
 
   // Create the hood's motor controller with the above configuration.
   private SmartMotorController smartIntakePivotMotor = new TalonFXWrapper(pivotMotor, DCMotor.getKrakenX44(1), intakePivotMotorConfig);
@@ -83,13 +84,32 @@ public class IntakeSystem extends SubsystemBase {
   // Configure the physical characteristics of the hood.
   private PivotConfig intakePivotConfig = new PivotConfig(smartIntakePivotMotor)
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
-      .withHardLimit(Degrees.of(IntakeConstants.LOWER_HARD_LIMIT), Degrees.of(IntakeConstants.UPPER_HARD_LIMIT))
-      .withSoftLimits(Degrees.of(IntakeConstants.LOWER_SOFT_LIMIT), Degrees.of(IntakeConstants.UPPER_SOFT_LIMIT))
+      .withHardLimit((IntakeConstants.LOWER_HARD_LIMIT), (IntakeConstants.UPPER_HARD_LIMIT))
+      .withSoftLimits((IntakeConstants.LOWER_SOFT_LIMIT), (IntakeConstants.UPPER_SOFT_LIMIT))
       .withTelemetry("Intake Pivot", TelemetryVerbosity.HIGH);
 
   // Create the hood pivot system with the above configuration.
   private Pivot intakePivot = new Pivot(intakePivotConfig);
   
+  public boolean deployState = false;
+
+  public boolean getDeployState(){
+      return deployState;
+
+  }
+
+
+  /**
+   * 
+   * 
+   * 
+   * @param 
+   * @return
+   */
+  public Command invertDeployState(){
+    return new InstantCommand(() -> deployState = !deployState);
+  }
+
 
   /**
    * Set the dutycycle of the intake.
