@@ -90,7 +90,7 @@ public final class Constants {
     // TODO: update these constants when testing on actual robot
     public static final int MOTOR_ID = 19;
     public static final int ENCODER_ID = 2;
-    public static final double MIN_ENCODER_POSITION = 0.13, MAX_ENCODER_POSITION = 0.7;
+    public static final double MIN_ENCODER_POSITION = 0.38, MAX_ENCODER_POSITION = 0.9;
     public static final double MIN_ANGLE = 40, MAX_ANGLE = 65;
     public static final double LOWER_SOFT_LIMIT = 45, UPPER_SOFT_LIMIT = 60;
     public static final double LOWER_HARD_LIMIT = 40, UPPER_HARD_LIMIT = 65;

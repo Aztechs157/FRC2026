@@ -49,8 +49,7 @@ public class HoodSystem extends SubsystemBase {
   private SmartMotorControllerConfig hoodPivotMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
       .withClosedLoopController(HoodConstants.KP, HoodConstants.KI, HoodConstants.KD, DegreesPerSecond.of(HoodConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(HoodConstants.ANGULAR_ACCELERATION)) //TODO: tune this PID
-      .withIdleMode(MotorMode.COAST) //TODO: evaluate if coast or brake is better for this mechanism
-      .withMotorInverted(false) //TODO: verify motor inversion
+      .withIdleMode(MotorMode.BRAKE) 
       .withGearing(HoodConstants.GEARING)
       .withTelemetry("Hood Motor", TelemetryVerbosity.HIGH) 
       .withSoftLimit(Degrees.of(HoodConstants.LOWER_SOFT_LIMIT), Degrees.of(HoodConstants.UPPER_SOFT_LIMIT))
