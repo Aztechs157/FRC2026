@@ -6,20 +6,17 @@ package org.team157.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.lang.reflect.Modifier;
-
-import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import org.team157.robot.Constants.ControllerConstants;
@@ -62,8 +59,7 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
- 
-
+    public final Trigger intakeDeployTrigger = new Trigger(() -> intake.getDeployState());
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
         if (ModifierConstants.DEMO_MODE) {
@@ -150,7 +146,9 @@ public class RobotContainer {
         ////////////////////////////////////////////////////////
         /// INTAKE COMMANDS
         ///////////////////////////////////////////////////////
-        intake.setDefaultCommand(intake.setDefault());
+        intake.setDefaultCommand(intake.setDefault()); 
+
+        intakeDeployTrigger.onTrue(intake.deployIntake()).onFalse(intake.retractIntake()); //TODO: decide on a button for this
         //driverController.a().toggleOnTrue(intake.deployIntake());
        // driverController.y().toggleOnTrue(intake.retractIntake());
         driverController.rightBumper().toggleOnTrue(intake.setRoller(0.75));
