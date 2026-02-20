@@ -45,7 +45,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import yams.mechanisms.swerve.SwerveDrive;
+
+import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.Constants.VisionConstants;
 import org.team157.robot.Robot;
 
@@ -53,6 +57,9 @@ import org.team157.robot.Robot;
 public class VisionSystem extends SubsystemBase {
 
   public boolean hasTag = false;
+
+  public static double angleToTarget = 0;
+  public static double distanceToTarget = 0;
 
   // TODO: move to constants.java
   final PoseStrategy poseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
@@ -101,6 +108,15 @@ public class VisionSystem extends SubsystemBase {
   
     PortForwarder.add(5800, "photonvision1.local", 5800);
     PortForwarder.add(5800, "photonvision2.local", 5800);
+    setDefaultCommand(getDefaultCommand());
+  }
+
+  public Command getDefaultCommand(DriveSystem drivetrain, TurretSystem turret) {
+    return run(() -> {
+      updatePoseEstimation(drivetrain);
+      // turret.updateRelativeAngleToTag(26, drivetrain.getPose());
+    });
+    
   }
 
   public void updateAlliance() {
@@ -133,6 +149,10 @@ public class VisionSystem extends SubsystemBase {
    */
   public void updatePoseEstimation(DriveSystem swerveDrive) {
     for (Cameras camera : Cameras.values()) {
+       // ignore turretCamera for global positioning
+      if(!camera.useForPositioning) {
+        continue;
+      }
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent()) {
         Optional<EstimatedRobotPose> filteredPose = filterPose(poseEst);
@@ -159,6 +179,10 @@ public class VisionSystem extends SubsystemBase {
    */
   public void resetPoseEstimation(DriveSystem swerveDrive) {
     for (Cameras camera : Cameras.values()) {
+      // ignore turretCamera for global positioning
+      if(!camera.useForPositioning) { 
+        continue;
+      }
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent()) {
         Optional<EstimatedRobotPose> filteredPose = filterPose(poseEst);
@@ -266,9 +290,13 @@ public class VisionSystem extends SubsystemBase {
   public void updateVisionField() {
 
     List<PhotonTrackedTarget> targets = new ArrayList<PhotonTrackedTarget>();
-    for (Cameras c : Cameras.values()) {
-      if (!c.resultsList.isEmpty()) {
-        PhotonPipelineResult latest = c.resultsList.get(0);
+    for (Cameras camera : Cameras.values()) {
+       // ignore turretCamera for global positioning
+      if(!camera.useForPositioning) {
+        continue;
+      }
+      if (!camera.resultsList.isEmpty()) {
+        PhotonPipelineResult latest = camera.resultsList.get(0);
         if (latest.hasTargets()) {
           targets.addAll(latest.targets);
         }
@@ -285,7 +313,42 @@ public class VisionSystem extends SubsystemBase {
 
     field2d.getObject("tracked targets").setPoses(poses);
   }
+    /**
+   * Update the pose estimation inside of {@link SwerveDrive} with all of the given poses.
+   *
+   * @param swerveDrive {@link SwerveDrive} instance.
+   */
+  public double getHubTagYawFromTurretCam() {
+    Cameras.TURRET_CAM.updateUnreadResults();
+    PhotonTrackedTarget target = getTargetFromId(26, Cameras.TURRET_CAM);
+    if(target == null) {
+      // arbitrary number indicating no target
+      return 157357;
+    }
 
+    return target.yaw;
+  }
+
+  /**
+   * Get a tag's 2d location on the field, and calculate the angle and distance to it from the robot's pose.
+   * @param id the tag ID to extract a Pose2d from
+   * @param robotPose the current Pose2d of the robot to calculate angle/distance from
+   */
+  public void setTargetParams(int id, Pose2d robotPose) {
+    Pose2d tagPose = fieldLayout.getTagPose(id).get().toPose2d();
+
+    distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, tagPose);
+    angleToTarget = PhotonUtils.getYawToPose(robotPose, tagPose).getDegrees();
+  }
+  /**
+   * Calculate the angle and distance to a certain target from the robot's pose.
+   * @param targetPose the target Pose2d to calculate angle/distance to
+   * @param robotPose the current Pose2d of the robot to calculate angle/distance from
+   */
+  public void setTargetParams(Pose2d targetPose, Pose2d robotPose) {
+    distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, targetPose);
+    angleToTarget = PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();
+  }
 
  /**
    * Camera Enum to select each camera
@@ -311,7 +374,19 @@ public class VisionSystem extends SubsystemBase {
     BACK_CAM(VisionConstants.BACK_CAMERA_NICKNAME,
                VisionConstants.BACK_CAMERA_ROTATION,
                VisionConstants.BACK_CAMERA_TRANSLATION,
+               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+    /**
+     * Turret Camera
+     */
+    TURRET_CAM(VisionConstants.TURRET_CAMERA_NICKNAME,
+               VisionConstants.TURRET_CAMERA_ROTATION,
+               VisionConstants.TURRET_CAMERA_TRANSLATION,
                VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+
+      /**
+     * flag to ignore the turret cam for positioning
+     */        
+    private boolean useForPositioning = true;
 
     /**
      * Latency alert to use when high latency is detected.
@@ -382,6 +457,10 @@ public class VisionSystem extends SubsystemBase {
                                               PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                                               robotToCamTransform);
       poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+
+      if(name.equals(VisionConstants.TURRET_CAMERA_NICKNAME)) {
+        this.useForPositioning = false;
+      } 
 
       this.singleTagStdDevs = singleTagStdDevs;
       this.multiTagStdDevs = multiTagStdDevsMatrix;

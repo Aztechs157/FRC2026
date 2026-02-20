@@ -89,8 +89,8 @@ public final class Constants {
   public static class TurretConstants {
     public static final int MOTOR_ID = 18;
     public static final int ENCODER_ID = 0;
-    public static final double MIN_ENCODER_POSITION = 0.1, MAX_ENCODER_POSITION = 1.2;
-    public static final double MIN_ANGLE = -32, MAX_ANGLE = 430;
+    public static final double MIN_ENCODER_POSITION = 0.006, MAX_ENCODER_POSITION = 0.99;
+    public static final double MIN_ANGLE = -179, MAX_ANGLE = 179;
     public static final double KP = 157, KI = 0, KD = 0;
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
     public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(2880);
@@ -105,8 +105,7 @@ public final class Constants {
     // TODO: update these constants when testing on actual robot
     public static final int MOTOR_ID = 19;
     public static final int ENCODER_ID = 2;
-    public static final double MIN_ENCODER_POSITION = 0.309, MAX_ENCODER_POSITION = 0.975
-    ;
+    public static final double MIN_ENCODER_POSITION = 0.13, MAX_ENCODER_POSITION = 0.7;
     public static final double MIN_ANGLE = 40, MAX_ANGLE = 65;
     public static final Angle LOWER_SOFT_LIMIT = Degrees.of(45), UPPER_SOFT_LIMIT = Degrees.of(60);
     public static final Angle LOWER_HARD_LIMIT = Degrees.of(40), UPPER_HARD_LIMIT = Degrees.of(65);
