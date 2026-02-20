@@ -66,7 +66,7 @@ public final class Constants {
     public static final double KP = 157, KI = 0, KD = 0;
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
     public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(540);
-    public static final double MIN_ENCODER_POSITION = 0.025, MAX_ENCODER_POSITION = 0.9157;
+    public static final double MIN_ENCODER_POSITION = 0.01, MAX_ENCODER_POSITION = 0.91;
     public static final double MIN_ANGLE = 0, MAX_ANGLE = 80;
     public static final Angle LOWER_SOFT_LIMIT = Degrees.of(0), UPPER_SOFT_LIMIT = Degrees.of(80);
     public static final Angle LOWER_HARD_LIMIT = Degrees.of(0), UPPER_HARD_LIMIT = Degrees.of(80);
@@ -93,19 +93,20 @@ public final class Constants {
     public static final double MIN_ANGLE = -179, MAX_ANGLE = 179;
     public static final double KP = 157, KI = 0, KD = 0;
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
-    public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(2880);
-    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromReductionStages(3, 5));
-    public static final Current CURRENT_LIMIT = Amps.of(30);
+    public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(360);
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("28:1"));
+    public static final Current CURRENT_LIMIT = Amps.of(40);
     public static final Time RAMP_RATE = Seconds.of(0.00157);
-    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(-120), UPPER_SOFT_LIMIT = Degrees.of(120);
-    public static final Angle LOWER_HARD_LIMIT = Degrees.of(-135), UPPER_HARD_LIMIT = Degrees.of(135);
+    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(-179), UPPER_SOFT_LIMIT = Degrees.of(179);
+    public static final Angle LOWER_HARD_LIMIT = Degrees.of(-179), UPPER_HARD_LIMIT = Degrees.of(179);
   }
 
   public static class HoodConstants {
     // TODO: update these constants when testing on actual robot
     public static final int MOTOR_ID = 19;
     public static final int ENCODER_ID = 2;
-    public static final double MIN_ENCODER_POSITION = 0.13, MAX_ENCODER_POSITION = 0.7;
+
+    public static final double MIN_ENCODER_POSITION = 0.375, MAX_ENCODER_POSITION = 0.94;
     public static final double MIN_ANGLE = 40, MAX_ANGLE = 65;
     public static final Angle LOWER_SOFT_LIMIT = Degrees.of(45), UPPER_SOFT_LIMIT = Degrees.of(60);
     public static final Angle LOWER_HARD_LIMIT = Degrees.of(40), UPPER_HARD_LIMIT = Degrees.of(65);
@@ -126,7 +127,7 @@ public final class Constants {
     public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("14:20"));
     //TODO: put real values here and not made up ones
     public static final Distance FLYWHEEL_DIAMETER = Inches.of(3.75);
-    public static final Mass FLYWHEEL_MASS = Pounds.of(4);
+    public static final Mass FLYWHEEL_MASS = Pounds.of(2);
     public static final AngularVelocity FLYWHEEL_RPM_LIMIT_UPPER = RPM.of(1000); // TODO: remove or update unused/outdated constant
     public static final Distance HEIGHT = Feet.of(2.5);
     public static final Time RAMP_RATE = Seconds.of(0.25);
