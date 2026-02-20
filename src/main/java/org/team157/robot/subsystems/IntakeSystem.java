@@ -140,8 +140,7 @@ public class IntakeSystem extends SubsystemBase {
    * @param angle Angle to go to.
    */
   public Command setAngle(Angle angle) {
-    return intakePivot.setAngle(angle);
-    // .finallyDo(() -> intakePivot.setDutyCycleSetpoint(0));
+    return intakePivot.setAngle(angle).finallyDo(() -> intakePivot.setDutyCycleSetpoint(0));
   }
 
   public Command setAngleThenStop(Angle angle) {
