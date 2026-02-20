@@ -6,20 +6,17 @@ package org.team157.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.lang.reflect.Modifier;
-
-import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import org.team157.robot.Constants.ControllerConstants;
@@ -61,10 +58,10 @@ public class RobotContainer {
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
 
+
     private final SendableChooser<Command> autoChooser;
 
- 
-
+    public final Trigger intakeDeployTrigger = new Trigger(() -> intake.getDeployState());
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
         if (ModifierConstants.DEMO_MODE) {
@@ -140,28 +137,35 @@ public class RobotContainer {
         // driverController.y().toggleOnTrue(turret.trackHubTag());
         // driverController.rightBumper().toggleOnTrue(turret.trackTagGlobalRelative());
 
+
         drivetrain.registerTelemetry(logger::telemeterize);
         
+        
+
         ////////////////////////////////////////////////////////
         /// FLYWHEEL COMMANDS
         ///////////////////////////////////////////////////////
         flywheel.setDefaultCommand(flywheel.set(0));
 
-        driverController.rightTrigger().whileTrue(flywheel.setVelocity(RPM.of(60)));
-        driverController.leftTrigger().whileTrue(flywheel.setVelocity(RPM.of(300)));
+
+        driverController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(6000)));
+        driverController.leftTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4500)));
         ////////////////////////////////////////////////////////
         /// INTAKE COMMANDS
         ///////////////////////////////////////////////////////
-        intake.setDefaultCommand(intake.setDefault());
-        driverController.a().toggleOnTrue(intake.deployIntake());
-        driverController.y().toggleOnTrue(intake.retractIntake());
-        // driverController.rightBumper().toggleOnTrue(intake.setRoller(1));
+        intake.setDefaultCommand(intake.setDefault()); 
+
+        intakeDeployTrigger.onTrue(intake.deployIntake()).onFalse(intake.retractIntake()); //TODO: decide on a button for this
+        driverController.start().and(driverController.a()).toggleOnTrue(intake.deployIntake());
+        driverController.start().and(driverController.y()).toggleOnTrue(intake.retractIntake());
+        driverController.rightBumper().toggleOnTrue(intake.setRoller(1));
 
         ////////////////////////////////////////////////////////
         /// HOPPER COMMANDS
         ///////////////////////////////////////////////////////
         hopper.setDefaultCommand(hopper.setDefault());
-        // driverController.leftBumper().toggleOnTrue(hopper.setRoller(1).alongWith(uptake.setRoller(1)));
+
+        driverController.leftBumper().toggleOnTrue(hopper.setRoller(0.5).alongWith(uptake.setRoller(1)));
 
         ////////////////////////////////////////////////////////
         /// UPTAKE COMMANDS
@@ -172,6 +176,14 @@ public class RobotContainer {
         /////////////////////
         driverController.leftBumper().toggleOnTrue(hood.setAngleThenStop(Degrees.of(40)));
         driverController.rightBumper().toggleOnTrue(hood.setAngleThenStop(Degrees.of(0)));
+
+
+        ////////////////////////////////////////////////////////
+        /// HOOD COMMANDS
+        ///////////////////////////////////////////////////////
+        hood.setDefaultCommand(hood.setDefault());
+        driverController.a().toggleOnTrue(hood.setAngle(Degrees.of(60)));
+        driverController.y().toggleOnTrue(hood.setAngle(Degrees.of(48)));
 
     }
 

@@ -4,10 +4,8 @@
 
 package org.team157.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
@@ -20,6 +18,7 @@ import org.team157.robot.Constants.IntakeConstants;
 import org.team157.robot.Constants.ModelConstants;
 import org.team157.utilities.PosUtils;
 
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -30,10 +29,8 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.config.PivotConfig;
 import yams.mechanisms.positional.Pivot;
-import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
@@ -43,28 +40,32 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class HoodSystem extends SubsystemBase {
 
+    ////////////////////
+   /// HOOD PIVOT ///
+  ////////////////////
   private TalonFX motor = new TalonFX(HoodConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
   private DutyCycleEncoder encoder = new DutyCycleEncoder(HoodConstants.ENCODER_ID);
 
   // Configure the hood motor controller for use with YAMS.
-  private SmartMotorControllerConfig intakePivotMotorConfig = new SmartMotorControllerConfig(this)
+  private SmartMotorControllerConfig hoodPivotMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(HoodConstants.KP, HoodConstants.KI, HoodConstants.KD, DegreesPerSecond.of(HoodConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(HoodConstants.ANGULAR_ACCELERATION)) //TODO: tune this PID
+      .withClosedLoopController(HoodConstants.KP, HoodConstants.KI, HoodConstants.KD, (HoodConstants.ANGULAR_VELOCITY), (HoodConstants.ANGULAR_ACCELERATION)) //TODO: tune this PID
       .withIdleMode(MotorMode.BRAKE) //TODO: evaluate if coast or brake is better for this mechanism
-      .withMotorInverted(true) //TODO: verify motor inversion
+      .withMotorInverted(false) //TODO: verify motor inversion
       .withGearing(HoodConstants.GEARING)
       .withTelemetry("Hood Motor", TelemetryVerbosity.HIGH) 
-      .withStatorCurrentLimit(Amps.of(HoodConstants.CURRENT_LIMIT)) // TODO: Evaluate constant types (ie doubles or correct units)
-      .withClosedLoopRampRate(Seconds.of(HoodConstants.RAMP_RATE));
+      .withSoftLimit((HoodConstants.LOWER_SOFT_LIMIT), (HoodConstants.UPPER_SOFT_LIMIT))
+      .withStatorCurrentLimit(HoodConstants.CURRENT_LIMIT) // TODO: Evaluate constant types (ie doubles or correct units)
+      .withClosedLoopRampRate((HoodConstants.RAMP_RATE));
 
   // Create the hood's motor controller with the above configuration.
-  private SmartMotorController smartHoodMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX60(1), intakePivotMotorConfig);
+  private SmartMotorController smartHoodMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), hoodPivotMotorConfig);
 
   // Configure the physical characteristics of the hood.
   private PivotConfig hoodConfig = new PivotConfig(smartHoodMotor)
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
-      .withHardLimit(Degrees.of(HoodConstants.LOWER_HARD_LIMIT), Degrees.of(HoodConstants.UPPER_HARD_LIMIT))
-      .withSoftLimits(Degrees.of(HoodConstants.LOWER_SOFT_LIMIT), Degrees.of(HoodConstants.UPPER_SOFT_LIMIT))
+      .withHardLimit((HoodConstants.LOWER_HARD_LIMIT), (HoodConstants.UPPER_HARD_LIMIT))
+      //.withSoftLimits(Degrees.of(HoodConstants.LOWER_SOFT_LIMIT), Degrees.of(HoodConstants.UPPER_SOFT_LIMIT))
       .withTelemetry("Hood", TelemetryVerbosity.HIGH)
       .withMOI(Meters.of(0.2), Kilograms.of(0.5));
 
@@ -73,9 +74,14 @@ public class HoodSystem extends SubsystemBase {
   
   /** Creates a new HoodSystem */
   public HoodSystem() {
+    var configurator = motor.getConfigurator();
+    configurator.refresh(new SoftwareLimitSwitchConfigs().withForwardSoftLimitEnable(true).withReverseSoftLimitEnable(true));
     
   }
-
+  public Command setDefault() {
+    // return setRoller(0).
+    return setHood(0);
+  }
   /**
    * Set the target angle of the hood.
    * @param angle Angle to go to.
@@ -89,19 +95,12 @@ public class HoodSystem extends SubsystemBase {
 
   }
 
-  // public Command deployIntake() {
-  //   return setAngleThenStop(Degrees.of(0));
-  // }
-
-  // public Command retractIntake() {
-  //   return setAngleThenStop(Degrees.of(80));
-  // }
 
   /**
    * Move the hood up and down.
    * @param dutycycle [-1, 1] speed to set the hood too.
    */
-  public Command setPivot(double dutycycle) { 
+  public Command setHood(double dutycycle) { 
     return hood.set(dutycycle);
   }
 
@@ -134,7 +133,7 @@ public class HoodSystem extends SubsystemBase {
    * @return The position of the hood scaled from 0 to 1.
    */
   public double getScaledPos() {
-    return PosUtils.mapRange(getPos(), IntakeConstants.MIN_ENCODER_POSITION, IntakeConstants.MAX_ENCODER_POSITION, 0.0,
+    return PosUtils.mapRange(getPos(), HoodConstants.MIN_ENCODER_POSITION, HoodConstants.MAX_ENCODER_POSITION, 0.0,
         1.0);
   }
 
@@ -150,8 +149,8 @@ public class HoodSystem extends SubsystemBase {
    * @return The angle of the hood, in degrees, from -180 to 180, using the encoder directly.
    */
   public double getScaledPosAngleEncoder() {
-    return PosUtils.mapRange(getPos(), IntakeConstants.MIN_ENCODER_POSITION, IntakeConstants.MAX_ENCODER_POSITION, IntakeConstants.MIN_ANGLE,
-        IntakeConstants.MAX_ANGLE);
+    return PosUtils.mapRange(getPos(), HoodConstants.MIN_ENCODER_POSITION, HoodConstants.MAX_ENCODER_POSITION, HoodConstants.MIN_ANGLE,
+        HoodConstants.MAX_ANGLE);
   }
 
   /**

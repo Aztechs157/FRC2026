@@ -4,7 +4,6 @@
 
 package org.team157.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilograms;
 
@@ -37,7 +36,7 @@ public class HopperSystem extends SubsystemBase {
     .withGearing(1)
     .withMotorInverted(true)
     .withIdleMode(MotorMode.COAST)
-    .withStatorCurrentLimit(Amps.of(HopperConstants.CURRENT_LIMIT));
+    .withStatorCurrentLimit((HopperConstants.CURRENT_LIMIT));
 
   // vendor motor controller object
   private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX44(1), hopperRollerMotorConfig);

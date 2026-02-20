@@ -4,12 +4,21 @@
 
 package org.team157.robot;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Feet;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Seconds;
 
 import org.team157.robot.parsing.PositionDetails;
+
 import com.ctre.phoenix6.CANBus;
 
-import edu.wpi.first.units.measure.Distance;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
 
@@ -17,6 +26,13 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.Time;
 
 public final class Constants {
   public static final CANBus RIO_CAN_BUS = new CANBus("rio", "./logs/example.hoot");
@@ -46,59 +62,62 @@ public final class Constants {
 
   public static class IntakeConstants {
     // Pivot
-    public static final int PIVOT_MOTOR_ID = 14;
+    public static final int PIVOT_MOTOR_ID = 15;
     public static final int PIVOT_ENCODER_ID = 1;
     // public static final MechanismGearing PIVOT_GEARING = new MechanismGearing(GearBox.fromReductionStages(1, 95.83));
     public static final MechanismGearing PIVOT_GEARING = new MechanismGearing(GearBox.fromStages("23:1", "50:12"));
     public static final double KP = 157, KI = 0, KD = 0;
-    public static final double ANGULAR_VELOCITY = 360, ANGULAR_ACCELERATION = 520;
-    public static final double MIN_ENCODER_POSITION = 0.0157, MAX_ENCODER_POSITION = 0.9157;
-    public static final double MIN_ANGLE = -0, MAX_ANGLE = 80;
-    public static final double LOWER_SOFT_LIMIT = 0, UPPER_SOFT_LIMIT = 78;
-    public static final double LOWER_HARD_LIMIT = -5, UPPER_HARD_LIMIT = 85;
-    public static final double CURRENT_LIMIT = 40;
-    public static final double RAMP_RATE = 0.00157;
+    public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
+    public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(540);
+    public static final double MIN_ENCODER_POSITION = 0.025, MAX_ENCODER_POSITION = 0.9157;
+    public static final double MIN_ANGLE = 0, MAX_ANGLE = 80;
+    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(0), UPPER_SOFT_LIMIT = Degrees.of(80);
+    public static final Angle LOWER_HARD_LIMIT = Degrees.of(0), UPPER_HARD_LIMIT = Degrees.of(80);
+    public static final Current CURRENT_LIMIT = Amps.of(40);
+    public static final Time RAMP_RATE = Seconds.of(0.00157);
 
-    public static final int ROLLER_MOTOR_ID = 15;
+    public static final int ROLLER_MOTOR_ID = 14;
   }
 
   public static class HopperConstants {
     public static final int MOTOR_ID = 16;
-    public static final double CURRENT_LIMIT = 40;
+    public static final Current CURRENT_LIMIT = Amps.of(40);
   }
 
   public static class UptakeConstants {
     public static final int MOTOR_ID = 17;
-    public static final double CURRENT_LIMIT = 40;
+    public static final Current CURRENT_LIMIT = Amps.of(40);
   }
 
   public static class TurretConstants {
     public static final int MOTOR_ID = 18;
     public static final int ENCODER_ID = 0;
-    public static final double MIN_ENCODER_POSITION = 0.1, MAX_ENCODER_POSITION = 1.2;
-    public static final double MIN_ANGLE = -32, MAX_ANGLE = 430;
+    public static final double MIN_ENCODER_POSITION = 0.006, MAX_ENCODER_POSITION = 0.99;
+    public static final double MIN_ANGLE = -179, MAX_ANGLE = 179;
     public static final double KP = 157, KI = 0, KD = 0;
-    public static final double ANGULAR_VELOCITY = 360, ANGULAR_ACCELERATION = 2880;
+    public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
+    public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(2880);
     public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromReductionStages(3, 5));
-    public static final double CURRENT_LIMIT = 30;
-    public static final double RAMP_RATE = 0.00157;
-    public static final double LOWER_SOFT_LIMIT = -120, UPPER_SOFT_LIMIT = 120;
-    public static final double LOWER_HARD_LIMIT = -135, UPPER_HARD_LIMIT = 135;
+    public static final Current CURRENT_LIMIT = Amps.of(30);
+    public static final Time RAMP_RATE = Seconds.of(0.00157);
+    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(-120), UPPER_SOFT_LIMIT = Degrees.of(120);
+    public static final Angle LOWER_HARD_LIMIT = Degrees.of(-135), UPPER_HARD_LIMIT = Degrees.of(135);
   }
 
   public static class HoodConstants {
     // TODO: update these constants when testing on actual robot
     public static final int MOTOR_ID = 19;
     public static final int ENCODER_ID = 2;
-    public static final double MIN_ENCODER_POSITION = 0.0157, MAX_ENCODER_POSITION = 0.9157;
-    public static final double MIN_ANGLE = 0, MAX_ANGLE = 40;
-    public static final double LOWER_SOFT_LIMIT = 0, UPPER_SOFT_LIMIT = 45;
-    public static final double LOWER_HARD_LIMIT = 0, UPPER_HARD_LIMIT = 45;
-    public static final double KP = 100, KI = 0,  KD = 0;
-    public static final double ANGULAR_VELOCITY = 360, ANGULAR_ACCELERATION = 520;
-    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("23:1", "50:12"));
-    public static final double CURRENT_LIMIT = 40;
-    public static final double RAMP_RATE = 0.00157;
+    public static final double MIN_ENCODER_POSITION = 0.13, MAX_ENCODER_POSITION = 0.7;
+    public static final double MIN_ANGLE = 40, MAX_ANGLE = 65;
+    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(45), UPPER_SOFT_LIMIT = Degrees.of(60);
+    public static final Angle LOWER_HARD_LIMIT = Degrees.of(40), UPPER_HARD_LIMIT = Degrees.of(65);
+    public static final double KP = 157, KI = 0,  KD = 0;
+    public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
+    public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(360);
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("32:14", "16:1"));
+    public static final Current CURRENT_LIMIT = Amps.of(40);
+    public static final Time RAMP_RATE = Seconds.of(0.00157);
     
   }
   
@@ -106,14 +125,14 @@ public final class Constants {
     public static final int MOTOR_ID = 20;
     public static final int MOTOR_ID_FOLLOWER = 21;
     // TODO: do actual tuning
-    public static final double P = 1, I = 0, D = 0;
-    public static final double KS = 0, KV = 0, KA = 0;
-    public static final double GEARING = 0.7;
+    public static final double P = 0.000157, I = 0, D = 0;
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("14:20"));
     //TODO: put real values here and not made up ones
-    public static final double FLYWHEEL_DIAMETER = 3.75; // inches
-    public static final double FLYWHEEL_MASS = 4; // pounds
-    public static final double FLYWHEEL_RPM_LIMIT_UPPER = 1000; 
-    public static final double HEIGHT = 2.5;
+    public static final Distance FLYWHEEL_DIAMETER = Inches.of(3.75);
+    public static final Mass FLYWHEEL_MASS = Pounds.of(4);
+    public static final AngularVelocity FLYWHEEL_RPM_LIMIT_UPPER = RPM.of(1000); // TODO: remove or update unused/outdated constant
+    public static final Distance HEIGHT = Feet.of(2.5);
+    public static final Time RAMP_RATE = Seconds.of(0.25);
 
   }
 
