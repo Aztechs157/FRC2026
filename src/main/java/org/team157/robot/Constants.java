@@ -93,12 +93,12 @@ public final class Constants {
     public static final double MIN_ANGLE = -179, MAX_ANGLE = 179;
     public static final double KP = 157, KI = 0, KD = 0;
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
-    public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(2880);
-    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromReductionStages(3, 5));
-    public static final Current CURRENT_LIMIT = Amps.of(30);
+    public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(360);
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("28:1"));
+    public static final Current CURRENT_LIMIT = Amps.of(40);
     public static final Time RAMP_RATE = Seconds.of(0.00157);
-    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(-120), UPPER_SOFT_LIMIT = Degrees.of(120);
-    public static final Angle LOWER_HARD_LIMIT = Degrees.of(-135), UPPER_HARD_LIMIT = Degrees.of(135);
+    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(-179), UPPER_SOFT_LIMIT = Degrees.of(179);
+    public static final Angle LOWER_HARD_LIMIT = Degrees.of(-179), UPPER_HARD_LIMIT = Degrees.of(179);
   }
 
   public static class HoodConstants {
