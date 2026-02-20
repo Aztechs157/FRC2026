@@ -36,7 +36,9 @@ public class UptakeSystem extends SubsystemBase {
     .withGearing(1)
     .withMotorInverted(false)
     .withIdleMode(MotorMode.COAST)
-    .withStatorCurrentLimit((UptakeConstants.CURRENT_LIMIT));
+    .withStatorCurrentLimit((UptakeConstants.CURRENT_LIMIT))
+    .withGearing(UptakeConstants.GEARING);
+
 
   // vendor motor controller object
   private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX44(1), uptakeRollerMotorConfig);

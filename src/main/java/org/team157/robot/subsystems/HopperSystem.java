@@ -36,7 +36,8 @@ public class HopperSystem extends SubsystemBase {
     .withGearing(1)
     .withMotorInverted(true)
     .withIdleMode(MotorMode.COAST)
-    .withStatorCurrentLimit((HopperConstants.CURRENT_LIMIT));
+    .withStatorCurrentLimit((HopperConstants.CURRENT_LIMIT))
+    .withGearing(HopperConstants.GEARING);
 
   // vendor motor controller object
   private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX44(1), hopperRollerMotorConfig);

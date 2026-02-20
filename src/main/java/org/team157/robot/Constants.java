@@ -82,11 +82,15 @@ public final class Constants {
   public static class HopperConstants {
     public static final int MOTOR_ID = 16;
     public static final Current CURRENT_LIMIT = Amps.of(40);
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("2:1"));
+
   }
 
   public static class UptakeConstants {
     public static final int MOTOR_ID = 17;
     public static final Current CURRENT_LIMIT = Amps.of(40);
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("9:1"));
+
   }
 
   public static class TurretConstants {
