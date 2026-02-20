@@ -149,8 +149,8 @@ public class RobotContainer {
         intake.setDefaultCommand(intake.setDefault()); 
 
         intakeDeployTrigger.onTrue(intake.deployIntake()).onFalse(intake.retractIntake()); //TODO: decide on a button for this
-        //driverController.a().toggleOnTrue(intake.deployIntake());
-       // driverController.y().toggleOnTrue(intake.retractIntake());
+        driverController.a().and(driverController.start()).toggleOnTrue(intake.deployIntake());
+        driverController.y().and(driverController.start()).toggleOnTrue(intake.retractIntake());
         driverController.rightBumper().toggleOnTrue(intake.setRoller(0.75));
 
         ////////////////////////////////////////////////////////
