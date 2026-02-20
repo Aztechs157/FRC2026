@@ -141,8 +141,8 @@ public class RobotContainer {
         ///////////////////////////////////////////////////////
         flywheel.setDefaultCommand(flywheel.set(0));
 
-        driverController.rightTrigger().whileTrue(flywheel.setVelocity(RPM.of(6000)));
-        driverController.leftTrigger().whileTrue(flywheel.setVelocity(RPM.of(4500)));
+        driverController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(6000)));
+        driverController.leftTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4500)));
         ////////////////////////////////////////////////////////
         /// INTAKE COMMANDS
         ///////////////////////////////////////////////////////
@@ -157,7 +157,7 @@ public class RobotContainer {
         /// HOPPER COMMANDS
         ///////////////////////////////////////////////////////
         hopper.setDefaultCommand(hopper.setDefault());
-        driverController.leftBumper().toggleOnTrue(hopper.setRoller(1).alongWith(uptake.setRoller(1)));
+        driverController.leftBumper().toggleOnTrue(hopper.setRoller(0.5).alongWith(uptake.setRoller(1)));
 
         ////////////////////////////////////////////////////////
         /// UPTAKE COMMANDS
