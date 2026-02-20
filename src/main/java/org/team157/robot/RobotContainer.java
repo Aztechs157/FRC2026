@@ -138,23 +138,23 @@ public class RobotContainer {
         ///////////////////////////////////////////////////////
         flywheel.setDefaultCommand(flywheel.set(0));
 
-        driverController.rightTrigger().whileTrue(flywheel.setVelocity(RPM.of(6000)));
-        driverController.leftTrigger().whileTrue(flywheel.setVelocity(RPM.of(4500)));
+        driverController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(6000)));
+        driverController.leftTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4500)));
         ////////////////////////////////////////////////////////
         /// INTAKE COMMANDS
         ///////////////////////////////////////////////////////
         intake.setDefaultCommand(intake.setDefault()); 
 
         intakeDeployTrigger.onTrue(intake.deployIntake()).onFalse(intake.retractIntake()); //TODO: decide on a button for this
-        //driverController.a().toggleOnTrue(intake.deployIntake());
-       // driverController.y().toggleOnTrue(intake.retractIntake());
-        driverController.rightBumper().toggleOnTrue(intake.setRoller(0.75));
+        driverController.start().and(driverController.a()).toggleOnTrue(intake.deployIntake());
+        driverController.start().and(driverController.y()).toggleOnTrue(intake.retractIntake());
+        driverController.rightBumper().toggleOnTrue(intake.setRoller(1));
 
         ////////////////////////////////////////////////////////
         /// HOPPER COMMANDS
         ///////////////////////////////////////////////////////
         hopper.setDefaultCommand(hopper.setDefault());
-        driverController.leftBumper().toggleOnTrue(hopper.setRoller(1).alongWith(uptake.setRoller(1)));
+        driverController.leftBumper().toggleOnTrue(hopper.setRoller(0.5).alongWith(uptake.setRoller(1)));
 
         ////////////////////////////////////////////////////////
         /// UPTAKE COMMANDS

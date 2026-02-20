@@ -145,6 +145,7 @@ public class FlywheelSystem extends SubsystemBase {
     //double desiredVelocity = 2 * ballVelocity / (FlywheelConstants.FLYWHEEL_DIAMETER / 12 * Math.PI) + lossFunction();
     // double desiredVelocity = 2 * ballVelocity + lossFunction();
     double desiredRPM = 60 / ((FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters) * Math.PI) * FeetPerSecond.of(ballVelocity).in(MetersPerSecond);
+    
     System.out.println("Desired Ball Velocity (ft/sec): " + ballVelocity);
     System.out.println("Desired Flywheel Velocity (rpm): " + desiredRPM);
     return RPM.of(desiredRPM);
