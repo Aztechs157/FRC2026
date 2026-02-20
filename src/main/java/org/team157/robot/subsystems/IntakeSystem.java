@@ -7,17 +7,23 @@ package org.team157.robot.subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.team157.robot.Constants;
+import org.team157.robot.Robot;
 import org.team157.robot.Constants.IntakeConstants;
+import org.team157.robot.Constants.ModelConstants;
 import org.team157.utilities.PosUtils;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
-
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -55,7 +61,9 @@ public class IntakeSystem extends SubsystemBase {
   private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX60(1), intakeRollerMotorConfig);
 
   private final FlyWheelConfig intakeRollerConfig = new FlyWheelConfig(smartRollerMotor)
-  .withTelemetry("Intake", TelemetryVerbosity.HIGH);
+  .withTelemetry("Intake", TelemetryVerbosity.HIGH)
+  .withDiameter(Inches.of(3))
+  .withMass(Kilograms.of(0.5)); //TODO: measure mass of the intake roller and update this constant
 
   // flywheel mechanism
   private FlyWheel intakeRollers = new FlyWheel(intakeRollerConfig);
@@ -86,7 +94,8 @@ public class IntakeSystem extends SubsystemBase {
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
       .withHardLimit((IntakeConstants.LOWER_HARD_LIMIT), (IntakeConstants.UPPER_HARD_LIMIT))
       .withSoftLimits((IntakeConstants.LOWER_SOFT_LIMIT), (IntakeConstants.UPPER_SOFT_LIMIT))
-      .withTelemetry("Intake Pivot", TelemetryVerbosity.HIGH);
+      .withTelemetry("Intake Pivot", TelemetryVerbosity.HIGH)
+      .withMOI(Meters.of(0.75), Kilograms.of(1)); //TODO: measure MOI of the intake pivot and update these constants
 
   // Create the hood pivot system with the above configuration.
   private Pivot intakePivot = new Pivot(intakePivotConfig);
@@ -141,6 +150,7 @@ public class IntakeSystem extends SubsystemBase {
 
   public Command deployIntake() {
     return setAngleThenStop(Degrees.of(0));
+    // return setAngle(Degrees.of(0));
   }
 
   public Command retractIntake() {
@@ -204,7 +214,18 @@ public class IntakeSystem extends SubsystemBase {
    * Get the current angle of the hood, directly from the encoder value.
    * @return The angle of the hood, in degrees, from -180 to 180, using the encoder directly.
    */
+  public double getHopperWallsPosition() {
+    return PosUtils.mapRange(getScaledPosAngleYAMS(), IntakeConstants.MIN_ANGLE, IntakeConstants.MAX_ANGLE, 0.3048, 0);
+  }
+
+  /**
+   * Get the current angle of the hood, directly from the encoder value.
+   * @return The angle of the hood, in degrees, from -180 to 180, using the encoder directly.
+   */
   public double getScaledPosAngleEncoder() {
+    if(!Robot.isReal()) {
+      return 0;
+    }
     return PosUtils.mapRange(getPos(), IntakeConstants.MIN_ENCODER_POSITION, IntakeConstants.MAX_ENCODER_POSITION, IntakeConstants.MIN_ANGLE,
         IntakeConstants.MAX_ANGLE);
   }
@@ -238,6 +259,21 @@ public class IntakeSystem extends SubsystemBase {
     SmartDashboard.putNumber("Intake Pivot Angle (YAMS)", getScaledPosAngleYAMS());
     SmartDashboard.putNumber("Intake Pivot Angle (Encoder)", getScaledPosAngleEncoder());
     intakePivot.updateTelemetry();
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    // This method will be called once per scheduler run during simulation
+    // Updates the intake pivot simulation's values,
+    intakePivot.simIterate();
+  }
+
+  public Pose3d getHopperWallsPose() {
+    return new Pose3d(getHopperWallsPosition(), 0, 0, new Rotation3d());
+  }
+
+  public Pose3d getIntakePivotPose() {
+    return new Pose3d(ModelConstants.ORIGIN_TO_INTAKE_PIVOT_POINT_OFFSET, new Rotation3d(0, -Math.toRadians(getScaledPosAngleYAMS()), 0));
   }
 
 }

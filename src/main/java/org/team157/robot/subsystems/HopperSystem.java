@@ -4,6 +4,9 @@
 
 package org.team157.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Kilograms;
+
 import org.team157.robot.Constants;
 import org.team157.robot.Constants.HopperConstants;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -39,10 +42,13 @@ public class HopperSystem extends SubsystemBase {
   private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX44(1), hopperRollerMotorConfig);
 
   private final FlyWheelConfig hopperRollerConfig = new FlyWheelConfig(smartRollerMotor)
-  .withTelemetry("Hopper", TelemetryVerbosity.HIGH);
+    .withMass(Kilograms.of(0.5)) //TODO: measure mass of the hopper roller and update this constant
+    .withDiameter(Inches.of(1)) //TODO: measure diameter of the hopper roller and update this constant
+    .withTelemetry("Hopper", TelemetryVerbosity.HIGH);
 
   // flywheel mechanism
   private FlyWheel hopperRollers = new FlyWheel(hopperRollerConfig);
+ 
 
   /**
    * Set the dutycycle of the hopper.

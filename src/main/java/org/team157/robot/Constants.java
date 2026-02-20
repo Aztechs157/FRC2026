@@ -10,9 +10,12 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
+
+import org.team157.robot.parsing.PositionDetails;
 
 import com.ctre.phoenix6.CANBus;
 
@@ -166,5 +169,18 @@ public final class Constants {
     public static final double MIN_DISTANCE_TO_TAG = 0.8;
   }
 
+  public static class FieldConstants {
+    public static final Distance FIELD_LENGTH = Meters.of(16.54175);
+    public static final Distance FIELD_WIDTH = Meters.of(8.0137);
+    
+    public static final PositionDetails positionDetails = new PositionDetails();
+    
 
+  }
+
+  public static class ModelConstants {
+    public static final Translation3d ORIGIN_TO_TURRET_BASE_OFFSET = new Translation3d(-0.171, 0, 0.460);
+    public static final Translation3d ORIGIN_TO_HOOD_PIVOT_POINT_OFFSET = new Translation3d(-0.0465, 0, 0.530);
+    public static final Translation3d ORIGIN_TO_INTAKE_PIVOT_POINT_OFFSET = new Translation3d(0.146050, 0, 0.197803);
+  }
 }

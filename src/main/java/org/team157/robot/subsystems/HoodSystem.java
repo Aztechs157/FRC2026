@@ -6,18 +6,23 @@ package org.team157.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.team157.robot.Constants;
 import org.team157.robot.Constants.HoodConstants;
+import org.team157.robot.Constants.IntakeConstants;
+import org.team157.robot.Constants.ModelConstants;
 import org.team157.utilities.PosUtils;
 
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -45,7 +50,7 @@ public class HoodSystem extends SubsystemBase {
   private SmartMotorControllerConfig hoodPivotMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
       .withClosedLoopController(HoodConstants.KP, HoodConstants.KI, HoodConstants.KD, (HoodConstants.ANGULAR_VELOCITY), (HoodConstants.ANGULAR_ACCELERATION)) //TODO: tune this PID
-      .withIdleMode(MotorMode.COAST) //TODO: evaluate if coast or brake is better for this mechanism
+      .withIdleMode(MotorMode.BRAKE) //TODO: evaluate if coast or brake is better for this mechanism
       .withMotorInverted(false) //TODO: verify motor inversion
       .withGearing(HoodConstants.GEARING)
       .withTelemetry("Hood Motor", TelemetryVerbosity.HIGH) 
@@ -61,7 +66,8 @@ public class HoodSystem extends SubsystemBase {
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
       .withHardLimit((HoodConstants.LOWER_HARD_LIMIT), (HoodConstants.UPPER_HARD_LIMIT))
       //.withSoftLimits(Degrees.of(HoodConstants.LOWER_SOFT_LIMIT), Degrees.of(HoodConstants.UPPER_SOFT_LIMIT))
-      .withTelemetry("Hood", TelemetryVerbosity.HIGH);
+      .withTelemetry("Hood", TelemetryVerbosity.HIGH)
+      .withMOI(Meters.of(0.2), Kilograms.of(0.5));
 
   // Create the hood pivot system with the above configuration.
   private Pivot hood = new Pivot(hoodConfig);
@@ -168,6 +174,17 @@ public class HoodSystem extends SubsystemBase {
     SmartDashboard.putNumber("Hood Angle (YAMS)", getScaledPosAngleYAMS());
     SmartDashboard.putNumber("Hood Angle (Encoder)", getScaledPosAngleEncoder());
     hood.updateTelemetry();
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    // This method will be called once per scheduler run during simulation
+    // Updates the intake pivot simulation's values,
+    hood.simIterate();
+  }
+  
+  public Pose3d getHoodPose() {
+    return new Pose3d(ModelConstants.ORIGIN_TO_HOOD_PIVOT_POINT_OFFSET, new Rotation3d(0, -getScaledPosAngleYAMS(), 0));
   }
 
 }

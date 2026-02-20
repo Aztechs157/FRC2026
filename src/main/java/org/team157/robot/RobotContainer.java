@@ -42,7 +42,6 @@ public class RobotContainer {
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-   public final VisionSystem visionSystem;
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -51,11 +50,14 @@ public class RobotContainer {
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
     public final FlywheelSystem flywheel = new FlywheelSystem();
+
+    public final VisionSystem visionSystem;
     public final TurretSystem turret;
+    public final HoodSystem hood = new HoodSystem();
     public final IntakeSystem intake = new IntakeSystem();
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
-    public final HoodSystem hood = new HoodSystem();
+
 
     private final SendableChooser<Command> autoChooser;
 
@@ -126,11 +128,15 @@ public class RobotContainer {
         ///////////////////////////////////////////////////
         turret.setDefaultCommand(turret.set(0));
 
-        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-30)));
-        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(70)));
-        driverController.povLeft().whileTrue(turret.set(-0.1));
-        driverController.povRight().whileTrue(turret.set(0.1));
-        driverController.x().whileTrue(turret.set(0));
+        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-100)));
+        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(100)));
+        driverController.povLeft().whileTrue(turret.set(-0.05));
+        driverController.povRight().whileTrue(turret.set(0.05));
+        // driverController.x().whileTrue(turret.set(0));
+
+        // driverController.y().toggleOnTrue(turret.trackHubTag());
+        // driverController.rightBumper().toggleOnTrue(turret.trackTagGlobalRelative());
+
 
         drivetrain.registerTelemetry(logger::telemeterize);
         
@@ -140,6 +146,7 @@ public class RobotContainer {
         /// FLYWHEEL COMMANDS
         ///////////////////////////////////////////////////////
         flywheel.setDefaultCommand(flywheel.set(0));
+
 
         driverController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(6000)));
         driverController.leftTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4500)));
@@ -157,12 +164,18 @@ public class RobotContainer {
         /// HOPPER COMMANDS
         ///////////////////////////////////////////////////////
         hopper.setDefaultCommand(hopper.setDefault());
+
         driverController.leftBumper().toggleOnTrue(hopper.setRoller(0.5).alongWith(uptake.setRoller(1)));
 
         ////////////////////////////////////////////////////////
         /// UPTAKE COMMANDS
         ///////////////////////////////////////////////////////
         uptake.setDefaultCommand(uptake.setDefault());
+          /////////////////////
+         /// HOOD COMMANDS ///
+        /////////////////////
+        driverController.leftBumper().toggleOnTrue(hood.setAngleThenStop(Degrees.of(40)));
+        driverController.rightBumper().toggleOnTrue(hood.setAngleThenStop(Degrees.of(0)));
 
 
         ////////////////////////////////////////////////////////

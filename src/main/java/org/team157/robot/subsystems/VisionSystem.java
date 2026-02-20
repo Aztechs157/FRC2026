@@ -38,23 +38,30 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTablesJNI;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.mechanisms.swerve.SwerveDrive;
 
+import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.Constants.VisionConstants;
 import org.team157.robot.Robot;
 
 @Logged(strategy = Strategy.OPT_OUT)
 public class VisionSystem extends SubsystemBase {
+
+  // Publishes the turret's target point to NT for field zoning testing.
+  public StructPublisher<Pose2d> targetPosePublisher = NetworkTableInstance.getDefault().getStructTopic("Target Pose", Pose2d.struct).publish();
 
   public boolean hasTag = false;
 
@@ -87,7 +94,7 @@ public class VisionSystem extends SubsystemBase {
   private double longDistangePoseEstimationCount = 0;
   private Supplier<Pose2d> currentPose;
 
-  boolean blueAlliance = true;
+  boolean isBlueAlliance = true;
 
   /** Creates a new vision. */
   public VisionSystem(Supplier<Pose2d> currentPose, Field2d field) {
@@ -114,14 +121,22 @@ public class VisionSystem extends SubsystemBase {
   public Command getDefaultCommand(DriveSystem drivetrain, TurretSystem turret) {
     return run(() -> {
       updatePoseEstimation(drivetrain);
-      // turret.updateRelativeAngleToTag(26, drivetrain.getPose());
+      turret.updateRelativeAngleToTag(FieldConstants.positionDetails.targetPose2d(drivetrain.getPose(), isBlueAlliance), drivetrain.getPose());
     });
     
   }
+  /** 
+   * Gets the aiming target of the turret, based on the current alliance, and the robot's current location on the field.
+   * @return the target point on the field the turret should be aiming at, as a Pose2d.
+   */
+  public Pose2d getDesiredPose() {
+    return FieldConstants.positionDetails.targetPose2d(currentPose.get(), isBlueAlliance);
+  }
 
   public void updateAlliance() {
-    var alliance = DriverStation.getAlliance();
-    blueAlliance = alliance.get() == DriverStation.Alliance.Blue;
+    isBlueAlliance = DriverStation.getAlliance()
+      .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
+    SmartDashboard.putBoolean("Is Blue Alliance", isBlueAlliance);
   }
 
     /**
@@ -608,5 +623,13 @@ public class VisionSystem extends SubsystemBase {
     }
 
 
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    // Publish the turret's target point to NT for field zoning testing.
+    targetPosePublisher.set(getDesiredPose());
+    updateAlliance();
   }
 }

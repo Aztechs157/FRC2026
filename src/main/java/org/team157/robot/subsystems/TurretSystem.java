@@ -17,6 +17,7 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.function.Supplier;
 
 import org.team157.robot.Constants;
+import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.TurretConstants;
 import org.team157.utilities.PosUtils;
 
@@ -26,6 +27,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -43,6 +46,7 @@ import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class TurretSystem extends SubsystemBase {
+
   private VisionSystem visionSystem;
   private TalonFX motor = new TalonFX(TurretConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
   private DutyCycleEncoder encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
@@ -51,6 +55,7 @@ public class TurretSystem extends SubsystemBase {
   // Configure the turret motor controller for use with YAMS.
   private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
+      .withSimClosedLoopController(7, 0, 0, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION) //TODO: tune this PID for the simulation  
       .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(false)
@@ -250,5 +255,20 @@ public class TurretSystem extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
     // Updates the turret simulation's values,
     turret.simIterate();
+  }
+
+  public Pose3d getBasePose() {
+    return new Pose3d(ModelConstants.ORIGIN_TO_TURRET_BASE_OFFSET, new Rotation3d(0, 0, Math.toRadians(getScaledPosAngleYAMS())));
+  }
+
+  public Transform3d getHoodPivotLocation() {
+    return new Transform3d(0.1245 * Math.cos(Math.toRadians(getScaledPosAngleYAMS())), 0.1245 * Math.sin(Math.toRadians(getScaledPosAngleYAMS())), 0.070, new Rotation3d(0, 0, Math.toRadians(getScaledPosAngleYAMS())));
+  }
+
+  public Pose3d getHoodPivotPose(Transform3d rotation) {
+    return new Pose3d(ModelConstants.ORIGIN_TO_TURRET_BASE_OFFSET, new Rotation3d())
+    .transformBy(getHoodPivotLocation())
+    .transformBy(rotation);
+
   }
 }
