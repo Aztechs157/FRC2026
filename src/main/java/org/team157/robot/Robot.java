@@ -4,25 +4,24 @@
 
 package org.team157.robot;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import com.ctre.phoenix6.HootAutoReplay;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -35,6 +34,15 @@ public class Robot extends TimedRobot {
   private String autoName, newAutoName;
   private Optional<Alliance> alliance, newAlliance;
   private Command m_autonomousCommand;
+
+  public static Pose3d[] zeroArray = new Pose3d[4];
+  public static Pose3d[] finalArray = new Pose3d[4];
+  // creates a publisher to send zeroed Pose3d values to NT for model calibration.
+  public static StructArrayPublisher<Pose3d> zeroedPoses = NetworkTableInstance.getDefault()
+      .getStructArrayTopic("ZeroedComponentPoses", Pose3d.struct).publish();
+  public static StructArrayPublisher<Pose3d> finalPoses = NetworkTableInstance.getDefault()
+      .getStructArrayTopic("FinalComponentPoses", Pose3d.struct).publish();
+
   public static final Field2d m_field = new Field2d();
 
   private final RobotContainer m_robotContainer;
@@ -71,6 +79,33 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
+    // these are just for model calibration
+    zeroArray = new Pose3d[] {
+      // turret base 
+      new Pose3d(), 
+      // turret hood
+      new Pose3d(),
+      // intake pivot
+      new Pose3d(), 
+      // hopper walls
+      new Pose3d() 
+    };
+    zeroedPoses.set(zeroArray);
+    
+     finalArray = new Pose3d[] {
+      // turret base 
+      m_robotContainer.turret.getBasePose(), 
+      // turret hood
+      m_robotContainer.turret.getHoodPivotPose(new Transform3d(0,0,0, new Rotation3d(0, Math.toRadians(m_robotContainer.hood.getScaledPosAngleYAMS()), 0))),
+
+
+      // m_robotContainer.hood.getHoodPose(),
+      // intake pivot
+      m_robotContainer.intake.getIntakePivotPose(), 
+      // hopper walls
+      m_robotContainer.intake.getHopperWallsPose() 
+    };
+    finalPoses.set(finalArray);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

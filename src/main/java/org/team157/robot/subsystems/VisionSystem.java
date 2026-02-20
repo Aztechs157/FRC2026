@@ -65,6 +65,9 @@ public class VisionSystem extends SubsystemBase {
 
   public boolean hasTag = false;
 
+  public static double angleToTarget = 0;
+  public static double distanceToTarget = 0;
+
   // TODO: move to constants.java
   final PoseStrategy poseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
   final PoseStrategy fallbackStrategy = PoseStrategy.LOWEST_AMBIGUITY;
@@ -334,37 +337,32 @@ public class VisionSystem extends SubsystemBase {
     Cameras.TURRET_CAM.updateUnreadResults();
     PhotonTrackedTarget target = getTargetFromId(26, Cameras.TURRET_CAM);
     if(target == null) {
+      // arbitrary number indicating no target
       return 157357;
     }
-    // what happens if target returns null
 
     return target.yaw;
   }
 
   /**
-   * Get a tag's 3d location on the field
-   * @param id the tag ID
-   * @return
+   * Get a tag's 2d location on the field, and calculate the angle and distance to it from the robot's pose.
+   * @param id the tag ID to extract a Pose2d from
+   * @param robotPose the current Pose2d of the robot to calculate angle/distance from
    */
-  public double getAngleToTarget(int id, Pose2d robotPose) {
+  public void setTargetParams(int id, Pose2d robotPose) {
     Pose2d tagPose = fieldLayout.getTagPose(id).get().toPose2d();
-    // Java example
-    double distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, tagPose);
-    double angleToTarget = PhotonUtils.getYawToPose(robotPose, tagPose).getDegrees();
 
-    return angleToTarget;
+    distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, tagPose);
+    angleToTarget = PhotonUtils.getYawToPose(robotPose, tagPose).getDegrees();
   }
   /**
-   * wawawawawawa
-   * @param id the tag ID
-   * @return
+   * Calculate the angle and distance to a certain target from the robot's pose.
+   * @param targetPose the target Pose2d to calculate angle/distance to
+   * @param robotPose the current Pose2d of the robot to calculate angle/distance from
    */
-  public double getAngleToTarget(Pose2d targetPose, Pose2d robotPose) {
-    // Java example
-    double distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, targetPose);
-    double angleToTarget = PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();
-
-    return angleToTarget;
+  public void setTargetParams(Pose2d targetPose, Pose2d robotPose) {
+    distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, targetPose);
+    angleToTarget = PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();
   }
 
  /**
@@ -539,7 +537,7 @@ public class VisionSystem extends SubsystemBase {
       }
 
         // resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
-        resultsList = Robot.isReal() ? camera.getAllUnreadResults() : new ArrayList<PhotonPipelineResult>();
+        resultsList = Robot.isReal() ? camera.getAllUnreadResults() : new ArrayList<PhotonPipelineResult>(); // ß
         lastReadTimestamp = currentTimestamp;
         resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
           return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;

@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
@@ -17,8 +16,9 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Supplier;
 
+import org.team157.robot.Constants;
+import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.TurretConstants;
-import org.team157.robot.generated.TunerConstants;
 import org.team157.utilities.PosUtils;
 
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
@@ -27,20 +27,16 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import yams.gearing.GearBox;
-import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.PivotConfig;
-import yams.mechanisms.positional.Arm;
 import yams.mechanisms.positional.Pivot;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
@@ -50,22 +46,24 @@ import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class TurretSystem extends SubsystemBase {
+
   private VisionSystem visionSystem;
-  private TalonFX motor = new TalonFX(TurretConstants.MOTOR_ID, TunerConstants.kCANBus);
+  private TalonFX motor = new TalonFX(TurretConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
   private DutyCycleEncoder encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
   public Angle trackingAngle = Degrees.of(0);
 
   // Configure the turret motor controller for use with YAMS.
   private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, DegreesPerSecond.of(TurretConstants.ANGULAR_VELOCITY), DegreesPerSecondPerSecond.of(TurretConstants.ANGULAR_ACCELERATION))
+      .withSimClosedLoopController(7, 0, 0, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION) //TODO: tune this PID for the simulation  
+      .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(false)
       .withGearing(TurretConstants.GEARING)
       .withTelemetry("Turret Motor", TelemetryVerbosity.HIGH) 
-      .withStatorCurrentLimit(Amps.of(TurretConstants.CURRENT_LIMIT))
-      .withClosedLoopRampRate(Seconds.of(TurretConstants.RAMP_RATE))
-      .withSoftLimit(Degrees.of(TurretConstants.LOWER_SOFT_LIMIT), Degrees.of(TurretConstants.UPPER_SOFT_LIMIT));
+      .withStatorCurrentLimit((TurretConstants.CURRENT_LIMIT))
+      .withClosedLoopRampRate((TurretConstants.RAMP_RATE))
+      .withSoftLimit((TurretConstants.LOWER_SOFT_LIMIT), (TurretConstants.UPPER_SOFT_LIMIT));
 
   // Create the turret's motor controller with the above configuration.
   private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX44(1), turretMotorConfig);
@@ -73,7 +71,7 @@ public class TurretSystem extends SubsystemBase {
   // Configure the physical characteristics of the turret.
   private PivotConfig turretConfig = new PivotConfig(smartMotor)
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
-      .withHardLimit(Degrees.of(TurretConstants.LOWER_HARD_LIMIT), Degrees.of(TurretConstants.UPPER_HARD_LIMIT))
+      .withHardLimit((TurretConstants.LOWER_HARD_LIMIT), (TurretConstants.UPPER_HARD_LIMIT))
       .withTelemetry("Turret", TelemetryVerbosity.HIGH)
       .withMOI(Meters.of(0.1), Kilograms.of(4));
 
@@ -166,7 +164,7 @@ public class TurretSystem extends SubsystemBase {
    * @return The position of the turret scaled from 0 to 1.
    */
   public double getScaledPos() {
-    return PosUtils.mapRange(getPos(), TurretConstants.MIN_POSITION, TurretConstants.MAX_POSITION, 0.0,
+    return PosUtils.mapRange(getPos(), TurretConstants.MIN_ENCODER_POSITION, TurretConstants.MAX_ENCODER_POSITION, 0.0,
         1.0);
   }
 
@@ -182,8 +180,7 @@ public class TurretSystem extends SubsystemBase {
    * @return The angle of the turret, in degrees, from -135 to 135, using the encoder directly.
    */
   public double getScaledPosAngleEncoder() {
-    return PosUtils.mapRange(getPos(), TurretConstants.MIN_POSITION, TurretConstants.MAX_POSITION, -135,
-        135);
+    return PosUtils.mapRange(getPos(), TurretConstants.MIN_ENCODER_POSITION, TurretConstants.MAX_ENCODER_POSITION, TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
   }
 
   /**
@@ -202,7 +199,7 @@ public class TurretSystem extends SubsystemBase {
     // The current angular offset of the tag, relative to the turret camera.
     double tagYaw = visionSystem.getHubTagYawFromTurretCam();
     SmartDashboard.putNumber("Target Yaw", tagYaw);
-    // if the target tag is seen,
+    // if the target tag is seen, at an arbitrary number indicating no target,
     if(tagYaw != 157357){
       // Subtract the camera-to-tag angle from the turret angle
       // to find our new setpoint angle to face the tag.
@@ -220,8 +217,8 @@ public class TurretSystem extends SubsystemBase {
    */
   public void updateRelativeAngleToTag(int tagID, Pose2d robotPose){
     // The current angular offset of the tag, relative to the turret camera.
-    double angleToTarget = visionSystem.getAngleToTarget(tagID, robotPose);
-    double turretToRobotAngleOffset = angleToTarget + 90;
+    visionSystem.setTargetParams(tagID, robotPose);
+    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 157; //158
     trackingAngle = Degrees.of(turretToRobotAngleOffset);
   }
 
@@ -231,8 +228,8 @@ public class TurretSystem extends SubsystemBase {
    */
   public void updateRelativeAngleToTag(Pose2d targetPose, Pose2d robotPose){
     // The current angular offset of the tag, relative to the turret camera.
-    double angleToTarget = visionSystem.getAngleToTarget(targetPose, robotPose);
-    double turretToRobotAngleOffset = angleToTarget + 90;
+    visionSystem.setTargetParams(targetPose, robotPose);
+    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 157; //158
     trackingAngle = Degrees.of(turretToRobotAngleOffset);
   }
 
@@ -258,5 +255,20 @@ public class TurretSystem extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
     // Updates the turret simulation's values,
     turret.simIterate();
+  }
+
+  public Pose3d getBasePose() {
+    return new Pose3d(ModelConstants.ORIGIN_TO_TURRET_BASE_OFFSET, new Rotation3d(0, 0, Math.toRadians(getScaledPosAngleYAMS())));
+  }
+
+  public Transform3d getHoodPivotLocation() {
+    return new Transform3d(0.1245 * Math.cos(Math.toRadians(getScaledPosAngleYAMS())), 0.1245 * Math.sin(Math.toRadians(getScaledPosAngleYAMS())), 0.070, new Rotation3d(0, 0, Math.toRadians(getScaledPosAngleYAMS())));
+  }
+
+  public Pose3d getHoodPivotPose(Transform3d rotation) {
+    return new Pose3d(ModelConstants.ORIGIN_TO_TURRET_BASE_OFFSET, new Rotation3d())
+    .transformBy(getHoodPivotLocation())
+    .transformBy(rotation);
+
   }
 }

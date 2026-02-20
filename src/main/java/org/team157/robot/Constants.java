@@ -4,11 +4,21 @@
 
 package org.team157.robot;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Feet;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Seconds;
 
 import org.team157.robot.parsing.PositionDetails;
 
-import edu.wpi.first.units.measure.Distance;
+import com.ctre.phoenix6.CANBus;
+
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
 
@@ -16,8 +26,17 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.Time;
 
 public final class Constants {
+  public static final CANBus RIO_CAN_BUS = new CANBus("rio", "./logs/example.hoot");
+  public static final CANBus DRIVE_CAN_BUS = new CANBus("canivore", "./logs/example2.hoot");
 
   public static class ModifierConstants {
     // Reduces drive speed by this factor when precision mode is active.
@@ -42,64 +61,103 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final int MOTOR_ID = 21;
+    // Pivot
+    public static final int PIVOT_MOTOR_ID = 15;
+    public static final int PIVOT_ENCODER_ID = 1;
+    // public static final MechanismGearing PIVOT_GEARING = new MechanismGearing(GearBox.fromReductionStages(1, 95.83));
+    public static final MechanismGearing PIVOT_GEARING = new MechanismGearing(GearBox.fromStages("23:1", "50:12"));
+    public static final double KP = 157, KI = 0, KD = 0;
+    public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
+    public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(540);
+    public static final double MIN_ENCODER_POSITION = 0.01, MAX_ENCODER_POSITION = 0.91;
+    public static final double MIN_ANGLE = 0, MAX_ANGLE = 80;
+    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(0), UPPER_SOFT_LIMIT = Degrees.of(80);
+    public static final Angle LOWER_HARD_LIMIT = Degrees.of(0), UPPER_HARD_LIMIT = Degrees.of(80);
+    public static final Current CURRENT_LIMIT = Amps.of(40);
+    public static final Time RAMP_RATE = Seconds.of(0.00157);
+
+    public static final int ROLLER_MOTOR_ID = 14;
+  }
+
+  public static class HopperConstants {
+    public static final int MOTOR_ID = 16;
+    public static final Current CURRENT_LIMIT = Amps.of(40);
   }
 
   public static class UptakeConstants {
-    public static final int MOTOR_ID = 22;
+    public static final int MOTOR_ID = 17;
+    public static final Current CURRENT_LIMIT = Amps.of(40);
   }
 
   public static class TurretConstants {
-    public static final int MOTOR_ID = 21;
+    public static final int MOTOR_ID = 18;
     public static final int ENCODER_ID = 0;
-    public static final double MIN_POSITION = 0.118, MAX_POSITION = 0.846;
+    public static final double MIN_ENCODER_POSITION = 0.006, MAX_ENCODER_POSITION = 0.99;
+    public static final double MIN_ANGLE = -179, MAX_ANGLE = 179;
     public static final double KP = 157, KI = 0, KD = 0;
-    public static final double ANGULAR_VELOCITY = 360, ANGULAR_ACCELERATION = 2880;
-    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromReductionStages(3, 5));
-    public static final double CURRENT_LIMIT = 30;
-    public static final double RAMP_RATE = 0.00157;
-    public static final double LOWER_SOFT_LIMIT = -120, UPPER_SOFT_LIMIT = 120;
-    public static final double LOWER_HARD_LIMIT = -135, UPPER_HARD_LIMIT = 135;
+    public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
+    public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(360);
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("28:1"));
+    public static final Current CURRENT_LIMIT = Amps.of(40);
+    public static final Time RAMP_RATE = Seconds.of(0.00157);
+    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(-179), UPPER_SOFT_LIMIT = Degrees.of(179);
+    public static final Angle LOWER_HARD_LIMIT = Degrees.of(-179), UPPER_HARD_LIMIT = Degrees.of(179);
   }
 
   public static class HoodConstants {
-    public static final int MOTOR_ID = 33;
-    public static final int POT_ID = 34;
+    // TODO: update these constants when testing on actual robot
+    public static final int MOTOR_ID = 19;
+    public static final int ENCODER_ID = 2;
+
+    public static final double MIN_ENCODER_POSITION = 0.375, MAX_ENCODER_POSITION = 0.94;
+    public static final double MIN_ANGLE = 40, MAX_ANGLE = 65;
+    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(45), UPPER_SOFT_LIMIT = Degrees.of(60);
+    public static final Angle LOWER_HARD_LIMIT = Degrees.of(40), UPPER_HARD_LIMIT = Degrees.of(65);
+    public static final double KP = 157, KI = 0,  KD = 0;
+    public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
+    public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(360);
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("32:14", "16:1"));
+    public static final Current CURRENT_LIMIT = Amps.of(40);
+    public static final Time RAMP_RATE = Seconds.of(0.00157);
+    
   }
   
   public static class FlywheelConstants {
-    public static final int MOTOR_ID = 35;
-    public static final int MOTOR_ID_FOLLOWER = 36;
+    public static final int MOTOR_ID = 20;
+    public static final int MOTOR_ID_FOLLOWER = 21;
     // TODO: do actual tuning
-    public static final double P = 50, I = 0, D = 0;
-    public static final double KS = 0, KV = 0, KA = 0;
-    public static final double GEARING = 0.7;
+    public static final double P = 0.000157, I = 0, D = 0;
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("14:20"));
     //TODO: put real values here and not made up ones
-    public static final double FLYWHEEL_DIAMETER = 4;
-    public static final double FLYWHEEL_MASS = 1;
-    public static final double FLYWHEEL_RPM_LIMIT_UPPER = 1000;
+    public static final Distance FLYWHEEL_DIAMETER = Inches.of(3.75);
+    public static final Mass FLYWHEEL_MASS = Pounds.of(2);
+    public static final AngularVelocity FLYWHEEL_RPM_LIMIT_UPPER = RPM.of(1000); // TODO: remove or update unused/outdated constant
+    public static final Distance HEIGHT = Feet.of(2.5);
+    public static final Time RAMP_RATE = Seconds.of(0.25);
 
   }
 
   public static class VisionConstants {
     public static final String FRONTLEFT_CAMERA_NICKNAME = "frontLeftCam";
-    public static final Rotation3d FRONTLEFT_CAMERA_ROTATION = new Rotation3d(0, -0.0523599, -0.139626);
-    public static final Translation3d FRONTLEFT_CAMERA_TRANSLATION = new Translation3d(0.2286, 0.3302, 0.4953);
+    public static final Rotation3d FRONTLEFT_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(25));
+    public static final Translation3d FRONTLEFT_CAMERA_TRANSLATION = new Translation3d(-0.136, 0.310, 0.339);
     public static final Transform3d FRONTLEFT_CAMERA_PLACEMENT = new Transform3d(
             FRONTLEFT_CAMERA_TRANSLATION, FRONTLEFT_CAMERA_ROTATION);
+
     public static final String FRONTRIGHT_CAMERA_NICKNAME = "frontRightCam";
-    public static final Rotation3d FRONTRIGHT_CAMERA_ROTATION = new Rotation3d(0, -0.0523599, 0.139626);
-    public static final Translation3d FRONTRIGHT_CAMERA_TRANSLATION = new Translation3d(0.2286, 0.3038, 0.4953);
+    public static final Rotation3d FRONTRIGHT_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(25));
+    public static final Translation3d FRONTRIGHT_CAMERA_TRANSLATION = new Translation3d(-0.136, -0.310, 0.339);
     public static final Transform3d FRONTRIGHT_CAMERA_PLACEMENT = new Transform3d(
             FRONTRIGHT_CAMERA_TRANSLATION, FRONTRIGHT_CAMERA_ROTATION);  
-    public static final String BACK_CAMERA_NICKNAME = "backTopCam";
-    public static final Rotation3d BACK_CAMERA_ROTATION = new Rotation3d(0, -0.0523599, 3.14159);
-    public static final Translation3d BACK_CAMERA_TRANSLATION = new Translation3d(-0.2921, -0.0381, 0.4953);
+
+    public static final String BACK_CAMERA_NICKNAME = "backCam";
+    public static final Rotation3d BACK_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(180));
+    public static final Translation3d BACK_CAMERA_TRANSLATION = new Translation3d(-0.301, 0, 0.294);
     public static final Transform3d BACK_CAMERA_PLACEMENT = new Transform3d(
             BACK_CAMERA_TRANSLATION, BACK_CAMERA_ROTATION);
 
     public static final String TURRET_CAMERA_NICKNAME = "turretCam";
-    public static final Rotation3d TURRET_CAMERA_ROTATION = new Rotation3d(0, -0.349066, 0);
+    public static final Rotation3d TURRET_CAMERA_ROTATION = new Rotation3d(0, 0, 0);
     public static final Translation3d TURRET_CAMERA_TRANSLATION = new Translation3d(0.2602992, 0, 0.126);
     public static final Transform3d TURRET_CAMERA_PLACEMENT = new Transform3d(
             TURRET_CAMERA_TRANSLATION, TURRET_CAMERA_ROTATION);
@@ -120,5 +178,9 @@ public final class Constants {
 
   }
 
-
+  public static class ModelConstants {
+    public static final Translation3d ORIGIN_TO_TURRET_BASE_OFFSET = new Translation3d(-0.171, 0, 0.460);
+    public static final Translation3d ORIGIN_TO_HOOD_PIVOT_POINT_OFFSET = new Translation3d(-0.0465, 0, 0.530);
+    public static final Translation3d ORIGIN_TO_INTAKE_PIVOT_POINT_OFFSET = new Translation3d(0.146050, 0, 0.197803);
+  }
 }

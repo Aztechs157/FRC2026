@@ -6,20 +6,17 @@ package org.team157.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.lang.reflect.Modifier;
-
-import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import org.team157.robot.Constants.ControllerConstants;
@@ -27,8 +24,11 @@ import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.DriveSystem;
 import org.team157.robot.subsystems.FlywheelSystem;
-
+import org.team157.robot.subsystems.HopperSystem;
+import org.team157.robot.subsystems.IntakeSystem;
+import org.team157.robot.subsystems.HoodSystem;
 import org.team157.robot.subsystems.TurretSystem;
+import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
 
 public class RobotContainer {
@@ -42,7 +42,6 @@ public class RobotContainer {
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-   public final VisionSystem visionSystem;
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -50,13 +49,19 @@ public class RobotContainer {
 
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
-    public final FlywheelSystem flywheelSystem = new FlywheelSystem();
+    public final FlywheelSystem flywheel = new FlywheelSystem();
+
+    public final VisionSystem visionSystem;
     public final TurretSystem turret;
+    public final HoodSystem hood = new HoodSystem();
+    public final IntakeSystem intake = new IntakeSystem();
+    public final HopperSystem hopper = new HopperSystem();
+    public final UptakeSystem uptake = new UptakeSystem();
+
 
     private final SendableChooser<Command> autoChooser;
 
- 
-
+    public final Trigger intakeDeployTrigger = new Trigger(() -> intake.getDeployState());
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
         if (ModifierConstants.DEMO_MODE) {
@@ -107,9 +112,6 @@ public class RobotContainer {
         );
 
         driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
-        driverController.a().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX()))
-        ));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -117,8 +119,6 @@ public class RobotContainer {
         driverController.back().and(driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
-
 
         // Reset the field-centric heading on start button press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
@@ -128,25 +128,65 @@ public class RobotContainer {
         ///////////////////////////////////////////////////
         turret.setDefaultCommand(turret.set(0));
 
-        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-30)));
-        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(70)));
-        driverController.povLeft().whileTrue(turret.set(-0.1));
-        driverController.povRight().whileTrue(turret.set(0.1));
-        driverController.x().whileTrue(turret.set(0));
+        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-100)));
+        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(100)));
+        driverController.povLeft().whileTrue(turret.set(-0.05));
+        driverController.povRight().whileTrue(turret.set(0.05));
+        // driverController.x().whileTrue(turret.set(0));
 
-        driverController.y().toggleOnTrue(turret.trackHubTag());
-        driverController.rightBumper().toggleOnTrue(turret.trackTagGlobalRelative());
+        // driverController.y().toggleOnTrue(turret.trackHubTag());
+        // driverController.rightBumper().toggleOnTrue(turret.trackTagGlobalRelative());
+
 
         drivetrain.registerTelemetry(logger::telemeterize);
         
+        
+
         ////////////////////////////////////////////////////////
         /// FLYWHEEL COMMANDS
         ///////////////////////////////////////////////////////
-        
-        flywheelSystem.setDefaultCommand(flywheelSystem.set(0));
+        flywheel.setDefaultCommand(flywheel.set(0));
 
-        driverController.rightTrigger().whileTrue(flywheelSystem.setVelocity(RPM.of(60)));
+
+        driverController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(6000)));
+        driverController.leftTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4500)));
+        ////////////////////////////////////////////////////////
+        /// INTAKE COMMANDS
+        ///////////////////////////////////////////////////////
+        intake.setDefaultCommand(intake.setDefault()); 
+
+        intakeDeployTrigger.onTrue(intake.deployIntake()).onFalse(intake.retractIntake()); //TODO: decide on a button for this
+        driverController.a().and(driverController.start()).toggleOnTrue(intake.deployIntake());
+        driverController.y().and(driverController.start()).toggleOnTrue(intake.retractIntake());
+        driverController.rightBumper().toggleOnTrue(intake.setRoller(0.75));
+
+        ////////////////////////////////////////////////////////
+        /// HOPPER COMMANDS
+        ///////////////////////////////////////////////////////
+        hopper.setDefaultCommand(hopper.setDefault());
+
+        driverController.leftBumper().toggleOnTrue(hopper.setRoller(0.5).alongWith(uptake.setRoller(1)));
+
+        ////////////////////////////////////////////////////////
+        /// UPTAKE COMMANDS
+        ///////////////////////////////////////////////////////
+        uptake.setDefaultCommand(uptake.setDefault());
+          /////////////////////
+         /// HOOD COMMANDS ///
+        /////////////////////
+        driverController.leftBumper().toggleOnTrue(hood.setAngleThenStop(Degrees.of(40)));
+        driverController.rightBumper().toggleOnTrue(hood.setAngleThenStop(Degrees.of(0)));
+
+
+        ////////////////////////////////////////////////////////
+        /// HOOD COMMANDS
+        ///////////////////////////////////////////////////////
+        hood.setDefaultCommand(hood.setDefault());
+        driverController.a().toggleOnTrue(hood.setAngle(Degrees.of(60)));
+        driverController.y().toggleOnTrue(hood.setAngle(Degrees.of(48)));
+
     }
+
 
     public double modifySpeed(final double speed) {
         final var modifier = 1 - driverController.getRightTriggerAxis() * ModifierConstants.PRECISION_DRIVE_MODIFIER;
