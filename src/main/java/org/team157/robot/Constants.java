@@ -96,7 +96,7 @@ public final class Constants {
   public static class TurretConstants {
     public static final int MOTOR_ID = 18;
     public static final int ENCODER_ID = 0;
-    public static final double MIN_ENCODER_POSITION = 0.014, MAX_ENCODER_POSITION = 0.99;
+    public static final double MIN_ENCODER_POSITION = 0.99, MAX_ENCODER_POSITION = 0.014;
     public static final double MIN_ANGLE = -179, MAX_ANGLE = 179;
     public static final double KP = 157, KI = 0, KD = 0;
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);

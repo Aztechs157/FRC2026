@@ -58,7 +58,7 @@ public class TurretSystem extends SubsystemBase {
       .withSimClosedLoopController(7, 0, 0, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION) //TODO: tune this PID for the simulation  
       .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)
       .withIdleMode(MotorMode.BRAKE)
-      .withMotorInverted(false)
+      .withMotorInverted(true)
       .withGearing(TurretConstants.GEARING)
       .withTelemetry("Turret Motor", TelemetryVerbosity.HIGH) 
       .withStatorCurrentLimit((TurretConstants.CURRENT_LIMIT))
@@ -218,7 +218,7 @@ public class TurretSystem extends SubsystemBase {
   public void updateRelativeAngleToTag(int tagID, Pose2d robotPose){
     // The current angular offset of the tag, relative to the turret camera.
     visionSystem.setTargetParams(tagID, robotPose);
-    double turretToRobotAngleOffset = VisionSystem.angleToTarget; //158
+    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 158; //158
     trackingAngle = Degrees.of(turretToRobotAngleOffset);
   }
 
@@ -229,7 +229,7 @@ public class TurretSystem extends SubsystemBase {
   public void updateRelativeAngleToTag(Pose2d targetPose, Pose2d robotPose){
     // The current angular offset of the tag, relative to the turret camera.
     visionSystem.setTargetParams(targetPose, robotPose);
-    double turretToRobotAngleOffset = VisionSystem.angleToTarget; //158
+    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 158; //158
     trackingAngle = Degrees.of(turretToRobotAngleOffset);
   }
 
