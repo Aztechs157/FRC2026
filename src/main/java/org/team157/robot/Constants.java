@@ -142,20 +142,20 @@ public final class Constants {
 
   public static class VisionConstants {
     public static final String FRONTLEFT_CAMERA_NICKNAME = "frontLeftCam";
-    public static final Rotation3d FRONTLEFT_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(25));
-    public static final Translation3d FRONTLEFT_CAMERA_TRANSLATION = new Translation3d(-0.136, 0.310, 0.339);
+    public static final Rotation3d FRONTLEFT_CAMERA_ROTATION = new Rotation3d(0, 0, -Math.toRadians(65));
+    public static final Translation3d FRONTLEFT_CAMERA_TRANSLATION = new Translation3d(-0.128, -0.329, 0.394);
     public static final Transform3d FRONTLEFT_CAMERA_PLACEMENT = new Transform3d(
             FRONTLEFT_CAMERA_TRANSLATION, FRONTLEFT_CAMERA_ROTATION);
 
     public static final String FRONTRIGHT_CAMERA_NICKNAME = "frontRightCam";
-    public static final Rotation3d FRONTRIGHT_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(25));
-    public static final Translation3d FRONTRIGHT_CAMERA_TRANSLATION = new Translation3d(-0.136, -0.310, 0.339);
+    public static final Rotation3d FRONTRIGHT_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(65));
+    public static final Translation3d FRONTRIGHT_CAMERA_TRANSLATION = new Translation3d(0.128, -0.329, 0.394);
     public static final Transform3d FRONTRIGHT_CAMERA_PLACEMENT = new Transform3d(
             FRONTRIGHT_CAMERA_TRANSLATION, FRONTRIGHT_CAMERA_ROTATION);  
 
     public static final String BACK_CAMERA_NICKNAME = "backCam";
     public static final Rotation3d BACK_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(180));
-    public static final Translation3d BACK_CAMERA_TRANSLATION = new Translation3d(-0.301, 0, 0.294);
+    public static final Translation3d BACK_CAMERA_TRANSLATION = new Translation3d(-0.322, 0, 0.381);
     public static final Transform3d BACK_CAMERA_PLACEMENT = new Transform3d(
             BACK_CAMERA_TRANSLATION, BACK_CAMERA_ROTATION);
 
