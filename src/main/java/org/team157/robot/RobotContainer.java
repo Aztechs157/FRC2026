@@ -125,19 +125,28 @@ public class RobotContainer {
         // Reset the field-centric heading on start button press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
         
+
+        
+        ////////////////////////////////////////////////////
+        /// VISION COMMANDS
+        ///////////////////////////////////////////////////
+        visionSystem.setDefaultCommand(visionSystem.getDefaultCommand(drivetrain, turret));
+
+
+
         ////////////////////////////////////////////////////
         /// TURRET COMMANDS
         ///////////////////////////////////////////////////
         turret.setDefaultCommand(turret.set(0));
 
-        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-100)));
+        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-123.5)));
         driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(100)));
         operatorController.povLeft().whileTrue(turret.set(-0.25));
         operatorController.povRight().whileTrue(turret.set(0.25));
         // driverController.x().whileTrue(turret.set(0));
 
         // driverController.y().toggleOnTrue(turret.trackHubTag());
-        // driverController.rightBumper().toggleOnTrue(turret.trackTagGlobalRelative());
+        operatorController.b().toggleOnTrue(turret.trackTagGlobalRelative());
 
 
         drivetrain.registerTelemetry(logger::telemeterize);
