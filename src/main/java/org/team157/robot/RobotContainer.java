@@ -46,6 +46,8 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController driverController = new CommandXboxController(0);
+    private final CommandXboxController operatorController = new CommandXboxController(1);
+
 
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
@@ -130,8 +132,8 @@ public class RobotContainer {
 
         driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-100)));
         driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(100)));
-        driverController.povLeft().whileTrue(turret.set(-0.05));
-        driverController.povRight().whileTrue(turret.set(0.05));
+        operatorController.povLeft().whileTrue(turret.set(-0.25));
+        operatorController.povRight().whileTrue(turret.set(0.25));
         // driverController.x().whileTrue(turret.set(0));
 
         // driverController.y().toggleOnTrue(turret.trackHubTag());
@@ -154,11 +156,11 @@ public class RobotContainer {
         /// INTAKE COMMANDS
         ///////////////////////////////////////////////////////
         intake.setDefaultCommand(intake.setDefault()); 
-
-        intakeDeployTrigger.onTrue(intake.deployIntake()).onFalse(intake.retractIntake()); //TODO: decide on a button for this
-        driverController.a().and(driverController.start()).toggleOnTrue(intake.deployIntake());
-        driverController.y().and(driverController.start()).toggleOnTrue(intake.retractIntake());
         driverController.rightBumper().toggleOnTrue(intake.setRoller(0.75));
+        //intakeDeployTrigger.onTrue(intake.deployIntake()).onFalse(intake.retractIntake()); //TODO: decide on a button for this
+        operatorController.a().toggleOnTrue(intake.deployIntake());
+        operatorController.y().toggleOnTrue(intake.retractIntake());
+       
 
         ////////////////////////////////////////////////////////
         /// HOPPER COMMANDS
@@ -171,12 +173,6 @@ public class RobotContainer {
         /// UPTAKE COMMANDS
         ///////////////////////////////////////////////////////
         uptake.setDefaultCommand(uptake.setDefault());
-          /////////////////////
-         /// HOOD COMMANDS ///
-        /////////////////////
-        driverController.leftBumper().toggleOnTrue(hood.setAngleThenStop(Degrees.of(40)));
-        driverController.rightBumper().toggleOnTrue(hood.setAngleThenStop(Degrees.of(0)));
-
 
         ////////////////////////////////////////////////////////
         /// HOOD COMMANDS

@@ -96,7 +96,7 @@ public final class Constants {
   public static class TurretConstants {
     public static final int MOTOR_ID = 18;
     public static final int ENCODER_ID = 0;
-    public static final double MIN_ENCODER_POSITION = 0.006, MAX_ENCODER_POSITION = 0.99;
+    public static final double MIN_ENCODER_POSITION = 0.014, MAX_ENCODER_POSITION = 0.99;
     public static final double MIN_ANGLE = -179, MAX_ANGLE = 179;
     public static final double KP = 157, KI = 0, KD = 0;
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
@@ -131,11 +131,10 @@ public final class Constants {
     public static final int MOTOR_ID_FOLLOWER = 21;
     // TODO: do actual tuning
     public static final double P = 0.000157, I = 0, D = 0;
-    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("14:20"));
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("1:1"));
     //TODO: put real values here and not made up ones
     public static final Distance FLYWHEEL_DIAMETER = Inches.of(3.75);
     public static final Mass FLYWHEEL_MASS = Pounds.of(2);
-    public static final AngularVelocity FLYWHEEL_RPM_LIMIT_UPPER = RPM.of(1000); // TODO: remove or update unused/outdated constant
     public static final Distance HEIGHT = Feet.of(2.5);
     public static final Time RAMP_RATE = Seconds.of(0.25);
 
