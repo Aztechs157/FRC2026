@@ -104,6 +104,11 @@ public class HoodSystem extends SubsystemBase {
     return hood.set(dutycycle);
   }
 
+
+  public Command setDynamicHoodAngle() {
+    return hood.setAngle(FlywheelSystem::getDesiredHoodAngle);
+  }
+
   /**
    * Run sysId on the {@link HoodSystem}.
    */

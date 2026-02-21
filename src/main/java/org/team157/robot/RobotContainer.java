@@ -189,6 +189,9 @@ public class RobotContainer {
         hood.setDefaultCommand(hood.setDefault());
         driverController.a().toggleOnTrue(hood.setAngle(Degrees.of(60)));
         driverController.y().toggleOnTrue(hood.setAngle(Degrees.of(48)));
+        operatorController.rightTrigger().toggleOnTrue(flywheel.setDynamicVelocity());
+        operatorController.leftTrigger().toggleOnTrue(hood.setDynamicHoodAngle());
+
 
     }
 

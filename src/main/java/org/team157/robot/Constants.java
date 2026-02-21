@@ -115,7 +115,7 @@ public final class Constants {
 
     public static final double MIN_ENCODER_POSITION = 0.375, MAX_ENCODER_POSITION = 0.94;
     public static final double MIN_ANGLE = 40, MAX_ANGLE = 65;
-    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(45), UPPER_SOFT_LIMIT = Degrees.of(60);
+    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(42), UPPER_SOFT_LIMIT = Degrees.of(63);
     public static final Angle LOWER_HARD_LIMIT = Degrees.of(40), UPPER_HARD_LIMIT = Degrees.of(65);
     public static final double KP = 157, KI = 0,  KD = 0;
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
