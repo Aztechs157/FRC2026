@@ -114,7 +114,7 @@ public class FlywheelSystem extends SubsystemBase {
             theta = x;
         }
     }
-    
+
     ballVelocity = velocity;
     hoodAngle = Radians.of(theta);
     SmartDashboard.putNumber("Hood Angle", Math.toDegrees(hoodAngle.magnitude()));
@@ -212,6 +212,9 @@ public class FlywheelSystem extends SubsystemBase {
     SmartDashboard.putNumber("Target Height", FieldConstants.positionDetails.getTargetHeight());
     SmartDashboard.putNumber("Desired Ball Velocity", getDesiredVelocity().in(RPM));
     SmartDashboard.putNumber("Desired Hood Angle", getDesiredHoodAngle().in(Degrees));
+    
+    SmartDashboard.putNumber("Ball Velocity (m/s)", ballVelocity);
+    SmartDashboard.putBoolean("Ball Velocity is NaN", Double.isNaN(ballVelocity));
     flywheel.updateTelemetry();
   }
 
