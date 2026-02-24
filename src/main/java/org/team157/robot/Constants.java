@@ -127,7 +127,7 @@ public final class Constants {
   }
   
   public static class FlywheelConstants {
-
+    // IDs of both motors powering the flywheel.
     public static final int MOTOR_ID = 20, FOLLOWER_MOTOR_ID = 21;
     // Closed-loop control values for the flywheel.
     public static final double P = 0.000157, I = 0, D = 0;
@@ -141,6 +141,10 @@ public final class Constants {
     public static final Distance HEIGHT = Meters.of(0.523);
     // TODO: determine why this ramp rate is so much higher than the others, and if it can be reduced
     public static final Time RAMP_RATE = Seconds.of(0.25);
+    // Flywheel RPM limits for safety, in... RPM.
+    public static final AngularVelocity FLYWHEEL_RPM_LIMIT_UPPER = RPM.of(6000), FLYWHEEL_RPM_LIMIT_LOWER = RPM.of(-6000);
+    // RPM multiplier to account for external factors like air resistance and wheel slip. This is determined experimentally.
+    public static final double RPM_MULTIPLIER = 0.4;
 
   }
 

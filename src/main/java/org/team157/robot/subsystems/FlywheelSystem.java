@@ -65,7 +65,7 @@ public class FlywheelSystem extends SubsystemBase {
   // mass of the flywheel
   .withMass((FlywheelConstants.FLYWHEEL_MASS))
   // maximum speed of the shooter
-  .withSoftLimit(RPM.of(-6000), RPM.of(6000))
+  .withSoftLimit(FlywheelConstants.FLYWHEEL_RPM_LIMIT_LOWER, FlywheelConstants.FLYWHEEL_RPM_LIMIT_UPPER)
   // .withUpperSoftLimit(RPM.of(FlywheelConstants.FLYWHEEL_RPM_LIMIT_UPPER))
   // telemetry name and verbosity
   .withTelemetry("FlywheelDynamics", TelemetryVerbosity.HIGH);
