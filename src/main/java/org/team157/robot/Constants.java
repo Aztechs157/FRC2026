@@ -127,15 +127,19 @@ public final class Constants {
   }
   
   public static class FlywheelConstants {
-    public static final int MOTOR_ID = 20;
-    public static final int MOTOR_ID_FOLLOWER = 21;
-    // TODO: do actual tuning
+
+    public static final int MOTOR_ID = 20, FOLLOWER_MOTOR_ID = 21;
+    // Closed-loop control values for the flywheel.
     public static final double P = 0.000157, I = 0, D = 0;
+    // Gear ratio between the motor and the flywheel.
     public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("1:1"));
-    //TODO: put real values here and not made up ones
+    // Diameter of the flywheel, in meters.
     public static final Distance FLYWHEEL_DIAMETER = Inches.of(3.75);
+    // Mass of the flywheel, in pounds.
     public static final Mass FLYWHEEL_MASS = Pounds.of(2);
-    public static final Distance HEIGHT = Feet.of(2.5);
+    // Z distance from the center of the flywheel to the ground, in meters.
+    public static final Distance HEIGHT = Meters.of(0.523);
+    // TODO: determine why this ramp rate is so much higher than the others, and if it can be reduced
     public static final Time RAMP_RATE = Seconds.of(0.25);
 
   }

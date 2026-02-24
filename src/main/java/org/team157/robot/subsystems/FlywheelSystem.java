@@ -6,11 +6,7 @@ package org.team157.robot.subsystems;
 // import the stuff 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Feet;
-import static edu.wpi.first.units.Units.FeetPerSecond;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
@@ -41,9 +37,9 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 public class FlywheelSystem extends SubsystemBase {
 
   private TalonFX motor  = new TalonFX(FlywheelConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
-  private TalonFX motor_follower = new TalonFX(FlywheelConstants.MOTOR_ID_FOLLOWER, Constants.RIO_CAN_BUS);
-  public static double ballVelocity = 0; //Feet per Second for the ball to be launched
-  public static Angle azimuth = Radians.of(0);
+  private TalonFX motor_follower = new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_ID, Constants.RIO_CAN_BUS);
+  public static double ballVelocity = 0; // Meters per second for the ball to be launched
+  public static Angle hoodAngle = Radians.of(0);
 
   private SmartMotorControllerConfig flywheelSystemConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.CLOSED_LOOP)
@@ -84,50 +80,62 @@ public class FlywheelSystem extends SubsystemBase {
      * 
      * @return flywheel velocity
      */
-  public AngularVelocity getVelocity() {return flyWheel.getSpeed();}
+  public AngularVelocity getVelocity() {
+    return flyWheel.getSpeed();
+  }
 
-  // Function to minimize: 
+  // Function to minimize (all parameters in metric units: meters, meters/second, radians)
+  // Calculates required ball velocity (m/s) for given distance, height, and launch angle
+  // Using projectile motion equations: y = x*tan(θ) - (g*x²)/(2*v₀²*cos²(θ))
+  // Solving for v₀: v₀ = sqrt((g*x²)/(2*cos²(θ)*(x*tan(θ) - y)))
   static double velocityFunction(double distance, double height, double theta) {
-        return distance / Math.cos(theta) * (Math.sqrt(16 / (distance * Math.tan(theta) - (height - FlywheelConstants.HEIGHT.in(Feet))))); //16 is Acceleration by gravity / 2 in imperial units (32/2)
-    }
+    double g = 9.81; // gravity in m/s²
+    double heightDifference = distance * Math.tan(theta) - (height - FlywheelConstants.HEIGHT.magnitude());
+    double denominator = 2 * Math.cos(theta) * Math.cos(theta) * heightDifference;
+    if (denominator <= 0) return Double.MAX_VALUE; // Invalid trajectory
+    return Math.sqrt((g * distance * distance) / denominator);
+  }
 
   public static void setShotParams(double height, double distance) {
-    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT.in(Degrees);
-    double upperBound = HoodConstants.UPPER_SOFT_LIMIT.in(Degrees);
+    // Convert hood angle limits from degrees to radians
+    double lowerBound = Math.toRadians(HoodConstants.LOWER_SOFT_LIMIT.in(Degrees));
+    double upperBound = Math.toRadians(HoodConstants.UPPER_SOFT_LIMIT.in(Degrees));
     double steps = 50;
     double stepSize = (upperBound - lowerBound) / steps;
     
     double theta = lowerBound;
-    double velocity = velocityFunction(distance, height, Math.toRadians(lowerBound));
+    double velocity = velocityFunction(distance, height, lowerBound);
 
     for (int i = 1; i <= steps; i++) {
         double x = lowerBound + i * stepSize;
-        double y = velocityFunction(distance, height, Math.toRadians(x));
+        double y = velocityFunction(distance, height, x);
         if (y < velocity) {
             velocity = y;
             theta = x;
         }
     }
     ballVelocity = velocity;
-    azimuth = Radians.of(Math.toRadians(theta));
-    SmartDashboard.putNumber("azimuth", Math.toDegrees(azimuth.magnitude()));
+    hoodAngle = Radians.of(theta);
+    SmartDashboard.putNumber("azimuth", Math.toDegrees(hoodAngle.magnitude()));
   }
 
     public void setBETTERShotParams(double height, double distance) {
-    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT.in(Degrees);
-    double upperBound = HoodConstants.UPPER_SOFT_LIMIT.in(Degrees);
+    // Convert hood angle limits from degrees to radians
+    double lowerBound = Math.toRadians(HoodConstants.LOWER_SOFT_LIMIT.in(Degrees));
+    double upperBound = Math.toRadians(HoodConstants.UPPER_SOFT_LIMIT.in(Degrees));
     double steps = 1000;
     double stepSize = (upperBound - lowerBound) / steps;
     
     double theta = lowerBound;
     double velocity = velocityFunction(distance, height, lowerBound);
     double previousVelocityDifference = -1;
+    double upperBoundDegrees = Math.toDegrees(upperBound);
 
     for (int i = 1; i <= steps; i++) {
         double x = lowerBound + i * stepSize;
         double y = velocityFunction(distance, height, x);
         double velocityDifference = Math.abs(ballVelocity - y);
-        if (previousVelocityDifference < 0 || (velocityDifference < previousVelocityDifference && x < 157)) {
+        if (previousVelocityDifference < 0 || (velocityDifference < previousVelocityDifference && Math.toDegrees(x) < upperBoundDegrees)) {
             previousVelocityDifference = velocityDifference;
             velocity = y;
             theta = x;
@@ -135,28 +143,37 @@ public class FlywheelSystem extends SubsystemBase {
     }
     // System.out.println("Min found at x = " + theta + ", f(x) = " + velocity);
     ballVelocity = velocity;
-    azimuth = Radians.of(theta);
+    hoodAngle = Radians.of(theta);
   }
 
   public AngularVelocity getDesiredVelocity() {
-    setShotParams(FieldConstants.positionDetails.getTargetHeight()*3.281, VisionSystem.distanceToTarget*3.281);
-    //double desiredVelocity = 2 * ballVelocity / (FlywheelConstants.FLYWHEEL_DIAMETER / 12 * Math.PI) + lossFunction();
-    // double desiredVelocity = 2 * ballVelocity + lossFunction();
-    double desiredRPM = 60 / ((FlywheelConstants.FLYWHEEL_DIAMETER).in(Inches)/39.37 * Math.PI) * FeetPerSecond.of(ballVelocity).in(MetersPerSecond);
+    double heightMeters = FieldConstants.positionDetails.getTargetHeight();
+    double distanceMeters = VisionSystem.distanceToTarget;
+    setShotParams(heightMeters, distanceMeters);
+    
+    // Convert ball velocity (m/s) to flywheel RPM
+    // Relationship: ballVelocity = (flywheelRPM / 60) * π * flywheel_radius
+    // Therefore: flywheelRPM = (ballVelocity * 60) / (π * flywheel_diameter)
+    double flywheelDiameterMeters = (FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters);
+    double desiredRPM = (ballVelocity * 60) / (Math.PI * flywheelDiameterMeters);
     return RPM.of(desiredRPM);
   }
 
   public static Angle getDesiredHoodAngle() {
-    setShotParams(FieldConstants.positionDetails.getTargetHeight()*3.281, VisionSystem.distanceToTarget*3.281);
-    return Degrees.of(Math.toDegrees(azimuth.magnitude()));
+    double heightMeters = FieldConstants.positionDetails.getTargetHeight();
+    double distanceMeters = VisionSystem.distanceToTarget;
+    setShotParams(heightMeters, distanceMeters);
+    return Degrees.of(Math.toDegrees(hoodAngle.magnitude()));
   }
 
+  // TODO: consider removing this, as it's never used and will always return 0.
   public double lossFunction() {
-    return 0 * azimuth.magnitude();
+    return 0 * hoodAngle.magnitude();
   }
 
-  public Angle getAzimuth() {
-    return azimuth;
+  // TODO: consider removing this unused method, as getDesiredHoodAngle already provides the hood angle that should be used for the shot.
+  public Angle getHoodAngle() {
+    return hoodAngle;
   }
 
   public Command setDynamicVelocity () {

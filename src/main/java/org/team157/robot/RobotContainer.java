@@ -139,14 +139,14 @@ public class RobotContainer {
         ///////////////////////////////////////////////////
         turret.setDefaultCommand(turret.set(0));
 
-        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-123.5)));
-        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(100)));
+        driverController.povUp().toggleOnTrue(turret.setAngle(Radians.of(2)));
+        driverController.povDown().toggleOnTrue(turret.setAngle(Radians.of(-2)));
         operatorController.povLeft().whileTrue(turret.set(-0.25));
         operatorController.povRight().whileTrue(turret.set(0.25));
         // driverController.x().whileTrue(turret.set(0));
 
         // driverController.y().toggleOnTrue(turret.trackHubTag());
-        operatorController.b().toggleOnTrue(turret.trackTagGlobalRelative());
+        driverController.b().toggleOnTrue(turret.trackTagGlobalRelative());
 
 
         drivetrain.registerTelemetry(logger::telemeterize);
@@ -187,10 +187,10 @@ public class RobotContainer {
         /// HOOD COMMANDS
         ///////////////////////////////////////////////////////
         hood.setDefaultCommand(hood.setDefault());
-        driverController.a().toggleOnTrue(hood.setAngle(Degrees.of(60)));
-        driverController.y().toggleOnTrue(hood.setAngle(Degrees.of(48)));
-        operatorController.rightTrigger().toggleOnTrue(flywheel.setDynamicVelocity());
-        operatorController.leftTrigger().toggleOnTrue(hood.setDynamicHoodAngle());
+        // driverController.a().toggleOnTrue(hood.setAngle(Degrees.of(60)));
+        // driverController.y().toggleOnTrue(hood.setAngle(Degrees.of(48)));
+        driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
+        driverController.y().toggleOnTrue(hood.setDynamicHoodAngle());
 
 
     }
