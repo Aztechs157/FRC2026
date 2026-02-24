@@ -89,16 +89,17 @@ public class FlywheelSystem extends SubsystemBase {
   // Using projectile motion equations: y = x*tan(θ) - (g*x²)/(2*v₀²*cos²(θ))
   // Solving for v₀: v₀ = sqrt((g*x²)/(2*cos²(θ)*(x*tan(θ) - y)))
   static double velocityFunction(double distance, double height, double theta) {
-    double g = 9.81; // gravity in m/s²
+    // gravity in m/s²
+    double g = 9.81; 
+    // height difference between target and shooter
     double heightDifference = height - FlywheelConstants.HEIGHT.magnitude();
     double denominator = 2 * Math.cos(theta) * Math.cos(theta) * (distance * Math.tan(theta) - heightDifference);
     return Math.sqrt((g * distance * distance) / denominator);
   }
 
   public static void setShotParams(double height, double distance) {
-    // Convert hood angle limits from degrees to radians
-    double lowerBound = Math.toRadians(HoodConstants.LOWER_SOFT_LIMIT.in(Degrees));
-    double upperBound = Math.toRadians(HoodConstants.UPPER_SOFT_LIMIT.in(Degrees));
+    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT.in(Radians);
+    double upperBound = HoodConstants.UPPER_SOFT_LIMIT.in(Radians);
     double steps = 50;
     double stepSize = (upperBound - lowerBound) / steps;
     
@@ -113,15 +114,16 @@ public class FlywheelSystem extends SubsystemBase {
             theta = x;
         }
     }
+    
     ballVelocity = velocity;
     hoodAngle = Radians.of(theta);
     SmartDashboard.putNumber("Hood Angle", Math.toDegrees(hoodAngle.magnitude()));
   }
+
   // TODO: evaluate necessity of this method, as the original setShotParams is used in every instance.
   public void setBETTERShotParams(double height, double distance) {
-    // Convert hood angle limits from degrees to radians
-    double lowerBound = Math.toRadians(HoodConstants.LOWER_SOFT_LIMIT.in(Degrees));
-    double upperBound = Math.toRadians(HoodConstants.UPPER_SOFT_LIMIT.in(Degrees));
+    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT.in(Radians);
+    double upperBound = HoodConstants.UPPER_SOFT_LIMIT.in(Radians);
     double steps = 1000;
     double stepSize = (upperBound - lowerBound) / steps;
     
@@ -140,7 +142,7 @@ public class FlywheelSystem extends SubsystemBase {
             theta = x;
         }
     }
-    // System.out.println("Min found at x = " + theta + ", f(x) = " + velocity);
+
     ballVelocity = velocity;
     hoodAngle = Radians.of(theta);
   }

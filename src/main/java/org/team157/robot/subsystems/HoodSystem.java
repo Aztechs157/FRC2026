@@ -49,7 +49,8 @@ public class HoodSystem extends SubsystemBase {
   // Configure the hood motor controller for use with YAMS.
   private SmartMotorControllerConfig hoodPivotMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(HoodConstants.KP, HoodConstants.KI, HoodConstants.KD, (HoodConstants.ANGULAR_VELOCITY), (HoodConstants.ANGULAR_ACCELERATION)) //TODO: tune this PID
+      .withClosedLoopController(HoodConstants.KP, HoodConstants.KI, HoodConstants.KD, HoodConstants.ANGULAR_VELOCITY, HoodConstants.ANGULAR_ACCELERATION)
+      .withSimClosedLoopController(20,0,0, HoodConstants.ANGULAR_VELOCITY, HoodConstants.ANGULAR_ACCELERATION)
       .withIdleMode(MotorMode.BRAKE) //TODO: evaluate if coast or brake is better for this mechanism
       .withMotorInverted(false) //TODO: verify motor inversion
       .withGearing(HoodConstants.GEARING)
@@ -148,6 +149,13 @@ public class HoodSystem extends SubsystemBase {
    */
   public double getScaledPosAngleYAMS() {
     return hood.getAngle().in(Degrees);
+  }
+  /**
+   * Get the current angle of the hood, based on the YAMS pivot system, relative to the simulated zero position.
+   * @return The angle of the hood, in degrees, from -180 to 180, using the YAMS pivot system.
+   */
+  public double getScaledPosAngleSim() {
+    return PosUtils.mapRange(getScaledPosAngleYAMS(), HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE, HoodConstants.MAX_ANGLE, HoodConstants.MIN_ANGLE) - 40;
   }
   /**
    * Get the current angle of the hood, directly from the encoder value.
