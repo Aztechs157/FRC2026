@@ -59,7 +59,7 @@ public class FlywheelSystem extends SubsystemBase {
   private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX60(1),flywheelSystemConfig);
  // private SmartMotorController smartMotorFollower = new TalonFXWrapper(motor_follower, DCMotor.getKrakenX60(1),flywheelSystemConfig);
 
-  private final FlyWheelConfig flyWheelConfig = new FlyWheelConfig(smartMotor)
+  private final FlyWheelConfig flywheelConfig = new FlyWheelConfig(smartMotor)
   // diameter of the flywheel 
   .withDiameter((FlywheelConstants.FLYWHEEL_DIAMETER))
   // mass of the flywheel
@@ -71,7 +71,7 @@ public class FlywheelSystem extends SubsystemBase {
   .withTelemetry("FlywheelDynamics", TelemetryVerbosity.HIGH);
 
   // flywheel mechanism
-  private FlyWheel flyWheel = new FlyWheel(flyWheelConfig);
+  private FlyWheel flywheel = new FlyWheel(flywheelConfig);
 
 
     /**
@@ -81,7 +81,7 @@ public class FlywheelSystem extends SubsystemBase {
      * @return flywheel velocity
      */
   public AngularVelocity getVelocity() {
-    return flyWheel.getSpeed();
+    return flywheel.getSpeed();
   }
 
   // Function to minimize (all parameters in metric units: meters, meters/second, radians)
@@ -117,7 +117,7 @@ public class FlywheelSystem extends SubsystemBase {
     hoodAngle = Radians.of(theta);
     SmartDashboard.putNumber("Hood Angle", Math.toDegrees(hoodAngle.magnitude()));
   }
-  
+  // TODO: evaluate necessity of this method, as the original setShotParams is used in every instance.
   public void setBETTERShotParams(double height, double distance) {
     // Convert hood angle limits from degrees to radians
     double lowerBound = Math.toRadians(HoodConstants.LOWER_SOFT_LIMIT.in(Degrees));
@@ -156,7 +156,7 @@ public class FlywheelSystem extends SubsystemBase {
     // desiredRPM is divided by 0.4 to account for external factors like air resistace and wheel slip.
     double flywheelDiameterMeters = (FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters);
     double desiredRPM = (ballVelocity * 60) / (Math.PI * flywheelDiameterMeters);
-    return RPM.of(desiredRPM / 0.4);
+    return RPM.of(desiredRPM / FlywheelConstants.RPM_MULTIPLIER);
   }
 
   public static Angle getDesiredHoodAngle() {
@@ -177,7 +177,7 @@ public class FlywheelSystem extends SubsystemBase {
   }
 
   public Command setDynamicVelocity () {
-    return flyWheel.setSpeed(this::getDesiredVelocity);
+    return flywheel.setSpeed(this::getDesiredVelocity);
   }
 
   /**
@@ -186,7 +186,7 @@ public class FlywheelSystem extends SubsystemBase {
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
   public Command setVelocity (AngularVelocity speed) {
-    return flyWheel.setSpeed(speed); 
+    return flywheel.setSpeed(speed); 
   }
 
   
@@ -196,7 +196,7 @@ public class FlywheelSystem extends SubsystemBase {
    * @param dutyCycle DutyCycle to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
-  public Command set(double dutyCycle) {return flyWheel.set(dutyCycle);}
+  public Command set(double dutyCycle) {return flywheel.set(dutyCycle);}
 
   /** Creates a new FlywheelSystem. */
   public FlywheelSystem() {}
@@ -210,13 +210,13 @@ public class FlywheelSystem extends SubsystemBase {
     SmartDashboard.putNumber("Target Height", FieldConstants.positionDetails.getTargetHeight());
     SmartDashboard.putNumber("Desired Ball Velocity", getDesiredVelocity().in(RPM));
     SmartDashboard.putNumber("Desired Hood Angle", getDesiredHoodAngle().in(Degrees));
-    flyWheel.updateTelemetry();
+    flywheel.updateTelemetry();
   }
 
     @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
-    flyWheel.simIterate();
+    flywheel.simIterate();
   }
 }
 
