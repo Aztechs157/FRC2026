@@ -90,9 +90,8 @@ public class FlywheelSystem extends SubsystemBase {
   // Solving for v₀: v₀ = sqrt((g*x²)/(2*cos²(θ)*(x*tan(θ) - y)))
   static double velocityFunction(double distance, double height, double theta) {
     double g = 9.81; // gravity in m/s²
-    double heightDifference = distance * Math.tan(theta) - (height - FlywheelConstants.HEIGHT.magnitude());
-    double denominator = 2 * Math.cos(theta) * Math.cos(theta) * heightDifference;
-    if (denominator <= 0) return Double.MAX_VALUE; // Invalid trajectory
+    double heightDifference = height - FlywheelConstants.HEIGHT.magnitude();
+    double denominator = 2 * Math.cos(theta) * Math.cos(theta) * (distance * Math.tan(theta) - heightDifference);
     return Math.sqrt((g * distance * distance) / denominator);
   }
 
@@ -116,10 +115,10 @@ public class FlywheelSystem extends SubsystemBase {
     }
     ballVelocity = velocity;
     hoodAngle = Radians.of(theta);
-    SmartDashboard.putNumber("azimuth", Math.toDegrees(hoodAngle.magnitude()));
+    SmartDashboard.putNumber("Hood Angle", Math.toDegrees(hoodAngle.magnitude()));
   }
-
-    public void setBETTERShotParams(double height, double distance) {
+  
+  public void setBETTERShotParams(double height, double distance) {
     // Convert hood angle limits from degrees to radians
     double lowerBound = Math.toRadians(HoodConstants.LOWER_SOFT_LIMIT.in(Degrees));
     double upperBound = Math.toRadians(HoodConstants.UPPER_SOFT_LIMIT.in(Degrees));
@@ -154,9 +153,10 @@ public class FlywheelSystem extends SubsystemBase {
     // Convert ball velocity (m/s) to flywheel RPM
     // Relationship: ballVelocity = (flywheelRPM / 60) * π * flywheel_radius
     // Therefore: flywheelRPM = (ballVelocity * 60) / (π * flywheel_diameter)
+    // desiredRPM is divided by 0.4 to account for external factors like air resistace and wheel slip.
     double flywheelDiameterMeters = (FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters);
     double desiredRPM = (ballVelocity * 60) / (Math.PI * flywheelDiameterMeters);
-    return RPM.of(desiredRPM);
+    return RPM.of(desiredRPM / 0.4);
   }
 
   public static Angle getDesiredHoodAngle() {
