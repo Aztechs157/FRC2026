@@ -23,7 +23,9 @@ import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
@@ -191,6 +193,7 @@ public final class Constants {
 
   public static class ModelConstants {
     public static final Translation3d ORIGIN_TO_TURRET_BASE_OFFSET = new Translation3d(-0.171, 0, 0.460);
+    public static final Transform2d XY_ORIGIN_TO_TURRET_BASE_OFFSET = new Transform2d(-0.171, 0.0, new Rotation2d());
     public static final Translation3d ORIGIN_TO_HOOD_PIVOT_POINT_OFFSET = new Translation3d(-0.0465, 0, 0.530);
     public static final Translation3d ORIGIN_TO_INTAKE_PIVOT_POINT_OFFSET = new Translation3d(0.146050, 0, 0.197803);
   }

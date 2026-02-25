@@ -53,6 +53,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.mechanisms.swerve.SwerveDrive;
 
 import org.team157.robot.Constants.FieldConstants;
+import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.Constants.VisionConstants;
 import org.team157.robot.Robot;
@@ -67,6 +68,7 @@ public class VisionSystem extends SubsystemBase {
 
   public static double angleToTarget = 0;
   public static double distanceToTarget = 0;
+  public static double distanceToTargetFromTurret = 0;
 
   // TODO: move to constants.java
   final PoseStrategy poseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
@@ -356,6 +358,7 @@ public class VisionSystem extends SubsystemBase {
     Pose2d tagPose = fieldLayout.getTagPose(id).get().toPose2d();
 
     distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, tagPose);
+    distanceToTargetFromTurret = PhotonUtils.getDistanceToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), tagPose);
     angleToTarget = PhotonUtils.getYawToPose(robotPose, tagPose).getDegrees();
   }
   /**
@@ -365,6 +368,7 @@ public class VisionSystem extends SubsystemBase {
    */
   public void setTargetParams(Pose2d targetPose, Pose2d robotPose) {
     distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, targetPose);
+    distanceToTargetFromTurret = PhotonUtils.getDistanceToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), targetPose);
     angleToTarget = PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();
   }
 

@@ -149,7 +149,7 @@ public class FlywheelSystem extends SubsystemBase {
 
   public AngularVelocity getDesiredVelocity() {
     double heightMeters = FieldConstants.positionDetails.getTargetHeight();
-    double distanceMeters = VisionSystem.distanceToTarget;
+    double distanceMeters = VisionSystem.distanceToTargetFromTurret; // Use distance from turret instead of robot center
     setShotParams(heightMeters, distanceMeters);
     
     // Convert ball velocity (m/s) to flywheel RPM
@@ -163,7 +163,7 @@ public class FlywheelSystem extends SubsystemBase {
 
   public static Angle getDesiredHoodAngle() {
     double heightMeters = FieldConstants.positionDetails.getTargetHeight();
-    double distanceMeters = VisionSystem.distanceToTarget;
+    double distanceMeters = VisionSystem.distanceToTargetFromTurret;
     setShotParams(heightMeters, distanceMeters);
     return Degrees.of(Math.toDegrees(hoodAngle.magnitude()));
   }
@@ -208,7 +208,7 @@ public class FlywheelSystem extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Flywheel Velocity", getVelocity().magnitude());
     SmartDashboard.putNumber("Flywheel RPM", getVelocity().in(RPM));
-    SmartDashboard.putNumber("Distance to Target", VisionSystem.distanceToTarget);
+    SmartDashboard.putNumber("Distance to Target", VisionSystem.distanceToTargetFromTurret);
     SmartDashboard.putNumber("Target Height", FieldConstants.positionDetails.getTargetHeight());
     SmartDashboard.putNumber("Desired Ball Velocity", getDesiredVelocity().in(RPM));
     SmartDashboard.putNumber("Desired Hood Angle", getDesiredHoodAngle().in(Degrees));
