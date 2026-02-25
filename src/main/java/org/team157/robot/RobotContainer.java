@@ -139,8 +139,8 @@ public class RobotContainer {
         ///////////////////////////////////////////////////
         turret.setDefaultCommand(turret.set(0));
 
-        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-123.5)));
-        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(100)));
+        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
+        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(130)));
         operatorController.povLeft().whileTrue(turret.set(-0.25));
         operatorController.povRight().whileTrue(turret.set(0.25));
         // driverController.x().whileTrue(turret.set(0));

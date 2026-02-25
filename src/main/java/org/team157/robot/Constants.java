@@ -145,7 +145,7 @@ public final class Constants {
     // Flywheel RPM limits for safety, in... RPM.
     public static final AngularVelocity FLYWHEEL_RPM_LIMIT_UPPER = RPM.of(6000), FLYWHEEL_RPM_LIMIT_LOWER = RPM.of(-6000);
     // RPM multiplier to account for external factors like air resistance and wheel slip. This is determined experimentally.
-    public static final double RPM_MULTIPLIER = 0.4;
+    public static final double SPEED_FACTOR = 0.4;
 
   }
 

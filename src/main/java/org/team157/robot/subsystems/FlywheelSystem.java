@@ -162,13 +162,13 @@ public class FlywheelSystem extends SubsystemBase {
     // desiredRPM is divided by 0.4 to account for external factors like air resistace and wheel slip.
     double flywheelDiameterMeters = (FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters);
     double desiredRPM = (ballVelocity * 60) / (Math.PI * flywheelDiameterMeters);
-    return RPM.of(desiredRPM / FlywheelConstants.RPM_MULTIPLIER);
+    return RPM.of(desiredRPM / FlywheelConstants.SPEED_FACTOR);
   }
 
   public static Angle getDesiredHoodAngle() {
-    double heightMeters = FieldConstants.positionDetails.getTargetHeight();
-    double distanceMeters = VisionSystem.distanceToTargetFromTurret;
-    setShotParams(heightMeters, distanceMeters);
+    // double heightMeters = FieldConstants.positionDetails.getTargetHeight();
+    // double distanceMeters = VisionSystem.distanceToTargetFromTurret;
+    // setShotParams(heightMeters, distanceMeters);
     return Degrees.of(Math.toDegrees(hoodAngle.magnitude()));
   }
 
