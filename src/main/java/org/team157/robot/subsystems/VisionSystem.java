@@ -69,6 +69,7 @@ public class VisionSystem extends SubsystemBase {
   public static double angleToTarget = 0;
   public static double distanceToTarget = 0;
   public static double distanceToTargetFromTurret = 0;
+  public static double angleToTargetFromTurret = 0;
 
   // TODO: move to constants.java
   final PoseStrategy poseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
@@ -360,6 +361,7 @@ public class VisionSystem extends SubsystemBase {
     distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, tagPose);
     distanceToTargetFromTurret = PhotonUtils.getDistanceToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), tagPose);
     angleToTarget = PhotonUtils.getYawToPose(robotPose, tagPose).getDegrees();
+    angleToTargetFromTurret = PhotonUtils.getYawToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), tagPose).getDegrees();
   }
   /**
    * Calculate the angle and distance to a certain target from the robot's pose.
@@ -370,6 +372,7 @@ public class VisionSystem extends SubsystemBase {
     distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, targetPose);
     distanceToTargetFromTurret = PhotonUtils.getDistanceToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), targetPose);
     angleToTarget = PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();
+    angleToTargetFromTurret = PhotonUtils.getYawToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), targetPose).getDegrees();
   }
 
  /**

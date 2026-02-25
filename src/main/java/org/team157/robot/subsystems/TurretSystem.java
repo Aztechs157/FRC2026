@@ -219,7 +219,7 @@ public class TurretSystem extends SubsystemBase {
   public void updateRelativeAngleToTag(int tagID, Pose2d robotPose){
     // The current angular offset of the tag, relative to the turret camera.
     visionSystem.setTargetParams(tagID, robotPose);
-    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 130;
+    double turretToRobotAngleOffset = VisionSystem.angleToTargetFromTurret + 130;
     if(Robot.isReal()){
       if(turretToRobotAngleOffset > 180) {
         turretToRobotAngleOffset = turretToRobotAngleOffset - 360;
@@ -231,7 +231,7 @@ public class TurretSystem extends SubsystemBase {
     
       trackingAngle = Degrees.of(turretToRobotAngleOffset);
     } else {
-      trackingAngle = Degrees.of(VisionSystem.angleToTarget);
+      trackingAngle = Degrees.of(VisionSystem.angleToTargetFromTurret);
     }
   }
 
@@ -242,7 +242,7 @@ public class TurretSystem extends SubsystemBase {
   public void updateRelativeAngleToTag(Pose2d targetPose, Pose2d robotPose){
     // The current angular offset of the tag, relative to the turret camera.
     visionSystem.setTargetParams(targetPose, robotPose);
-    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 130;
+    double turretToRobotAngleOffset = VisionSystem.angleToTargetFromTurret + 130;
     if(Robot.isReal()){
       if(turretToRobotAngleOffset > 180) {
         turretToRobotAngleOffset = turretToRobotAngleOffset - 360;
@@ -254,7 +254,7 @@ public class TurretSystem extends SubsystemBase {
     
       trackingAngle = Degrees.of(turretToRobotAngleOffset);
     } else {
-      trackingAngle = Degrees.of(VisionSystem.angleToTarget);
+      trackingAngle = Degrees.of(VisionSystem.angleToTargetFromTurret);
     }
   }
 
