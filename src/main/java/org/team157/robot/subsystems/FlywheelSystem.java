@@ -94,6 +94,10 @@ public class FlywheelSystem extends SubsystemBase {
     // height difference between target and shooter
     double heightDifference = height - FlywheelConstants.HEIGHT.magnitude();
     double denominator = 2 * Math.cos(theta) * Math.cos(theta) * (distance * Math.tan(theta) - heightDifference);
+    
+    if (denominator <= 0) {
+        return 157; // Invalid shot parameters, return arbitrary velocity
+    }
     return Math.sqrt((g * distance * distance) / denominator);
   }
 
