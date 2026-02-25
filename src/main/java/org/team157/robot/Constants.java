@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pounds;
@@ -192,9 +191,11 @@ public final class Constants {
   }
 
   public static class ModelConstants {
+    // 3D offsets from the robot's origin (center of rotation) to various key points on the robot, used for mechanism visualization on the AdvantageScope model.
     public static final Translation3d ORIGIN_TO_TURRET_BASE_OFFSET = new Translation3d(-0.171, 0, 0.460);
-    public static final Transform2d XY_ORIGIN_TO_TURRET_BASE_OFFSET = new Transform2d(-0.171, 0.0, new Rotation2d());
     public static final Translation3d ORIGIN_TO_HOOD_PIVOT_POINT_OFFSET = new Translation3d(-0.0465, 0, 0.530);
     public static final Translation3d ORIGIN_TO_INTAKE_PIVOT_POINT_OFFSET = new Translation3d(0.146050, 0, 0.197803);
+    // 2D offset from the robot's origin to the turret base, used in position-based dynamic shooting calculations.
+    public static final Transform2d XY_ORIGIN_TO_TURRET_BASE_OFFSET = new Transform2d(-0.171, 0.0, new Rotation2d());
   }
 }

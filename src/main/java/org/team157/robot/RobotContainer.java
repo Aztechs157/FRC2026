@@ -139,13 +139,14 @@ public class RobotContainer {
         ///////////////////////////////////////////////////
         turret.setDefaultCommand(turret.set(0));
 
-        driverController.povUp().toggleOnTrue(turret.setAngle(Radians.of(2)));
-        driverController.povDown().toggleOnTrue(turret.setAngle(Radians.of(-2)));
+        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-123.5)));
+        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(100)));
         operatorController.povLeft().whileTrue(turret.set(-0.25));
         operatorController.povRight().whileTrue(turret.set(0.25));
         // driverController.x().whileTrue(turret.set(0));
 
         // driverController.y().toggleOnTrue(turret.trackHubTag());
+        // TODO: switch back to operator controller
         driverController.b().toggleOnTrue(turret.trackTagGlobalRelative());
 
 
@@ -189,6 +190,7 @@ public class RobotContainer {
         hood.setDefaultCommand(hood.setDefault());
         // driverController.a().toggleOnTrue(hood.setAngle(Degrees.of(60)));
         // driverController.y().toggleOnTrue(hood.setAngle(Degrees.of(48)));
+        // Enables dynamic control of the flywheel and hood.
         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
         driverController.y().toggleOnTrue(hood.setDynamicHoodAngle());
 

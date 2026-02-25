@@ -4,8 +4,6 @@
 
 package org.team157.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Kilograms;
@@ -56,7 +54,7 @@ public class TurretSystem extends SubsystemBase {
   // Configure the turret motor controller for use with YAMS.
   private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withSimClosedLoopController(5, 0, 0, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION) //TODO: tune this PID for the simulation  
+      .withSimClosedLoopController(7, 0, 0, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)  
       .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(true)
@@ -231,6 +229,7 @@ public class TurretSystem extends SubsystemBase {
     
       trackingAngle = Degrees.of(turretToRobotAngleOffset);
     } else {
+      // Disable turret offset in simulation, as simulated 0 is forward.
       trackingAngle = Degrees.of(VisionSystem.angleToTargetFromTurret);
     }
   }
@@ -254,6 +253,7 @@ public class TurretSystem extends SubsystemBase {
     
       trackingAngle = Degrees.of(turretToRobotAngleOffset);
     } else {
+      // Disable turret offset in simulation, as simulated 0 is forward.
       trackingAngle = Degrees.of(VisionSystem.angleToTargetFromTurret);
     }
   }
