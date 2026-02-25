@@ -162,7 +162,7 @@ public class FlywheelSystem extends SubsystemBase {
     // desiredRPM is divided by 0.4 to account for external factors like air resistace and wheel slip.
     double flywheelDiameterMeters = (FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters);
     double desiredRPM = (ballVelocity * 60) / (Math.PI * flywheelDiameterMeters);
-    return RPM.of(desiredRPM / FlywheelConstants.RPM_MULTIPLIER);
+    return RPM.of(Math.max(3800, desiredRPM / FlywheelConstants.RPM_MULTIPLIER));
   }
 
   public static Angle getDesiredHoodAngle() {

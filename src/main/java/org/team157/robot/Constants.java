@@ -133,7 +133,7 @@ public final class Constants {
     // Closed-loop control values for the flywheel.
     public static final double P = 0.000157, I = 0, D = 0;
     // Gear ratio between the motor and the flywheel.
-    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("1:1"));
+    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("17:17"));
     // Diameter of the flywheel, in meters.
     public static final Distance FLYWHEEL_DIAMETER = Inches.of(3.75);
     // Mass of the flywheel, in pounds.
@@ -141,11 +141,11 @@ public final class Constants {
     // Z distance from the center of the flywheel to the ground, in meters.
     public static final Distance HEIGHT = Meters.of(0.523);
     // TODO: determine why this ramp rate is so much higher than the others, and if it can be reduced
-    public static final Time RAMP_RATE = Seconds.of(0.25);
+    public static final Time RAMP_RATE = Seconds.of(0.00157);
     // Flywheel RPM limits for safety, in... RPM.
     public static final AngularVelocity FLYWHEEL_RPM_LIMIT_UPPER = RPM.of(6000), FLYWHEEL_RPM_LIMIT_LOWER = RPM.of(-6000);
     // RPM multiplier to account for external factors like air resistance and wheel slip. This is determined experimentally.
-    public static final double RPM_MULTIPLIER = 0.4;
+    public static final double RPM_MULTIPLIER = 0.3;
 
   }
 
