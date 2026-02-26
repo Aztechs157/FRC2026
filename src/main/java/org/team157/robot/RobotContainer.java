@@ -147,7 +147,7 @@ public class RobotContainer {
 
         // driverController.y().toggleOnTrue(turret.trackHubTag());
         // TODO: switch back to operator controller
-        driverController.b().toggleOnTrue(turret.trackTagGlobalRelative());
+        driverController.x().toggleOnTrue(turret.trackTagGlobalRelative());
 
 
         drivetrain.registerTelemetry(logger::telemeterize);

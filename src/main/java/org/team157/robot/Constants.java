@@ -134,8 +134,8 @@ public final class Constants {
     // IDs of both motors powering the flywheel.
     public static final int MOTOR_ID = 20, FOLLOWER_MOTOR_ID = 21;
     // Closed-loop control values for the flywheel.
-    public static final double P = 0.000157, I = 0, D = 0;
-    public static final double SIM_KP = 0.000157, SIM_KI = 0, SIM_KD = 0;
+    public static final double P = 0.6328, I = 0, D = 0;
+    public static final double SIM_KP = 1.57, SIM_KI = 0, SIM_KD = 0;
     // Gear ratio between the motor and the flywheel.
     public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("17:17"));
     // Diameter of the flywheel, in meters.
@@ -149,7 +149,7 @@ public final class Constants {
     // Flywheel RPM limits for safety, in... RPM.
     public static final AngularVelocity FLYWHEEL_RPM_LIMIT_UPPER = RPM.of(6000), FLYWHEEL_RPM_LIMIT_LOWER = RPM.of(-6000);
     // RPM multiplier to account for external factors like air resistance and wheel slip. This is determined experimentally.
-    public static final double SPEED_FACTOR = 0.3;
+    public static final double SPEED_FACTOR = 0.4;
 
   }
 
