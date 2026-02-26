@@ -50,7 +50,7 @@ public class HoodSystem extends SubsystemBase {
   private SmartMotorControllerConfig hoodPivotMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
       .withClosedLoopController(HoodConstants.KP, HoodConstants.KI, HoodConstants.KD, HoodConstants.ANGULAR_VELOCITY, HoodConstants.ANGULAR_ACCELERATION)
-      .withSimClosedLoopController(20,0,0, HoodConstants.ANGULAR_VELOCITY, HoodConstants.ANGULAR_ACCELERATION)
+      .withSimClosedLoopController(HoodConstants.SIM_KP, HoodConstants.SIM_KI, HoodConstants.SIM_KD, HoodConstants.ANGULAR_VELOCITY, HoodConstants.ANGULAR_ACCELERATION)
       .withIdleMode(MotorMode.BRAKE) //TODO: evaluate if coast or brake is better for this mechanism
       .withMotorInverted(false) //TODO: verify motor inversion
       .withGearing(HoodConstants.GEARING)
@@ -81,7 +81,7 @@ public class HoodSystem extends SubsystemBase {
   }
   public Command setDefault() {
     // return setRoller(0).
-    return setHood(0);
+    return set(0);
   }
   /**
    * Set the target angle of the hood.
@@ -101,7 +101,7 @@ public class HoodSystem extends SubsystemBase {
    * Move the hood up and down.
    * @param dutycycle [-1, 1] speed to set the hood too.
    */
-  public Command setHood(double dutycycle) { 
+  public Command set(double dutycycle) { 
     return hood.set(dutycycle);
   }
 

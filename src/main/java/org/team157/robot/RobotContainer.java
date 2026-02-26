@@ -188,11 +188,14 @@ public class RobotContainer {
         /// HOOD COMMANDS
         ///////////////////////////////////////////////////////
         hood.setDefaultCommand(hood.setDefault());
-        // driverController.a().toggleOnTrue(hood.setAngle(Degrees.of(60)));
-        // driverController.y().toggleOnTrue(hood.setAngle(Degrees.of(48)));
+        operatorController.povUp().toggleOnTrue(hood.set(0.1));
+        operatorController.povDown().toggleOnTrue(hood.set(-0.1));
+           ///////////////////////
+         /// DYNAMIC COMMANDS ///
+        ///////////////////////
         // Enables dynamic control of the flywheel and hood.
-        driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
-        driverController.y().toggleOnTrue(hood.setDynamicHoodAngle());
+
+         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity().alongWith(hood.setDynamicHoodAngle()));
 
 
     }

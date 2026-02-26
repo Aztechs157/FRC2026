@@ -54,8 +54,8 @@ public class TurretSystem extends SubsystemBase {
   // Configure the turret motor controller for use with YAMS.
   private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withSimClosedLoopController(7, 0, 0, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)  
       .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)
+      .withSimClosedLoopController(TurretConstants.SIM_KP, TurretConstants.SIM_KI, TurretConstants.SIM_KD, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)  
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(true)
       .withGearing(TurretConstants.GEARING)

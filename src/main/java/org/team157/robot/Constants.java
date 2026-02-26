@@ -68,6 +68,7 @@ public final class Constants {
     // public static final MechanismGearing PIVOT_GEARING = new MechanismGearing(GearBox.fromReductionStages(1, 95.83));
     public static final MechanismGearing PIVOT_GEARING = new MechanismGearing(GearBox.fromStages("23:1", "50:12"));
     public static final double KP = 157, KI = 0, KD = 0;
+    public static final double SIM_KP = 157, SIM_KI = 0, SIM_KD = 0;
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
     public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(540);
     public static final double MIN_ENCODER_POSITION = 0.01, MAX_ENCODER_POSITION = 0.91;
@@ -100,6 +101,7 @@ public final class Constants {
     public static final double MIN_ENCODER_POSITION = 0.99, MAX_ENCODER_POSITION = 0.014;
     public static final double MIN_ANGLE = -179, MAX_ANGLE = 179;
     public static final double KP = 157, KI = 0, KD = 0;
+    public static final double SIM_KP = 157, SIM_KI = 0, SIM_KD = 0;
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
     public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(2880);
     public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("28:1"));
@@ -119,6 +121,7 @@ public final class Constants {
     public static final Angle LOWER_SOFT_LIMIT = Degrees.of(42), UPPER_SOFT_LIMIT = Degrees.of(63);
     public static final Angle LOWER_HARD_LIMIT = Degrees.of(40), UPPER_HARD_LIMIT = Degrees.of(65);
     public static final double KP = 157, KI = 0,  KD = 0;
+    public static final double SIM_KP = 157, SIM_KI = 0, SIM_KD = 0;
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
     public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(360);
     public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("32:14", "16:1"));
@@ -132,6 +135,7 @@ public final class Constants {
     public static final int MOTOR_ID = 20, FOLLOWER_MOTOR_ID = 21;
     // Closed-loop control values for the flywheel.
     public static final double P = 0.000157, I = 0, D = 0;
+    public static final double SIM_KP = 0.000157, SIM_KI = 0, SIM_KD = 0;
     // Gear ratio between the motor and the flywheel.
     public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("17:17"));
     // Diameter of the flywheel, in meters.

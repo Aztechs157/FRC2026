@@ -45,7 +45,7 @@ public class FlywheelSystem extends SubsystemBase {
     .withControlMode(ControlMode.CLOSED_LOOP)
     // feedback constant (pid constants)
     .withClosedLoopController(FlywheelConstants.P, FlywheelConstants.I, FlywheelConstants.D, RPM.of(6000), RotationsPerSecondPerSecond.of(3000)) // TODO: move to constants
-    .withSimClosedLoopController(FlywheelConstants.P, FlywheelConstants.I, FlywheelConstants.D, RPM.of(6000), RotationsPerSecondPerSecond.of(3000))
+    .withSimClosedLoopController(FlywheelConstants.SIM_KP, FlywheelConstants.SIM_KI, FlywheelConstants.SIM_KD, RPM.of(6000), RotationsPerSecondPerSecond.of(3000))
     // telemetry name and verbosity level
     .withTelemetry("FlywheelMotor", TelemetryVerbosity.HIGH)
     // gearing from the motor rotor to final shaft
@@ -72,8 +72,6 @@ public class FlywheelSystem extends SubsystemBase {
 
   // flywheel mechanism
   private FlyWheel flywheel = new FlyWheel(flywheelConfig);
-
-
     /**
      * 
      * gets the current velocity of the flywheel
@@ -151,7 +149,7 @@ public class FlywheelSystem extends SubsystemBase {
     hoodAngle = Radians.of(theta);
   }
 
-  public AngularVelocity getDesiredVelocity() {
+  public AngularVelocity getDesiredFlywheelVelocity() {
     double heightMeters = FieldConstants.positionDetails.getTargetHeight();
     double distanceMeters = VisionSystem.distanceToTargetFromTurret; // Use distance from turret instead of robot center
     setShotParams(heightMeters, distanceMeters);
@@ -183,7 +181,7 @@ public class FlywheelSystem extends SubsystemBase {
   }
 
   public Command setDynamicVelocity () {
-    return flywheel.setSpeed(this::getDesiredVelocity);
+    return flywheel.setSpeed(this::getDesiredFlywheelVelocity);
   }
 
   /**
@@ -214,7 +212,7 @@ public class FlywheelSystem extends SubsystemBase {
     SmartDashboard.putNumber("Flywheel RPM", getVelocity().in(RPM));
     SmartDashboard.putNumber("Distance to Target", VisionSystem.distanceToTargetFromTurret);
     SmartDashboard.putNumber("Target Height", FieldConstants.positionDetails.getTargetHeight());
-    SmartDashboard.putNumber("Desired Ball Velocity", getDesiredVelocity().in(RPM));
+    SmartDashboard.putNumber("Desired Flywheel Velocity", getDesiredFlywheelVelocity().in(RPM));
     SmartDashboard.putNumber("Desired Hood Angle", getDesiredHoodAngle().in(Degrees));
     
     SmartDashboard.putNumber("Ball Velocity (m/s)", ballVelocity);
