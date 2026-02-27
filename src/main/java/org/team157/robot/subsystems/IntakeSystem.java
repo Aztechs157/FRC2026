@@ -18,6 +18,7 @@ import org.team157.robot.Constants;
 import org.team157.robot.Robot;
 import org.team157.robot.Constants.IntakeConstants;
 import org.team157.robot.Constants.ModelConstants;
+import org.team157.robot.Constants.TelemetryConstants;
 import org.team157.utilities.PosUtils;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -51,7 +52,7 @@ public class IntakeSystem extends SubsystemBase {
 
   private SmartMotorControllerConfig intakeRollerMotorConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.OPEN_LOOP)
-    .withTelemetry("IntakeRollerMotor", TelemetryVerbosity.HIGH)
+    .withTelemetry("IntakeRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
     .withGearing(1)
     .withMotorInverted(true)
     .withIdleMode(MotorMode.COAST)
@@ -61,7 +62,7 @@ public class IntakeSystem extends SubsystemBase {
   private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX60(1), intakeRollerMotorConfig);
 
   private final FlyWheelConfig intakeRollerConfig = new FlyWheelConfig(smartRollerMotor)
-  .withTelemetry("Intake", TelemetryVerbosity.HIGH)
+  .withTelemetry("Intake", TelemetryConstants.TELEMETRY_VERBOSITY)
   .withDiameter(Inches.of(3))
   .withMass(Kilograms.of(0.5)); //TODO: measure mass of the intake roller and update this constant
 
@@ -82,7 +83,7 @@ public class IntakeSystem extends SubsystemBase {
       .withIdleMode(MotorMode.COAST)
       .withMotorInverted(true)
       .withGearing(IntakeConstants.PIVOT_GEARING)
-      .withTelemetry("Intake Pivot Motor", TelemetryVerbosity.HIGH) 
+      .withTelemetry("Intake Pivot Motor", TelemetryConstants.TELEMETRY_VERBOSITY) 
       .withStatorCurrentLimit(IntakeConstants.CURRENT_LIMIT)
       .withClosedLoopRampRate(IntakeConstants.RAMP_RATE);
 
@@ -94,7 +95,7 @@ public class IntakeSystem extends SubsystemBase {
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
       .withHardLimit((IntakeConstants.LOWER_HARD_LIMIT), (IntakeConstants.UPPER_HARD_LIMIT))
       .withSoftLimits((IntakeConstants.LOWER_SOFT_LIMIT), (IntakeConstants.UPPER_SOFT_LIMIT))
-      .withTelemetry("Intake Pivot", TelemetryVerbosity.HIGH)
+      .withTelemetry("Intake Pivot", TelemetryConstants.TELEMETRY_VERBOSITY)
       .withMOI(Meters.of(0.75), Kilograms.of(1)); //TODO: measure MOI of the intake pivot and update these constants
 
   // Create the hood pivot system with the above configuration.
@@ -254,10 +255,11 @@ public class IntakeSystem extends SubsystemBase {
      *  marked for removal along with Shuffleboard for next season.
      *  Consider publishing to NT directly.
      */
+    if(TelemetryConstants.TELEMETRY_VERBOSITY == TelemetryVerbosity.HIGH) {
     SmartDashboard.putNumber("Intake Pivot Pos", getPos());
     SmartDashboard.putNumber("Scaled Intake Pivot Pos", getScaledPos());
-    SmartDashboard.putNumber("Intake Pivot Angle (YAMS)", getScaledPosAngleYAMS());
     SmartDashboard.putNumber("Intake Pivot Angle (Encoder)", getScaledPosAngleEncoder());
+    }
     intakePivot.updateTelemetry();
   }
 

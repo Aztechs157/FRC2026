@@ -16,6 +16,7 @@ import java.util.function.Supplier;
 
 import org.team157.robot.Constants;
 import org.team157.robot.Constants.ModelConstants;
+import org.team157.robot.Constants.TelemetryConstants;
 import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.Robot;
 import org.team157.utilities.PosUtils;
@@ -59,7 +60,7 @@ public class TurretSystem extends SubsystemBase {
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(true)
       .withGearing(TurretConstants.GEARING)
-      .withTelemetry("Turret Motor", TelemetryVerbosity.HIGH) 
+      .withTelemetry("Turret Motor", TelemetryConstants.TELEMETRY_VERBOSITY) 
       .withStatorCurrentLimit((TurretConstants.CURRENT_LIMIT))
       .withClosedLoopRampRate((TurretConstants.RAMP_RATE))
       .withSoftLimit((TurretConstants.LOWER_SOFT_LIMIT), (TurretConstants.UPPER_SOFT_LIMIT));
@@ -71,7 +72,7 @@ public class TurretSystem extends SubsystemBase {
   private PivotConfig turretConfig = new PivotConfig(smartMotor)
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
       .withHardLimit((TurretConstants.LOWER_HARD_LIMIT), (TurretConstants.UPPER_HARD_LIMIT))
-      .withTelemetry("Turret", TelemetryVerbosity.HIGH)
+      .withTelemetry("Turret", TelemetryConstants.TELEMETRY_VERBOSITY)
       .withMOI(Meters.of(0.1), Kilograms.of(4));
 
   // Create the turret pivot system with the above configuration.
@@ -267,10 +268,12 @@ public class TurretSystem extends SubsystemBase {
      *  marked for removal along with Shuffleboard for next season.
      *  Consider publishing to NT directly.
      */
-    SmartDashboard.putNumber("Turret Pos", getPos());
-    SmartDashboard.putNumber("Scaled Turret Pos", getScaledPos());
-    SmartDashboard.putNumber("Turret Angle (YAMS)", getScaledPosAngleYAMS());
-    SmartDashboard.putNumber("Turret Angle (Encoder)", getScaledPosAngleEncoder());
+     if(TelemetryConstants.TELEMETRY_VERBOSITY == TelemetryVerbosity.HIGH) {
+      SmartDashboard.putNumber("Turret Pos", getPos());
+      SmartDashboard.putNumber("Scaled Turret Pos", getScaledPos());
+      //SmartDashboard.putNumber("Turret Angle (YAMS)", getScaledPosAngleYAMS());
+      SmartDashboard.putNumber("Turret Angle (Encoder)", getScaledPosAngleEncoder());
+  }
     SmartDashboard.putNumber("where me going", trackingAngle.magnitude());
     turret.updateTelemetry();
   }

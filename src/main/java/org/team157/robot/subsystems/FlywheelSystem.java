@@ -19,6 +19,7 @@ import org.team157.robot.Constants;
 import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.FlywheelConstants;
 import org.team157.robot.Constants.HoodConstants;
+import org.team157.robot.Constants.TelemetryConstants;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -46,7 +47,7 @@ public class FlywheelSystem extends SubsystemBase {
     .withFeedforward(new SimpleMotorFeedforward(FlywheelConstants.KS, FlywheelConstants.KV, FlywheelConstants.KA)) 
     .withSimClosedLoopController(FlywheelConstants.SIM_KP, FlywheelConstants.SIM_KI, FlywheelConstants.SIM_KD, FlywheelConstants.ANGULAR_VELOCITY, FlywheelConstants.ANGULAR_ACCELERATION)
     .withSimFeedforward(new SimpleMotorFeedforward(FlywheelConstants.SIM_KS, FlywheelConstants.SIM_KV, FlywheelConstants.SIM_KA))
-    .withTelemetry("FlywheelMotor", TelemetryVerbosity.HIGH)
+    .withTelemetry("FlywheelMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
     .withGearing(FlywheelConstants.GEARING)
     .withMotorInverted(false)
     .withIdleMode(MotorMode.COAST)
@@ -65,7 +66,7 @@ public class FlywheelSystem extends SubsystemBase {
   .withSoftLimit(FlywheelConstants.FLYWHEEL_RPM_LIMIT_LOWER, FlywheelConstants.FLYWHEEL_RPM_LIMIT_UPPER)
   // .withUpperSoftLimit(RPM.of(FlywheelConstants.FLYWHEEL_RPM_LIMIT_UPPER))
   // telemetry name and verbosity
-  .withTelemetry("FlywheelDynamics", TelemetryVerbosity.HIGH);
+  .withTelemetry("FlywheelDynamics", TelemetryConstants.TELEMETRY_VERBOSITY);
 
   // flywheel mechanism
   private FlyWheel flywheel = new FlyWheel(flywheelConfig);
@@ -194,12 +195,9 @@ public class FlywheelSystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Flywheel Velocity", getVelocity().magnitude());
-    SmartDashboard.putNumber("Flywheel RPM", getVelocity().in(RPM));
+
     SmartDashboard.putNumber("Distance to Target", VisionSystem.distanceToTargetFromTurret);
     SmartDashboard.putNumber("Target Height", FieldConstants.positionDetails.getTargetHeight());
-    SmartDashboard.putNumber("Desired Flywheel Velocity", getDesiredFlywheelVelocity().in(RPM));
-    SmartDashboard.putNumber("Desired Hood Angle", getDesiredHoodAngle().in(Degrees));
     SmartDashboard.putNumber("Ball Velocity (m/s)", ballVelocity);
     SmartDashboard.putBoolean("Ball Velocity is NaN", Double.isNaN(ballVelocity));
     flywheel.updateTelemetry();
