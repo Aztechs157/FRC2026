@@ -4,12 +4,10 @@
 
 package org.team157.robot.subsystems;
 // import the stuff 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
@@ -23,6 +21,7 @@ import org.team157.robot.Constants.FlywheelConstants;
 import org.team157.robot.Constants.HoodConstants;
 
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -43,21 +42,19 @@ public class FlywheelSystem extends SubsystemBase {
 
   private SmartMotorControllerConfig flywheelSystemConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.CLOSED_LOOP)
-    // feedback constant (pid constants)
-    .withClosedLoopController(FlywheelConstants.P, FlywheelConstants.I, FlywheelConstants.D, RPM.of(6000), RotationsPerSecondPerSecond.of(3000)) // TODO: move to constants
-    .withSimClosedLoopController(FlywheelConstants.SIM_KP, FlywheelConstants.SIM_KI, FlywheelConstants.SIM_KD, RPM.of(6000), RotationsPerSecondPerSecond.of(3000))
-    // telemetry name and verbosity level
+    .withClosedLoopController(FlywheelConstants.KP, FlywheelConstants.KI, FlywheelConstants.KD, FlywheelConstants.ANGULAR_VELOCITY, FlywheelConstants.ANGULAR_ACCELERATION) // TODO: move to constants
+    .withFeedforward(new SimpleMotorFeedforward(FlywheelConstants.KS, FlywheelConstants.KV, FlywheelConstants.KA)) 
+    .withSimClosedLoopController(FlywheelConstants.SIM_KP, FlywheelConstants.SIM_KI, FlywheelConstants.SIM_KD, FlywheelConstants.ANGULAR_VELOCITY, FlywheelConstants.ANGULAR_ACCELERATION)
+    .withSimFeedforward(new SimpleMotorFeedforward(FlywheelConstants.SIM_KS, FlywheelConstants.SIM_KV, FlywheelConstants.SIM_KA))
     .withTelemetry("FlywheelMotor", TelemetryVerbosity.HIGH)
-    // gearing from the motor rotor to final shaft
     .withGearing(FlywheelConstants.GEARING)
     .withMotorInverted(false)
     .withIdleMode(MotorMode.COAST)
-    .withStatorCurrentLimit(Amps.of(40))
+    .withStatorCurrentLimit(FlywheelConstants.CURRENT_LIMIT)
     .withClosedLoopRampRate((FlywheelConstants.RAMP_RATE))
     .withFollowers(Pair.of(motor_follower, true));
 
   private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX60(1),flywheelSystemConfig);
- // private SmartMotorController smartMotorFollower = new TalonFXWrapper(motor_follower, DCMotor.getKrakenX60(1),flywheelSystemConfig);
 
   private final FlyWheelConfig flywheelConfig = new FlyWheelConfig(smartMotor)
   // diameter of the flywheel 
@@ -159,25 +156,12 @@ public class FlywheelSystem extends SubsystemBase {
     // Therefore: flywheelRPM = (ballVelocity * 60) / (π * flywheel_diameter)
     // desiredRPM is divided by 0.4 to account for external factors like air resistace and wheel slip.
     double flywheelDiameterMeters = (FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters);
-    double desiredRPM = (ballVelocity * 60) / (Math.PI * flywheelDiameterMeters);
-    return RPM.of(Math.max(2800, desiredRPM / FlywheelConstants.SPEED_FACTOR));
+    double desiredRPM = (ballVelocity * 60) / (Math.PI * flywheelDiameterMeters) * FlywheelConstants.SPEED_FACTOR;
+    return RPM.of(Math.max(2800, desiredRPM));
   }
 
   public static Angle getDesiredHoodAngle() {
-    // double heightMeters = FieldConstants.positionDetails.getTargetHeight();
-    // double distanceMeters = VisionSystem.distanceToTargetFromTurret;
-    // setShotParams(heightMeters, distanceMeters);
     return Degrees.of(Math.toDegrees(hoodAngle.magnitude()));
-  }
-
-  // TODO: consider removing this, as it's never used and will always return 0.
-  public double lossFunction() {
-    return 0 * hoodAngle.magnitude();
-  }
-
-  // TODO: consider removing this unused method, as getDesiredHoodAngle already provides the hood angle that should be used for the shot.
-  public Angle getHoodAngle() {
-    return hoodAngle;
   }
 
   public Command setDynamicVelocity () {
@@ -200,7 +184,9 @@ public class FlywheelSystem extends SubsystemBase {
    * @param dutyCycle DutyCycle to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
-  public Command set(double dutyCycle) {return flywheel.set(dutyCycle);}
+  public Command set(double dutyCycle) {
+    return flywheel.set(dutyCycle);
+  }
 
   /** Creates a new FlywheelSystem. */
   public FlywheelSystem() {}
@@ -214,7 +200,6 @@ public class FlywheelSystem extends SubsystemBase {
     SmartDashboard.putNumber("Target Height", FieldConstants.positionDetails.getTargetHeight());
     SmartDashboard.putNumber("Desired Flywheel Velocity", getDesiredFlywheelVelocity().in(RPM));
     SmartDashboard.putNumber("Desired Hood Angle", getDesiredHoodAngle().in(Degrees));
-    
     SmartDashboard.putNumber("Ball Velocity (m/s)", ballVelocity);
     SmartDashboard.putBoolean("Ball Velocity is NaN", Double.isNaN(ballVelocity));
     flywheel.updateTelemetry();

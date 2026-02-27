@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import org.team157.robot.parsing.PositionDetails;
@@ -121,7 +122,7 @@ public final class Constants {
     public static final Angle LOWER_SOFT_LIMIT = Degrees.of(42), UPPER_SOFT_LIMIT = Degrees.of(63);
     public static final Angle LOWER_HARD_LIMIT = Degrees.of(40), UPPER_HARD_LIMIT = Degrees.of(65);
     public static final double KP = 157, KI = 0,  KD = 0;
-    public static final double SIM_KP = 157, SIM_KI = 0, SIM_KD = 0;
+    public static final double SIM_KP = 20, SIM_KI = 0, SIM_KD = 0;
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
     public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(360);
     public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("32:14", "16:1"));
@@ -134,13 +135,17 @@ public final class Constants {
     // IDs of both motors powering the flywheel.
     public static final int MOTOR_ID = 20, FOLLOWER_MOTOR_ID = 21;
     // Closed-loop control values for the flywheel.
-    public static final double P = 0.6328, I = 0, D = 0;
-    public static final double SIM_KP = 1.57, SIM_KI = 0, SIM_KD = 0;
+    public static final double KP = 0.95, KI = 0, KD = 0.095;
+    public static final double KS = 0.0, KV = 0.37, KA = 0.37; 
+    public static final double SIM_KP = 1.57, SIM_KI = 0, SIM_KD = 0.157;
+    public static final double SIM_KS = 0.0, SIM_KV = 0.37, SIM_KA = 0.27; // Determined via Reca.lc, tune and/or run SysID to verify these values.
+    public static final AngularVelocity ANGULAR_VELOCITY = RPM.of(6000);
+    public static final AngularAcceleration ANGULAR_ACCELERATION = RotationsPerSecondPerSecond.of(3000);
     // Gear ratio between the motor and the flywheel.
     public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("17:17"));
     // Diameter of the flywheel, in meters.
     public static final Distance FLYWHEEL_DIAMETER = Inches.of(3.75);
-    // Mass of the flywheel, in pounds.
+    // Mass of the flywheel (including shooter wheels), in pounds.
     public static final Mass FLYWHEEL_MASS = Pounds.of(2);
     // Z distance from the center of the flywheel to the ground, in meters.
     public static final Distance HEIGHT = Meters.of(0.523);
@@ -149,7 +154,8 @@ public final class Constants {
     // Flywheel RPM limits for safety, in... RPM.
     public static final AngularVelocity FLYWHEEL_RPM_LIMIT_UPPER = RPM.of(6000), FLYWHEEL_RPM_LIMIT_LOWER = RPM.of(-6000);
     // RPM multiplier to account for external factors like air resistance and wheel slip. This is determined experimentally.
-    public static final double SPEED_FACTOR = 0.4;
+    public static final double SPEED_FACTOR = 1 / 0.4;
+    public static final Current CURRENT_LIMIT = Amps.of(40);
 
   }
 
