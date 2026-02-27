@@ -110,6 +110,8 @@ public final class Constants {
     public static final Time RAMP_RATE = Seconds.of(0.00157);
     public static final Angle LOWER_SOFT_LIMIT = Degrees.of(-179), UPPER_SOFT_LIMIT = Degrees.of(179);
     public static final Angle LOWER_HARD_LIMIT = Degrees.of(-179), UPPER_HARD_LIMIT = Degrees.of(179);
+    // Angle offset to account for misalignment between turret zero position and robot forward, in degrees.
+    public static final double TURRET_ANGLE_OFFSET = 130; 
   }
 
   public static class HoodConstants {
