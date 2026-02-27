@@ -21,7 +21,7 @@ import com.ctre.phoenix6.CANBus;
 
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
-
+import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -159,6 +159,8 @@ public final class Constants {
 
   }
 
+  
+
   public static class VisionConstants {
     public static final String FRONTLEFT_CAMERA_NICKNAME = "frontLeftCam";
     public static final Rotation3d FRONTLEFT_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(65));
@@ -189,6 +191,12 @@ public final class Constants {
     // How close the robot can be (bumper to tag, in meters) before losing the
     // ability to auto-align.
     public static final double MIN_DISTANCE_TO_TAG = 0.8;
+  }
+
+
+  public static class TelemetryConstants{
+    public static final TelemetryVerbosity TELEMETRY_VERBOSITY = TelemetryVerbosity.LOW;
+
   }
 
   public static class FieldConstants {

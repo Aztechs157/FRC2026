@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilograms;
 
 import org.team157.robot.Constants;
+import org.team157.robot.Constants.TelemetryConstants;
 import org.team157.robot.Constants.UptakeConstants;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -32,7 +33,7 @@ public class UptakeSystem extends SubsystemBase {
 
   private SmartMotorControllerConfig uptakeRollerMotorConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.OPEN_LOOP)
-    .withTelemetry("UptakeRollerMotor", TelemetryVerbosity.HIGH)
+    .withTelemetry("UptakeRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
     .withGearing(1)
     .withMotorInverted(false)
     .withIdleMode(MotorMode.COAST)
@@ -44,7 +45,7 @@ public class UptakeSystem extends SubsystemBase {
   private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX44(1), uptakeRollerMotorConfig);
 
   private final FlyWheelConfig uptakeRollerConfig = new FlyWheelConfig(smartRollerMotor)
-  .withTelemetry("Uptake", TelemetryVerbosity.HIGH)
+  .withTelemetry("Uptake", TelemetryConstants.TELEMETRY_VERBOSITY)
   .withMass(Kilograms.of(0.5)) //TODO: measure mass of the uptake roller and update this constant
   .withDiameter(Inches.of(2));
 

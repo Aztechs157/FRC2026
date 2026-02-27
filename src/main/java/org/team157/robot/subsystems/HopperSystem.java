@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.Kilograms;
 
 import org.team157.robot.Constants;
 import org.team157.robot.Constants.HopperConstants;
+import org.team157.robot.Constants.TelemetryConstants;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 
 
@@ -32,7 +34,7 @@ public class HopperSystem extends SubsystemBase {
 
   private SmartMotorControllerConfig hopperRollerMotorConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.OPEN_LOOP)
-    .withTelemetry("HopperRollerMotor", TelemetryVerbosity.HIGH)
+    .withTelemetry("HopperRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
     .withGearing(1)
     .withMotorInverted(true)
     .withIdleMode(MotorMode.COAST)
@@ -45,7 +47,7 @@ public class HopperSystem extends SubsystemBase {
   private final FlyWheelConfig hopperRollerConfig = new FlyWheelConfig(smartRollerMotor)
     .withMass(Kilograms.of(0.5)) //TODO: measure mass of the hopper roller and update this constant
     .withDiameter(Inches.of(1)) //TODO: measure diameter of the hopper roller and update this constant
-    .withTelemetry("Hopper", TelemetryVerbosity.HIGH);
+    .withTelemetry("Hopper", TelemetryConstants.TELEMETRY_VERBOSITY);
 
   // flywheel mechanism
   private FlyWheel hopperRollers = new FlyWheel(hopperRollerConfig);
