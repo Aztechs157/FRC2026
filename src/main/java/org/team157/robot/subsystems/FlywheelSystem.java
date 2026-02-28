@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -150,6 +151,10 @@ public class FlywheelSystem extends SubsystemBase {
   public AngularVelocity getDesiredFlywheelVelocity() {
     double heightMeters = FieldConstants.positionDetails.getTargetHeight();
     double distanceMeters = VisionSystem.distanceToTargetFromTurret; // Use distance from turret instead of robot center
+    // double currentTime = NetworkTablesJNI.now();
+    // double timeDelta = currentTime - VisionSystem.lastTrackedTime;
+    // double distanceDelta = distanceMeters - VisionSystem.lastDistanceToTarget;
+    // double velocityDelta = distanceDelta / timeDelta;
     setShotParams(heightMeters, distanceMeters);
     
     // Convert ball velocity (m/s) to flywheel RPM
@@ -157,7 +162,7 @@ public class FlywheelSystem extends SubsystemBase {
     // Therefore: flywheelRPM = (ballVelocity * 60) / (π * flywheel_diameter)
     // desiredRPM is divided by 0.4 to account for external factors like air resistace and wheel slip.
     double flywheelDiameterMeters = (FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters);
-    double desiredRPM = (ballVelocity * 60) / (Math.PI * flywheelDiameterMeters) * FlywheelConstants.SPEED_FACTOR;
+    double desiredRPM = ((ballVelocity) * 60) / (Math.PI * flywheelDiameterMeters) * FlywheelConstants.SPEED_FACTOR;
     return RPM.of(Math.max(2800, desiredRPM));
   }
 

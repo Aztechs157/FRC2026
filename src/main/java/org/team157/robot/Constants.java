@@ -146,7 +146,7 @@ public final class Constants {
     // Gear ratio between the motor and the flywheel.
     public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("17:17"));
     // Diameter of the flywheel, in meters.
-    public static final Distance FLYWHEEL_DIAMETER = Inches.of(3.75);
+    public static final Distance FLYWHEEL_DIAMETER = Inches.of(4);
     // Mass of the flywheel (including shooter wheels), in pounds.
     public static final Mass FLYWHEEL_MASS = Pounds.of(2);
     // Z distance from the center of the flywheel to the ground, in meters.
@@ -178,7 +178,7 @@ public final class Constants {
 
     public static final String BACK_CAMERA_NICKNAME = "backCam";
     public static final Rotation3d BACK_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(180));
-    public static final Translation3d BACK_CAMERA_TRANSLATION = new Translation3d(-0.322, 0, 0.381);
+    public static final Translation3d BACK_CAMERA_TRANSLATION = new Translation3d(0.322, 0, 0.381);
     public static final Transform3d BACK_CAMERA_PLACEMENT = new Transform3d(
             BACK_CAMERA_TRANSLATION, BACK_CAMERA_ROTATION);
 
@@ -203,7 +203,7 @@ public final class Constants {
 
   public static class FieldConstants {
     public static final Distance FIELD_LENGTH = Meters.of(16.54175);
-    public static final Distance FIELD_WIDTH = Meters.of(8.0137);
+    public static final Distance FIELD_WIDTH = Meters.of(8.0137); 
     
     public static final PositionDetails positionDetails = new PositionDetails();
     
