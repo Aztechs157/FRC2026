@@ -191,7 +191,8 @@ public class RobotContainer {
         // operatorController.y().toggleOnTrue(turret.trackHubTag());
         operatorController.x().toggleOnTrue(turret.trackTagGlobalRelative());
         // Enables dynamic control of the flywheel and hood.
-        driverController.a().toggleOnTrue(flywheel.setDynamicVelocity().alongWith(hood.setDynamicHoodAngle()));
+        //driverController.a().toggleOnTrue(flywheel.setDynamicVelocity().alongWith(hood.setDynamicHoodAngle()));
+        driverController.a().toggleOnTrue(flywheel.setDynamicBangBangSpeed().alongWith(hood.setDynamicHoodAngle()));
 
     }
 

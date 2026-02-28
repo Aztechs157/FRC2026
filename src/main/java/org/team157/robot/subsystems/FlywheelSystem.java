@@ -22,6 +22,7 @@ import org.team157.robot.Constants.HoodConstants;
 import org.team157.robot.Constants.TelemetryConstants;
 
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -40,6 +41,7 @@ public class FlywheelSystem extends SubsystemBase {
   private TalonFX motor_follower = new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_ID, Constants.RIO_CAN_BUS);
   public static double ballVelocity = 0; // Meters per second for the ball to be launched
   public static Angle hoodAngle = Radians.of(0);
+  private BangBangController bangBangController = new BangBangController();
 
   private SmartMotorControllerConfig flywheelSystemConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.CLOSED_LOOP)
@@ -168,6 +170,9 @@ public class FlywheelSystem extends SubsystemBase {
   public Command setDynamicVelocity () {
     return flywheel.setSpeed(this::getDesiredFlywheelVelocity);
   }
+  public Command setDynamicBangBangSpeed() {
+    return run(() -> flywheel.setDutyCycleSetpoint(bangBangController.calculate(flywheel.getSpeed().in(RPM), getDesiredFlywheelVelocity().in(RPM))));
+  }
 
   /**
    * set the shooter velocity
@@ -176,6 +181,9 @@ public class FlywheelSystem extends SubsystemBase {
    */
   public Command setVelocity (AngularVelocity speed) {
     return flywheel.setSpeed(speed); 
+  }
+  public Command setBangBangVelocity(AngularVelocity speed) {
+    return run(() -> flywheel.setDutyCycleSetpoint(bangBangController.calculate(flywheel.getSpeed().in(RPM), speed.in(RPM))));
   }
 
   
