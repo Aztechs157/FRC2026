@@ -152,8 +152,10 @@ public class RobotContainer {
         // Disable flywheel when no commands are running.
         flywheel.setDefaultCommand(flywheel.set(0));
 
-        driverController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(5800)));
-        driverController.leftTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4500)));
+        // driverController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(5800)));
+        // driverController.leftTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4500)));
+        driverController.rightTrigger().toggleOnTrue(flywheel.setBangBangVelocity(RPM.of(5800)));
+        driverController.leftTrigger().toggleOnTrue(flywheel.setBangBangVelocity(RPM.of(4500)));
 
           ///////////////////////
          /// INTAKE COMMANDS ///
