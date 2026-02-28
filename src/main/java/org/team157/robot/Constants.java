@@ -178,7 +178,7 @@ public final class Constants {
 
     public static final String BACK_CAMERA_NICKNAME = "backCam";
     public static final Rotation3d BACK_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(180));
-    public static final Translation3d BACK_CAMERA_TRANSLATION = new Translation3d(0.322, 0, 0.381);
+    public static final Translation3d BACK_CAMERA_TRANSLATION = new Translation3d(-0.322, 0, 0.381);
     public static final Transform3d BACK_CAMERA_PLACEMENT = new Transform3d(
             BACK_CAMERA_TRANSLATION, BACK_CAMERA_ROTATION);
 
