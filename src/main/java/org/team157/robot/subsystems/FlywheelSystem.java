@@ -200,6 +200,8 @@ public class FlywheelSystem extends SubsystemBase {
     SmartDashboard.putNumber("Target Height", FieldConstants.positionDetails.getTargetHeight());
     SmartDashboard.putNumber("Ball Velocity (m/s)", ballVelocity);
     SmartDashboard.putBoolean("Ball Velocity is NaN", Double.isNaN(ballVelocity));
+    SmartDashboard.putNumber("Flywheel RPM", getVelocity().in(RPM));
+    SmartDashboard.putNumber("Desired Flywheel Velocity", getDesiredFlywheelVelocity().in(RPM));
     flywheel.updateTelemetry();
   }
 
