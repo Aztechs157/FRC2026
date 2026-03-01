@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.io.IOException;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +19,10 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.estimation.TargetModel;
 import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -60,6 +64,8 @@ import org.team157.robot.Robot;
 
 @Logged(strategy = Strategy.OPT_OUT)
 public class VisionSystem extends SubsystemBase {
+
+  public static VisionSystemSim visionSim = new VisionSystemSim("main");
 
   // Publishes the turret's target point to NT for field zoning testing.
   public StructPublisher<Pose2d> targetPosePublisher = NetworkTableInstance.getDefault().getStructTopic("Target Pose", Pose2d.struct).publish();
@@ -118,6 +124,8 @@ public class VisionSystem extends SubsystemBase {
         turretCamera.close();
         throw new RuntimeException(exception);
       }
+
+      visionSim.addAprilTags(fieldLayout);
     
       PortForwarder.add(5800, "photonvision1.local", 5800);
       PortForwarder.add(5800, "photonvision2.local", 5800);
@@ -392,21 +400,25 @@ public class VisionSystem extends SubsystemBase {
     LEFT_CAM(VisionConstants.FRONTLEFT_CAMERA_NICKNAME,
              VisionConstants.FRONTLEFT_CAMERA_ROTATION,
              VisionConstants.FRONTLEFT_CAMERA_TRANSLATION,
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1),
+             VisionConstants.FRONTLEFT_PROPS),
     /**
      * Right Camera
      */
     RIGHT_CAM(VisionConstants.FRONTRIGHT_CAMERA_NICKNAME,
               VisionConstants.FRONTRIGHT_CAMERA_ROTATION,
               VisionConstants.FRONTRIGHT_CAMERA_TRANSLATION,
-              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1),
+              VisionConstants.FRONTRIGHT_PROPS),
     /**
      * Back Camera
      */
     BACK_CAM(VisionConstants.BACK_CAMERA_NICKNAME,
                VisionConstants.BACK_CAMERA_ROTATION,
                VisionConstants.BACK_CAMERA_TRANSLATION,
-               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+               VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1),
+               VisionConstants.BACK_PROPS),
+
     /**
      * Turret Camera
      */
@@ -457,6 +469,8 @@ public class VisionSystem extends SubsystemBase {
      * Simulated camera instance which only exists during simulations.
      */
     public PhotonCameraSim cameraSim;
+    public SimCameraProperties cameraSimProps;
+
     /**
      * Results list to be updated periodically and cached to avoid unnecessary queries.
      */
@@ -496,6 +510,29 @@ public class VisionSystem extends SubsystemBase {
 
       this.singleTagStdDevs = singleTagStdDevs;
       this.multiTagStdDevs = multiTagStdDevsMatrix;
+    }
+    Cameras(String name, Rotation3d robotToCamRotation, Translation3d robotToCamTranslation,
+            Matrix<N3, N1> singleTagStdDevs, Matrix<N3, N1> multiTagStdDevsMatrix, SimCameraProperties props) {
+      latencyAlert = new Alert("'" + name + "' Camera is experiencing high latency.", AlertType.kWarning);
+
+      camera = new PhotonCamera(name);
+
+      // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
+      robotToCamTransform = new Transform3d(robotToCamTranslation, robotToCamRotation);
+
+      poseEstimator = new PhotonPoseEstimator(VisionSystem.fieldLayout,
+                                              PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                                              robotToCamTransform);
+      poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+
+      if(name.equals(VisionConstants.TURRET_CAMERA_NICKNAME)) {
+        this.useForPositioning = false;
+      } 
+
+      this.singleTagStdDevs = singleTagStdDevs;
+      this.multiTagStdDevs = multiTagStdDevsMatrix;
+      this.cameraSim = new PhotonCameraSim(camera, props);
+      VisionSystem.visionSim.addCamera(cameraSim, robotToCamTransform);
     }
 
     /**
@@ -554,7 +591,7 @@ public class VisionSystem extends SubsystemBase {
       }
 
         // resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
-        resultsList = Robot.isReal() ? camera.getAllUnreadResults() : new ArrayList<PhotonPipelineResult>(); // ß
+        resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults(); // ß
         lastReadTimestamp = currentTimestamp;
         resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
           return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;

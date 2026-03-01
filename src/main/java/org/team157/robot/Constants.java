@@ -15,6 +15,7 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import org.photonvision.simulation.SimCameraProperties;
 import org.team157.robot.parsing.PositionDetails;
 
 import com.ctre.phoenix6.CANBus;
@@ -169,18 +170,33 @@ public final class Constants {
     public static final Translation3d FRONTLEFT_CAMERA_TRANSLATION = new Translation3d(-0.128, 0.329, 0.394);
     public static final Transform3d FRONTLEFT_CAMERA_PLACEMENT = new Transform3d(
             FRONTLEFT_CAMERA_TRANSLATION, FRONTLEFT_CAMERA_ROTATION);
+    public static final SimCameraProperties FRONTLEFT_PROPS = new SimCameraProperties()
+    .setCalibration(640, 480, Rotation2d.fromDegrees(80))
+    .setFPS(60)
+    .setAvgLatencyMs(20)
+    .setLatencyStdDevMs(5);
 
     public static final String FRONTRIGHT_CAMERA_NICKNAME = "frontRightCam";
     public static final Rotation3d FRONTRIGHT_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(-65));
     public static final Translation3d FRONTRIGHT_CAMERA_TRANSLATION = new Translation3d(-0.128, -0.329, 0.394);
     public static final Transform3d FRONTRIGHT_CAMERA_PLACEMENT = new Transform3d(
-            FRONTRIGHT_CAMERA_TRANSLATION, FRONTRIGHT_CAMERA_ROTATION);  
+            FRONTRIGHT_CAMERA_TRANSLATION, FRONTRIGHT_CAMERA_ROTATION);
+    public static final SimCameraProperties FRONTRIGHT_PROPS = new SimCameraProperties()
+    .setCalibration(640, 480, Rotation2d.fromDegrees(80))
+    .setFPS(60)
+    .setAvgLatencyMs(20)
+    .setLatencyStdDevMs(5);;  
 
     public static final String BACK_CAMERA_NICKNAME = "backCam";
     public static final Rotation3d BACK_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(180));
     public static final Translation3d BACK_CAMERA_TRANSLATION = new Translation3d(-0.322, 0, 0.381);
     public static final Transform3d BACK_CAMERA_PLACEMENT = new Transform3d(
             BACK_CAMERA_TRANSLATION, BACK_CAMERA_ROTATION);
+    public static final SimCameraProperties BACK_PROPS = new SimCameraProperties()
+    .setCalibration(640, 480, Rotation2d.fromDegrees(80))
+    .setFPS(60)
+    .setAvgLatencyMs(20)
+    .setLatencyStdDevMs(5);
 
     public static final String TURRET_CAMERA_NICKNAME = "turretCam";
     public static final Rotation3d TURRET_CAMERA_ROTATION = new Rotation3d(0, 0, 0);

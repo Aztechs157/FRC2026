@@ -285,6 +285,11 @@ public class DriveSystem extends TunerSwerveDrivetrain implements Subsystem {
         }
     }
 
+    @Override
+    public void simulationPeriodic() {
+        VisionSystem.visionSim.update(getPose());
+    }
+
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
 
