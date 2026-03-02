@@ -151,6 +151,7 @@ public class FlywheelSystem extends SubsystemBase {
   public AngularVelocity getDesiredFlywheelVelocity() {
     double heightMeters = FieldConstants.positionDetails.getTargetHeight();
     double distanceMeters = VisionSystem.distanceToTargetFromTurret; // Use distance from turret instead of robot center
+    // TODO: Continue work on implementation of momentum-based velocity calculation on new branch.
     // double currentTime = NetworkTablesJNI.now();
     // double timeDelta = currentTime - VisionSystem.lastTrackedTime;
     // double distanceDelta = distanceMeters - VisionSystem.lastDistanceToTarget;
