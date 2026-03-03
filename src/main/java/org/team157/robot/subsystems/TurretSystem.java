@@ -4,8 +4,6 @@
 
 package org.team157.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Kilograms;
@@ -18,7 +16,9 @@ import java.util.function.Supplier;
 
 import org.team157.robot.Constants;
 import org.team157.robot.Constants.ModelConstants;
+import org.team157.robot.Constants.TelemetryConstants;
 import org.team157.robot.Constants.TurretConstants;
+import org.team157.robot.Robot;
 import org.team157.utilities.PosUtils;
 
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
@@ -55,12 +55,12 @@ public class TurretSystem extends SubsystemBase {
   // Configure the turret motor controller for use with YAMS.
   private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withSimClosedLoopController(7, 0, 0, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION) //TODO: tune this PID for the simulation  
       .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)
+      .withSimClosedLoopController(TurretConstants.SIM_KP, TurretConstants.SIM_KI, TurretConstants.SIM_KD, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)  
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(true)
       .withGearing(TurretConstants.GEARING)
-      .withTelemetry("Turret Motor", TelemetryVerbosity.HIGH) 
+      .withTelemetry("Turret Motor", TelemetryConstants.TELEMETRY_VERBOSITY) 
       .withStatorCurrentLimit((TurretConstants.CURRENT_LIMIT))
       .withClosedLoopRampRate((TurretConstants.RAMP_RATE))
       .withSoftLimit((TurretConstants.LOWER_SOFT_LIMIT), (TurretConstants.UPPER_SOFT_LIMIT));
@@ -72,7 +72,7 @@ public class TurretSystem extends SubsystemBase {
   private PivotConfig turretConfig = new PivotConfig(smartMotor)
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
       .withHardLimit((TurretConstants.LOWER_HARD_LIMIT), (TurretConstants.UPPER_HARD_LIMIT))
-      .withTelemetry("Turret", TelemetryVerbosity.HIGH)
+      .withTelemetry("Turret", TelemetryConstants.TELEMETRY_VERBOSITY)
       .withMOI(Meters.of(0.1), Kilograms.of(4));
 
   // Create the turret pivot system with the above configuration.
@@ -218,14 +218,21 @@ public class TurretSystem extends SubsystemBase {
   public void updateRelativeAngleToTag(int tagID, Pose2d robotPose){
     // The current angular offset of the tag, relative to the turret camera.
     visionSystem.setTargetParams(tagID, robotPose);
-    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 130; //158
-    if(turretToRobotAngleOffset > 180) {
-      turretToRobotAngleOffset = turretToRobotAngleOffset - 360;
+    double turretToRobotAngleOffset = VisionSystem.angleToTargetFromTurret + TurretConstants.TURRET_ANGLE_OFFSET;
+    if(Robot.isReal()){
+      if(turretToRobotAngleOffset > 180) {
+        turretToRobotAngleOffset = turretToRobotAngleOffset - 360;
+      }
+
+      if(turretToRobotAngleOffset < -180) {
+        turretToRobotAngleOffset = turretToRobotAngleOffset + 360;
+      }
+    
+      trackingAngle = Degrees.of(turretToRobotAngleOffset);
+    } else {
+      // Disable turret offset in simulation, as simulated 0 is forward.
+      trackingAngle = Degrees.of(VisionSystem.angleToTargetFromTurret);
     }
-    if(turretToRobotAngleOffset < -180) {
-      turretToRobotAngleOffset = turretToRobotAngleOffset + 360;
-    }
-    trackingAngle = Degrees.of(turretToRobotAngleOffset);
   }
 
   /**
@@ -235,14 +242,21 @@ public class TurretSystem extends SubsystemBase {
   public void updateRelativeAngleToTag(Pose2d targetPose, Pose2d robotPose){
     // The current angular offset of the tag, relative to the turret camera.
     visionSystem.setTargetParams(targetPose, robotPose);
-    double turretToRobotAngleOffset = VisionSystem.angleToTarget + 130; //158
-    if(turretToRobotAngleOffset > 180) {
-      turretToRobotAngleOffset = turretToRobotAngleOffset - 360;
+    double turretToRobotAngleOffset = VisionSystem.angleToTargetFromTurret + TurretConstants.TURRET_ANGLE_OFFSET;
+    if(Robot.isReal()){
+      if(turretToRobotAngleOffset > 180) {
+        turretToRobotAngleOffset = turretToRobotAngleOffset - 360;
+      }
+
+      if(turretToRobotAngleOffset < -180) {
+        turretToRobotAngleOffset = turretToRobotAngleOffset + 360;
+      }
+    
+      trackingAngle = Degrees.of(turretToRobotAngleOffset);
+    } else {
+      // Disable turret offset in simulation, as simulated 0 is forward.
+      trackingAngle = Degrees.of(VisionSystem.angleToTargetFromTurret);
     }
-    if(turretToRobotAngleOffset < -180) {
-      turretToRobotAngleOffset = turretToRobotAngleOffset + 360;
-    }
-    trackingAngle = Degrees.of(turretToRobotAngleOffset);
   }
 
 
@@ -254,10 +268,12 @@ public class TurretSystem extends SubsystemBase {
      *  marked for removal along with Shuffleboard for next season.
      *  Consider publishing to NT directly.
      */
-    SmartDashboard.putNumber("Turret Pos", getPos());
-    SmartDashboard.putNumber("Scaled Turret Pos", getScaledPos());
-    SmartDashboard.putNumber("Turret Angle (YAMS)", getScaledPosAngleYAMS());
-    SmartDashboard.putNumber("Turret Angle (Encoder)", getScaledPosAngleEncoder());
+     if(TelemetryConstants.TELEMETRY_VERBOSITY == TelemetryVerbosity.HIGH) {
+      SmartDashboard.putNumber("Turret Pos", getPos());
+      SmartDashboard.putNumber("Scaled Turret Pos", getScaledPos());
+      //SmartDashboard.putNumber("Turret Angle (YAMS)", getScaledPosAngleYAMS());
+      SmartDashboard.putNumber("Turret Angle (Encoder)", getScaledPosAngleEncoder());
+  }
     SmartDashboard.putNumber("where me going", trackingAngle.magnitude());
     turret.updateTelemetry();
   }

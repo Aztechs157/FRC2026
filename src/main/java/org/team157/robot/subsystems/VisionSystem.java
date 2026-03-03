@@ -53,6 +53,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.mechanisms.swerve.SwerveDrive;
 
 import org.team157.robot.Constants.FieldConstants;
+import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.Constants.VisionConstants;
 import org.team157.robot.Robot;
@@ -67,6 +68,10 @@ public class VisionSystem extends SubsystemBase {
 
   public static double angleToTarget = 0;
   public static double distanceToTarget = 0;
+  public static double distanceToTargetFromTurret = 0;
+  public static double angleToTargetFromTurret = 0;
+  public static double lastDistanceToTarget = 0;
+  public static double lastTrackedTime = 0;
 
   // TODO: move to constants.java
   final PoseStrategy poseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
@@ -95,277 +100,286 @@ public class VisionSystem extends SubsystemBase {
   private Supplier<Pose2d> currentPose;
 
   boolean isBlueAlliance = true;
-
-  /** Creates a new vision. */
-  public VisionSystem(Supplier<Pose2d> currentPose, Field2d field) {
-
-    this.currentPose = currentPose;
-    this.field2d = field;
-    Shuffleboard.getTab("vision").add("vision based field", field2d).withWidget(BuiltInWidgets.kField);
-
-    try {
-      fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2026RebuiltAndymark.m_resourceFile);
-    } catch (IOException exception) {
-      frontRightCamera.close();
-      frontLeftCamera.close();
-      topBackCamera.close();
-      turretCamera.close();
-      throw new RuntimeException(exception);
-    }
   
-    PortForwarder.add(5800, "photonvision1.local", 5800);
-    PortForwarder.add(5800, "photonvision2.local", 5800);
-    setDefaultCommand(getDefaultCommand());
-  }
-
-  public Command getDefaultCommand(DriveSystem drivetrain, TurretSystem turret) {
-    return run(() -> {
-      updatePoseEstimation(drivetrain);
-      turret.updateRelativeAngleToTag(FieldConstants.positionDetails.targetPose2d(drivetrain.getPose(), isBlueAlliance), drivetrain.getPose());
-      // turret.updateRelativeAngleToTag(26, drivetrain.getPose());
-
-
-    });
+  
+    /** Creates a new vision. */
+    public VisionSystem(Supplier<Pose2d> currentPose, Field2d field) {
+  
+      this.currentPose = currentPose;
+      this.field2d = field;
+      Shuffleboard.getTab("vision").add("vision based field", field2d).withWidget(BuiltInWidgets.kField);
+  
+      try {
+        fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2026RebuiltAndymark.m_resourceFile);
+      } catch (IOException exception) {
+        frontRightCamera.close();
+        frontLeftCamera.close();
+        topBackCamera.close();
+        turretCamera.close();
+        throw new RuntimeException(exception);
+      }
     
-  }
-  /** 
-   * Gets the aiming target of the turret, based on the current alliance, and the robot's current location on the field.
-   * @return the target point on the field the turret should be aiming at, as a Pose2d.
-   */
-  public Pose2d getDesiredPose() {
-    return FieldConstants.positionDetails.targetPose2d(currentPose.get(), isBlueAlliance);
-  }
-
-  public void updateAlliance() {
-    isBlueAlliance = DriverStation.getAlliance()
-      .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
-    SmartDashboard.putBoolean("Is Blue Alliance", isBlueAlliance);
-  }
-
-    /**
-   * Calculates a target pose relative to an AprilTag on the field.
-   *
-   * @param aprilTag    The ID of the AprilTag.
-   * @param robotOffset The offset {@link Transform2d} of the robot to apply to the pose for the robot to position
-   *                    itself correctly.
-   * @return The target pose of the AprilTag.
-   */
-  public static Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset) {
-    Optional<Pose3d> aprilTagPose3d = fieldLayout.getTagPose(aprilTag);
-    if (aprilTagPose3d.isPresent()) {
-      return aprilTagPose3d.get().toPose2d().transformBy(robotOffset);
-    } else {
-      throw new RuntimeException("Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
+      PortForwarder.add(5800, "photonvision1.local", 5800);
+      PortForwarder.add(5800, "photonvision2.local", 5800);
+      setDefaultCommand(getDefaultCommand());
     }
-
-  }
-
-    /**
-   * Update the pose estimation inside of {@link SwerveDrive} with all of the given poses.
-   *
-   * @param swerveDrive {@link SwerveDrive} instance.
-   */
-  public void updatePoseEstimation(DriveSystem swerveDrive) {
-    for (Cameras camera : Cameras.values()) {
-       // ignore turretCamera for global positioning
-      if(!camera.useForPositioning) {
-        continue;
-      }
-      Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
-      if (poseEst.isPresent()) {
-        Optional<EstimatedRobotPose> filteredPose = filterPose(poseEst);
-        if (filteredPose.isPresent()) {
-          var pose = filteredPose.get();
-        
-          swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
-                                          pose.timestampSeconds,
-                                          camera.curStdDevs);
-          field2d.getObject("Vision").setPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
-          field2d.setRobotPose(swerveDrive.getPose()); // photon's pose combined with robot's known pose
-        }
-      }
-    }
-
-  }
-
-
   
-    /**
-   * Reset the pose estimation inside of {@link SwerveDrive} with all of the given poses.
-   *
-   * @param swerveDrive {@link SwerveDrive} instance.
-   */
-  public void resetPoseEstimation(DriveSystem swerveDrive) {
-    for (Cameras camera : Cameras.values()) {
-      // ignore turretCamera for global positioning
-      if(!camera.useForPositioning) { 
-        continue;
-      }
-      Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
-      if (poseEst.isPresent()) {
-        Optional<EstimatedRobotPose> filteredPose = filterPose(poseEst);
-        if (filteredPose.isPresent()) {
-          var pose = filteredPose.get();
-
-          swerveDrive.resetPose(pose.estimatedPose.toPose2d());
-
-          field2d.getObject("Vision").setPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
-          field2d.setRobotPose(swerveDrive.getPose()); // photon's pose combined with robot's known pose
-
-          break;
-        }
-      }
+    public Command getDefaultCommand(DriveSystem drivetrain, TurretSystem turret) {
+      return run(() -> {
+        updatePoseEstimation(drivetrain);
+        turret.updateRelativeAngleToTag(FieldConstants.positionDetails.targetPose2d(drivetrain.getPose(), isBlueAlliance), drivetrain.getPose());
+        // turret.updateRelativeAngleToTag(26, drivetrain.getPose());
+  
+  
+      });
+      
     }
-
-  }
-    /**
-   * Generates the estimated robot pose. Returns empty if:
-   * <ul>
-   *  <li> No Pose Estimates could be generated</li>
-   * <li> The generated pose estimate was considered not accurate</li>
-   * </ul>
-   *
-   * @return an {@link EstimatedRobotPose} with an estimated pose, timestamp, and targets used to create the estimate
-   */
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Cameras camera) {
-    Optional<EstimatedRobotPose> poseEst = camera.getEstimatedGlobalPose();
-    return poseEst;
-  }
-
-  /**
-   * Filter pose via the ambiguity and find best estimate between all of the camera's throwing out distances more than
-   * 10m for a short amount of time.
-   *
-   * @param pose Estimated robot pose.
-   * @return Could be empty if there isn't a good reading.
-   */
-  private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose) {
-    if (pose.isPresent()) {
-      double bestTargetAmbiguity = 1; // 1 is max ambiguity
-      for (PhotonTrackedTarget target : pose.get().targetsUsed) {
-        double ambiguity = target.getPoseAmbiguity();
-        if (ambiguity != -1 && ambiguity < bestTargetAmbiguity) {
-          bestTargetAmbiguity = ambiguity;
-        }
-      }
-      //ambiguity to high dont use estimate
-      if (bestTargetAmbiguity > maximumAmbiguity) {
-        return Optional.empty();
-      }
-
-      //est pose is very far from recorded robot pose
-      if (PhotonUtils.getDistanceToPose(currentPose.get(), pose.get().estimatedPose.toPose2d()) > 1) {
-        longDistangePoseEstimationCount++;
-
-        //if it calculates that were 10 meter away for more than 10 times in a row its probably right
-        if (longDistangePoseEstimationCount < 10) {
-          return Optional.empty();
-        }
+    /** 
+     * Gets the aiming target of the turret, based on the current alliance, and the robot's current location on the field.
+     * @return the target point on the field the turret should be aiming at, as a Pose2d.
+     */
+    public Pose2d getDesiredPose() {
+      return FieldConstants.positionDetails.targetPose2d(currentPose.get(), isBlueAlliance);
+    }
+  
+    public void updateAlliance() {
+      isBlueAlliance = DriverStation.getAlliance()
+        .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
+      SmartDashboard.putBoolean("Is Blue Alliance", isBlueAlliance);
+    }
+  
+      /**
+     * Calculates a target pose relative to an AprilTag on the field.
+     *
+     * @param aprilTag    The ID of the AprilTag.
+     * @param robotOffset The offset {@link Transform2d} of the robot to apply to the pose for the robot to position
+     *                    itself correctly.
+     * @return The target pose of the AprilTag.
+     */
+    public static Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset) {
+      Optional<Pose3d> aprilTagPose3d = fieldLayout.getTagPose(aprilTag);
+      if (aprilTagPose3d.isPresent()) {
+        return aprilTagPose3d.get().toPose2d().transformBy(robotOffset);
       } else {
-        longDistangePoseEstimationCount = 0;
+        throw new RuntimeException("Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
       }
-      return pose;
+  
     }
-    return Optional.empty();
-  }
-
-  /**
-   * Get distance of the robot from the AprilTag pose.
-   *
-   * @param id AprilTag ID
-   * @return Distance
-   */
-  public double getDistanceFromAprilTag(int id) {
-    Optional<Pose3d> tag = fieldLayout.getTagPose(id);
-    return tag.map(pose3d -> PhotonUtils.getDistanceToPose(currentPose.get(), pose3d.toPose2d())).orElse(-1.0);
-  }
-
-  /**
-   * Get tracked target from a camera of AprilTagID
-   *
-   * @param id     AprilTag ID
-   * @param camera Camera to check.
-   * @return Tracked target.
-   */
-  public PhotonTrackedTarget getTargetFromId(int id, Cameras camera) {
-    PhotonTrackedTarget target = null;
-    for (PhotonPipelineResult result : camera.resultsList) {
-      if (result.hasTargets()) {
-        for (PhotonTrackedTarget i : result.getTargets()) {
-          if (i.getFiducialId() == id) {
-            return i;
+  
+      /**
+     * Update the pose estimation inside of {@link SwerveDrive} with all of the given poses.
+     *
+     * @param swerveDrive {@link SwerveDrive} instance.
+     */
+    public void updatePoseEstimation(DriveSystem swerveDrive) {
+      for (Cameras camera : Cameras.values()) {
+         // ignore turretCamera for global positioning
+        if(!camera.useForPositioning) {
+          continue;
+        }
+        Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
+        if (poseEst.isPresent()) {
+          Optional<EstimatedRobotPose> filteredPose = filterPose(poseEst);
+          if (filteredPose.isPresent()) {
+            var pose = filteredPose.get();
+          
+            swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
+                                            pose.timestampSeconds,
+                                            camera.curStdDevs);
+            field2d.getObject("Vision").setPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
+            field2d.setRobotPose(swerveDrive.getPose()); // photon's pose combined with robot's known pose
           }
         }
       }
+  
     }
-    return target;
-
-  }
-
-  /**
-   * Update the {@link Field2d} to include tracked targets/
-   */
-  public void updateVisionField() {
-
-    List<PhotonTrackedTarget> targets = new ArrayList<PhotonTrackedTarget>();
-    for (Cameras camera : Cameras.values()) {
-       // ignore turretCamera for global positioning
-      if(!camera.useForPositioning) {
-        continue;
-      }
-      if (!camera.resultsList.isEmpty()) {
-        PhotonPipelineResult latest = camera.resultsList.get(0);
-        if (latest.hasTargets()) {
-          targets.addAll(latest.targets);
+  
+  
+    
+      /**
+     * Reset the pose estimation inside of {@link SwerveDrive} with all of the given poses.
+     *
+     * @param swerveDrive {@link SwerveDrive} instance.
+     */
+    public void resetPoseEstimation(DriveSystem swerveDrive) {
+      for (Cameras camera : Cameras.values()) {
+        // ignore turretCamera for global positioning
+        if(!camera.useForPositioning) { 
+          continue;
+        }
+        Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
+        if (poseEst.isPresent()) {
+          Optional<EstimatedRobotPose> filteredPose = filterPose(poseEst);
+          if (filteredPose.isPresent()) {
+            var pose = filteredPose.get();
+  
+            swerveDrive.resetPose(pose.estimatedPose.toPose2d());
+  
+            field2d.getObject("Vision").setPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
+            field2d.setRobotPose(swerveDrive.getPose()); // photon's pose combined with robot's known pose
+  
+            break;
+          }
         }
       }
+  
     }
-
-    List<Pose2d> poses = new ArrayList<>();
-    for (PhotonTrackedTarget target : targets) {
-      if (fieldLayout.getTagPose(target.getFiducialId()).isPresent()) {
-        Pose2d targetPose = fieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
-        poses.add(targetPose);
-      }
+      /**
+     * Generates the estimated robot pose. Returns empty if:
+     * <ul>
+     *  <li> No Pose Estimates could be generated</li>
+     * <li> The generated pose estimate was considered not accurate</li>
+     * </ul>
+     *
+     * @return an {@link EstimatedRobotPose} with an estimated pose, timestamp, and targets used to create the estimate
+     */
+    public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Cameras camera) {
+      Optional<EstimatedRobotPose> poseEst = camera.getEstimatedGlobalPose();
+      return poseEst;
     }
-
-    field2d.getObject("tracked targets").setPoses(poses);
-  }
+  
     /**
-   * Update the pose estimation inside of {@link SwerveDrive} with all of the given poses.
-   *
-   * @param swerveDrive {@link SwerveDrive} instance.
-   */
-  public double getHubTagYawFromTurretCam() {
-    Cameras.TURRET_CAM.updateUnreadResults();
-    PhotonTrackedTarget target = getTargetFromId(26, Cameras.TURRET_CAM);
-    if(target == null) {
-      // arbitrary number indicating no target
-      return 157357;
+     * Filter pose via the ambiguity and find best estimate between all of the camera's throwing out distances more than
+     * 10m for a short amount of time.
+     *
+     * @param pose Estimated robot pose.
+     * @return Could be empty if there isn't a good reading.
+     */
+    private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose) {
+      if (pose.isPresent()) {
+        double bestTargetAmbiguity = 1; // 1 is max ambiguity
+        for (PhotonTrackedTarget target : pose.get().targetsUsed) {
+          double ambiguity = target.getPoseAmbiguity();
+          if (ambiguity != -1 && ambiguity < bestTargetAmbiguity) {
+            bestTargetAmbiguity = ambiguity;
+          }
+        }
+        //ambiguity to high dont use estimate
+        if (bestTargetAmbiguity > maximumAmbiguity) {
+          return Optional.empty();
+        }
+  
+        //est pose is very far from recorded robot pose
+        if (PhotonUtils.getDistanceToPose(currentPose.get(), pose.get().estimatedPose.toPose2d()) > 1) {
+          longDistangePoseEstimationCount++;
+  
+          //if it calculates that were 10 meter away for more than 10 times in a row its probably right
+          if (longDistangePoseEstimationCount < 10) {
+            return Optional.empty();
+          }
+        } else {
+          longDistangePoseEstimationCount = 0;
+        }
+        return pose;
+      }
+      return Optional.empty();
     }
-
-    return target.yaw;
-  }
-
-  /**
-   * Get a tag's 2d location on the field, and calculate the angle and distance to it from the robot's pose.
-   * @param id the tag ID to extract a Pose2d from
-   * @param robotPose the current Pose2d of the robot to calculate angle/distance from
-   */
-  public void setTargetParams(int id, Pose2d robotPose) {
-    Pose2d tagPose = fieldLayout.getTagPose(id).get().toPose2d();
-
-    distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, tagPose);
-    angleToTarget = PhotonUtils.getYawToPose(robotPose, tagPose).getDegrees();
-  }
-  /**
-   * Calculate the angle and distance to a certain target from the robot's pose.
-   * @param targetPose the target Pose2d to calculate angle/distance to
-   * @param robotPose the current Pose2d of the robot to calculate angle/distance from
-   */
-  public void setTargetParams(Pose2d targetPose, Pose2d robotPose) {
-    distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, targetPose);
-    angleToTarget = PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();
+  
+    /**
+     * Get distance of the robot from the AprilTag pose.
+     *
+     * @param id AprilTag ID
+     * @return Distance
+     */
+    public double getDistanceFromAprilTag(int id) {
+      Optional<Pose3d> tag = fieldLayout.getTagPose(id);
+      return tag.map(pose3d -> PhotonUtils.getDistanceToPose(currentPose.get(), pose3d.toPose2d())).orElse(-1.0);
+    }
+  
+    /**
+     * Get tracked target from a camera of AprilTagID
+     *
+     * @param id     AprilTag ID
+     * @param camera Camera to check.
+     * @return Tracked target.
+     */
+    public PhotonTrackedTarget getTargetFromId(int id, Cameras camera) {
+      PhotonTrackedTarget target = null;
+      for (PhotonPipelineResult result : camera.resultsList) {
+        if (result.hasTargets()) {
+          for (PhotonTrackedTarget i : result.getTargets()) {
+            if (i.getFiducialId() == id) {
+              return i;
+            }
+          }
+        }
+      }
+      return target;
+  
+    }
+  
+    /**
+     * Update the {@link Field2d} to include tracked targets/
+     */
+    public void updateVisionField() {
+  
+      List<PhotonTrackedTarget> targets = new ArrayList<PhotonTrackedTarget>();
+      for (Cameras camera : Cameras.values()) {
+         // ignore turretCamera for global positioning
+        if(!camera.useForPositioning) {
+          continue;
+        }
+        if (!camera.resultsList.isEmpty()) {
+          PhotonPipelineResult latest = camera.resultsList.get(0);
+          if (latest.hasTargets()) {
+            targets.addAll(latest.targets);
+          }
+        }
+      }
+  
+      List<Pose2d> poses = new ArrayList<>();
+      for (PhotonTrackedTarget target : targets) {
+        if (fieldLayout.getTagPose(target.getFiducialId()).isPresent()) {
+          Pose2d targetPose = fieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
+          poses.add(targetPose);
+        }
+      }
+  
+      field2d.getObject("tracked targets").setPoses(poses);
+    }
+      /**
+     * Update the pose estimation inside of {@link SwerveDrive} with all of the given poses.
+     *
+     * @param swerveDrive {@link SwerveDrive} instance.
+     */
+    public double getHubTagYawFromTurretCam() {
+      Cameras.TURRET_CAM.updateUnreadResults();
+      PhotonTrackedTarget target = getTargetFromId(26, Cameras.TURRET_CAM);
+      if(target == null) {
+        // arbitrary number indicating no target
+        return 157357;
+      }
+  
+      return target.yaw;
+    }
+  
+    /**
+     * Get a tag's 2d location on the field, and calculate the angle and distance to it from the robot's pose.
+     * @param id the tag ID to extract a Pose2d from
+     * @param robotPose the current Pose2d of the robot to calculate angle/distance from
+     */
+    public void setTargetParams(int id, Pose2d robotPose) {
+      Pose2d tagPose = fieldLayout.getTagPose(id).get().toPose2d();
+  
+      distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, tagPose);
+      distanceToTargetFromTurret = PhotonUtils.getDistanceToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), tagPose);
+      angleToTarget = PhotonUtils.getYawToPose(robotPose, tagPose).getDegrees();
+      // angleToTargetFromTurret = PhotonUtils.getYawToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), tagPose).getDegrees();
+      angleToTargetFromTurret = PhotonUtils.getYawToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), tagPose).getDegrees();
+  
+    }
+    /**
+     * Calculate the angle and distance to a certain target from the robot's pose.
+     * @param targetPose the target Pose2d to calculate angle/distance to
+     * @param robotPose the current Pose2d of the robot to calculate angle/distance from
+     */
+    public void setTargetParams(Pose2d targetPose, Pose2d robotPose) {
+      distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, targetPose);
+      // TODO: Continue work on implementation of momentum-based velocity calculation on new branch.
+      // lastDistanceToTarget = distanceToTarget;
+      // lastTrackedTime = NetworkTablesJNI.now();
+      angleToTarget = PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();
+      angleToTargetFromTurret = PhotonUtils.getYawToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), targetPose).getDegrees();
   }
 
  /**

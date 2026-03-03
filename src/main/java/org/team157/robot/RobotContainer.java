@@ -85,9 +85,9 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        ////////////////////////////////////////////////////
-        /// DRIVETRAIN COMMANDS
-        ///////////////////////////////////////////////////
+          ///////////////////////////
+         /// DRIVETRAIN COMMANDS ///
+        ///////////////////////////
         
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -124,71 +124,74 @@ public class RobotContainer {
 
         // Reset the field-centric heading on start button press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-        
 
+        drivetrain.registerTelemetry(logger::telemeterize);        
+
+          ///////////////////////
+         /// VISION COMMANDS ///
+        ///////////////////////
         
-        ////////////////////////////////////////////////////
-        /// VISION COMMANDS
-        ///////////////////////////////////////////////////
         visionSystem.setDefaultCommand(visionSystem.getDefaultCommand(drivetrain, turret));
 
-
-
-        ////////////////////////////////////////////////////
-        /// TURRET COMMANDS
-        ///////////////////////////////////////////////////
+          ///////////////////////
+         /// TURRET COMMANDS ///
+        ///////////////////////
+        
+        // Disable turret movement when no other commands are running.
         turret.setDefaultCommand(turret.set(0));
 
-        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-123.5)));
-        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(100)));
+        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
+        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(130)));
         operatorController.povLeft().whileTrue(turret.set(-0.25));
         operatorController.povRight().whileTrue(turret.set(0.25));
-        // driverController.x().whileTrue(turret.set(0));
-
-        // driverController.y().toggleOnTrue(turret.trackHubTag());
-        operatorController.b().toggleOnTrue(turret.trackTagGlobalRelative());
-
-
-        drivetrain.registerTelemetry(logger::telemeterize);
-        
-        
 
         ////////////////////////////////////////////////////////
         /// FLYWHEEL COMMANDS
         ///////////////////////////////////////////////////////
+        
+        // Disable flywheel when no commands are running.
         flywheel.setDefaultCommand(flywheel.set(0));
 
-
-        driverController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(6000)));
+        driverController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(5800)));
         driverController.leftTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4500)));
-        ////////////////////////////////////////////////////////
-        /// INTAKE COMMANDS
-        ///////////////////////////////////////////////////////
+
+          ///////////////////////
+         /// INTAKE COMMANDS ///
+        ///////////////////////
+
         intake.setDefaultCommand(intake.setDefault()); 
+
         driverController.rightBumper().toggleOnTrue(intake.setRoller(0.75));
         //intakeDeployTrigger.onTrue(intake.deployIntake()).onFalse(intake.retractIntake()); //TODO: decide on a button for this
         operatorController.a().toggleOnTrue(intake.deployIntake());
         operatorController.y().toggleOnTrue(intake.retractIntake());
        
+          //////////////////////////////////
+         /// HOPPER AND UPTAKE COMMANDS ///
+        //////////////////////////////////
 
-        ////////////////////////////////////////////////////////
-        /// HOPPER COMMANDS
-        ///////////////////////////////////////////////////////
         hopper.setDefaultCommand(hopper.setDefault());
+        uptake.setDefaultCommand(uptake.setDefault());
 
         driverController.leftBumper().toggleOnTrue(hopper.setRoller(0.5).alongWith(uptake.setRoller(1)));
 
-        ////////////////////////////////////////////////////////
-        /// UPTAKE COMMANDS
-        ///////////////////////////////////////////////////////
-        uptake.setDefaultCommand(uptake.setDefault());
-
-        ////////////////////////////////////////////////////////
-        /// HOOD COMMANDS
-        ///////////////////////////////////////////////////////
+          /////////////////////
+         /// HOOD COMMANDS ///
+        /////////////////////
+        
         hood.setDefaultCommand(hood.setDefault());
-        driverController.a().toggleOnTrue(hood.setAngle(Degrees.of(60)));
-        driverController.y().toggleOnTrue(hood.setAngle(Degrees.of(48)));
+        operatorController.povUp().toggleOnTrue(hood.set(0.1));
+        operatorController.povDown().toggleOnTrue(hood.set(-0.1));
+
+           ///////////////////////
+         /// DYNAMIC COMMANDS ///
+        ///////////////////////
+        
+        // Enables dynamic control of the turret.
+        // operatorController.y().toggleOnTrue(turret.trackHubTag());
+        operatorController.x().toggleOnTrue(turret.trackTagGlobalRelative());
+        // Enables dynamic control of the flywheel and hood.
+        driverController.a().toggleOnTrue(flywheel.setDynamicVelocity().alongWith(hood.setDynamicHoodAngle()));
 
     }
 
