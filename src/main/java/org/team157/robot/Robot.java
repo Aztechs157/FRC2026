@@ -5,6 +5,9 @@
 package org.team157.robot;
 
 import java.util.Optional;
+
+import org.team157.robot.Constants.VisionConstants;
+
 import com.ctre.phoenix6.HootAutoReplay;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -35,13 +38,17 @@ public class Robot extends TimedRobot {
   private Optional<Alliance> alliance, newAlliance;
   private Command m_autonomousCommand;
 
-  public static Pose3d[] zeroArray = new Pose3d[4];
+  public static Pose3d[] zeroArray = new Pose3d[4]; //TODO: make 5 poses and make climber getter once climber system exists
   public static Pose3d[] finalArray = new Pose3d[4];
+  public static Pose3d[] cameras = new Pose3d[3];
   // creates a publisher to send zeroed Pose3d values to NT for model calibration.
   public static StructArrayPublisher<Pose3d> zeroedPoses = NetworkTableInstance.getDefault()
       .getStructArrayTopic("ZeroedComponentPoses", Pose3d.struct).publish();
   public static StructArrayPublisher<Pose3d> finalPoses = NetworkTableInstance.getDefault()
       .getStructArrayTopic("FinalComponentPoses", Pose3d.struct).publish();
+
+  public static StructArrayPublisher<Pose3d> cameraPoses = NetworkTableInstance.getDefault()
+      .getStructArrayTopic("CameraPoses", Pose3d.struct).publish();
 
   public static final Field2d m_field = new Field2d();
 
@@ -92,20 +99,25 @@ public class Robot extends TimedRobot {
     };
     zeroedPoses.set(zeroArray);
     
-     finalArray = new Pose3d[] {
+    finalArray = new Pose3d[] {
       // turret base 
       m_robotContainer.turret.getBasePose(), 
       // turret hood
-      m_robotContainer.turret.getHoodPivotPose(new Transform3d(0,0,0, new Rotation3d(0, Math.toRadians(m_robotContainer.hood.getScaledPosAngleYAMS()), 0))),
-
-
-      // m_robotContainer.hood.getHoodPose(),
+      m_robotContainer.turret.getHoodPivotPose(new Transform3d(0,0,0, 
+        new Rotation3d(0, Math.toRadians(m_robotContainer.hood.getScaledPosAngleSim()), 0))),
       // intake pivot
       m_robotContainer.intake.getIntakePivotPose(), 
       // hopper walls
       m_robotContainer.intake.getHopperWallsPose() 
     };
     finalPoses.set(finalArray);
+
+    cameras = new Pose3d[] {
+      new Pose3d(m_robotContainer.drivetrain.getPose()).plus(VisionConstants.FRONTLEFT_CAMERA_PLACEMENT),
+      new Pose3d(m_robotContainer.drivetrain.getPose()).plus(VisionConstants.FRONTRIGHT_CAMERA_PLACEMENT),
+      new Pose3d(m_robotContainer.drivetrain.getPose()).plus(VisionConstants.BACK_CAMERA_PLACEMENT)
+    };
+    cameraPoses.set(cameras);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

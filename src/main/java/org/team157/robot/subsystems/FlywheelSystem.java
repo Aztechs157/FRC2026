@@ -4,27 +4,26 @@
 
 package org.team157.robot.subsystems;
 // import the stuff 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Feet;
-import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import yams.motorcontrollers.SmartMotorController;
 
 import org.team157.robot.Constants;
+import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.FlywheelConstants;
 import org.team157.robot.Constants.HoodConstants;
+import org.team157.robot.Constants.TelemetryConstants;
 
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -39,128 +38,141 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 public class FlywheelSystem extends SubsystemBase {
 
   private TalonFX motor  = new TalonFX(FlywheelConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
-  private TalonFX motor_follower = new TalonFX(FlywheelConstants.MOTOR_ID_FOLLOWER, Constants.RIO_CAN_BUS);
-  public double ballVelocity = 0; //Feet per Second for the ball to be launched
-  public Angle azimuth = Radians.of(0);
+  private TalonFX motor_follower = new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_ID, Constants.RIO_CAN_BUS);
+  public static double ballVelocity = 0; // Meters per second for the ball to be launched
+  public static Angle hoodAngle = Radians.of(0);
 
   private SmartMotorControllerConfig flywheelSystemConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.CLOSED_LOOP)
-    // feedback constant (pid constants)
-    .withClosedLoopController(FlywheelConstants.P, FlywheelConstants.I, FlywheelConstants.D, RPM.of(6000), RotationsPerSecondPerSecond.of(3000)) // TODO: move to constants
-    .withSimClosedLoopController(FlywheelConstants.P, FlywheelConstants.I, FlywheelConstants.D, RPM.of(6000), RotationsPerSecondPerSecond.of(3000))
-    // telemetry name and verbosity level
-    .withTelemetry("FlywheelMotor", TelemetryVerbosity.HIGH)
-    // gearing from the motor rotor to final shaft
+    .withClosedLoopController(FlywheelConstants.KP, FlywheelConstants.KI, FlywheelConstants.KD, FlywheelConstants.ANGULAR_VELOCITY, FlywheelConstants.ANGULAR_ACCELERATION) // TODO: move to constants
+    .withFeedforward(new SimpleMotorFeedforward(FlywheelConstants.KS, FlywheelConstants.KV, FlywheelConstants.KA)) 
+    .withSimClosedLoopController(FlywheelConstants.SIM_KP, FlywheelConstants.SIM_KI, FlywheelConstants.SIM_KD, FlywheelConstants.ANGULAR_VELOCITY, FlywheelConstants.ANGULAR_ACCELERATION)
+    .withSimFeedforward(new SimpleMotorFeedforward(FlywheelConstants.SIM_KS, FlywheelConstants.SIM_KV, FlywheelConstants.SIM_KA))
+    .withTelemetry("FlywheelMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
     .withGearing(FlywheelConstants.GEARING)
     .withMotorInverted(false)
     .withIdleMode(MotorMode.COAST)
-    .withStatorCurrentLimit(Amps.of(40))
+    .withStatorCurrentLimit(FlywheelConstants.CURRENT_LIMIT)
     .withClosedLoopRampRate((FlywheelConstants.RAMP_RATE))
     .withFollowers(Pair.of(motor_follower, true));
 
   private SmartMotorController smartMotor = new TalonFXWrapper(motor, DCMotor.getKrakenX60(1),flywheelSystemConfig);
- // private SmartMotorController smartMotorFollower = new TalonFXWrapper(motor_follower, DCMotor.getKrakenX60(1),flywheelSystemConfig);
 
-  private final FlyWheelConfig flyWheelConfig = new FlyWheelConfig(smartMotor)
+  private final FlyWheelConfig flywheelConfig = new FlyWheelConfig(smartMotor)
   // diameter of the flywheel 
   .withDiameter((FlywheelConstants.FLYWHEEL_DIAMETER))
   // mass of the flywheel
   .withMass((FlywheelConstants.FLYWHEEL_MASS))
   // maximum speed of the shooter
-  .withSoftLimit(RPM.of(-6000), RPM.of(6000))
+  .withSoftLimit(FlywheelConstants.FLYWHEEL_RPM_LIMIT_LOWER, FlywheelConstants.FLYWHEEL_RPM_LIMIT_UPPER)
   // .withUpperSoftLimit(RPM.of(FlywheelConstants.FLYWHEEL_RPM_LIMIT_UPPER))
   // telemetry name and verbosity
-  .withTelemetry("FlywheelDynamics", TelemetryVerbosity.HIGH);
+  .withTelemetry("FlywheelDynamics", TelemetryConstants.TELEMETRY_VERBOSITY);
 
   // flywheel mechanism
-  private FlyWheel flyWheel = new FlyWheel(flyWheelConfig);
-
-
+  private FlyWheel flywheel = new FlyWheel(flywheelConfig);
     /**
      * 
      * gets the current velocity of the flywheel
      * 
      * @return flywheel velocity
      */
-  public AngularVelocity getVelocity() {return flyWheel.getSpeed();}
+  public AngularVelocity getVelocity() {
+    return flywheel.getSpeed();
+  }
 
-  // Function to minimize: 
-  double velocityFunction(double distance, double height, double theta) {
-        return distance / Math.cos(theta) * (Math.sqrt(16 / (distance * Math.tan(theta) - (height - FlywheelConstants.HEIGHT.in(Feet)))));
+  // Function to minimize (all parameters in metric units: meters, meters/second, radians)
+  // Calculates required ball velocity (m/s) for given distance, height, and launch angle
+  // Using projectile motion equations: y = x*tan(θ) - (g*x²)/(2*v₀²*cos²(θ))
+  // Solving for v₀: v₀ = sqrt((g*x²)/(2*cos²(θ)*(x*tan(θ) - y)))
+  static double velocityFunction(double distance, double height, double theta) {
+    // gravity in m/s²
+    double g = 9.81; 
+    // height difference between target and shooter
+    double heightDifference = height - FlywheelConstants.HEIGHT.magnitude();
+    double denominator = 2 * Math.cos(theta) * Math.cos(theta) * (distance * Math.tan(theta) - heightDifference);
+    
+    if (denominator <= 0) {
+        return 157; // Invalid shot parameters, return arbitrary velocity
     }
+    return Math.sqrt((g * distance * distance) / denominator);
+  }
 
-  public void setShotParams(double height, double distance) {
-    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT.in(Degrees);
-    double upperBound = HoodConstants.UPPER_SOFT_LIMIT.in(Degrees);
-    double steps = 1000;
+  public static void setShotParams(double height, double distance) {
+    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT.in(Radians);
+    double upperBound = HoodConstants.UPPER_SOFT_LIMIT.in(Radians);
+    double steps = 50;
     double stepSize = (upperBound - lowerBound) / steps;
     
     double theta = lowerBound;
-    double velocity = velocityFunction(distance, height, Math.toRadians(lowerBound));
-
-    System.out.println("Starting optimization with initial velocity: " + velocity);
+    double velocity = velocityFunction(distance, height, lowerBound);
 
     for (int i = 1; i <= steps; i++) {
         double x = lowerBound + i * stepSize;
-        double y = velocityFunction(distance, height, Math.toRadians(x));
+        double y = velocityFunction(distance, height, x);
         if (y < velocity) {
             velocity = y;
             theta = x;
         }
     }
-    System.out.println("Min found at x = " + theta + ", f(x) = " + velocity);
+
     ballVelocity = velocity;
-    azimuth = Radians.of(theta);
-    System.out.println("Ball Velocity: " + ballVelocity);
-    System.out.println("Azimuth: " + azimuth);
+    hoodAngle = Radians.of(theta);
+    SmartDashboard.putNumber("Hood Angle", Math.toDegrees(hoodAngle.magnitude()));
   }
 
-    public void setBETTERShotParams(double height, double distance) {
-    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT.in(Degrees);
-    double upperBound = HoodConstants.UPPER_SOFT_LIMIT.in(Degrees);
+  // TODO: evaluate necessity of this method, as the original setShotParams is used in every instance.
+  public void setBETTERShotParams(double height, double distance) {
+    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT.in(Radians);
+    double upperBound = HoodConstants.UPPER_SOFT_LIMIT.in(Radians);
     double steps = 1000;
     double stepSize = (upperBound - lowerBound) / steps;
     
     double theta = lowerBound;
     double velocity = velocityFunction(distance, height, lowerBound);
     double previousVelocityDifference = -1;
+    double upperBoundDegrees = Math.toDegrees(upperBound);
 
     for (int i = 1; i <= steps; i++) {
         double x = lowerBound + i * stepSize;
         double y = velocityFunction(distance, height, x);
         double velocityDifference = Math.abs(ballVelocity - y);
-        if (previousVelocityDifference < 0 || (velocityDifference < previousVelocityDifference && x < 157)) {
+        if (previousVelocityDifference < 0 || (velocityDifference < previousVelocityDifference && Math.toDegrees(x) < upperBoundDegrees)) {
             previousVelocityDifference = velocityDifference;
             velocity = y;
             theta = x;
         }
     }
-    // System.out.println("Min found at x = " + theta + ", f(x) = " + velocity);
+
     ballVelocity = velocity;
-    azimuth = Radians.of(theta);
+    hoodAngle = Radians.of(theta);
   }
 
-  public AngularVelocity getDesiredVelocity() {
-    setShotParams(0, 10);
-    //double desiredVelocity = 2 * ballVelocity / (FlywheelConstants.FLYWHEEL_DIAMETER / 12 * Math.PI) + lossFunction();
-    // double desiredVelocity = 2 * ballVelocity + lossFunction();
-    double desiredRPM = 60 / ((FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters) * Math.PI) * FeetPerSecond.of(ballVelocity).in(MetersPerSecond);
+  public AngularVelocity getDesiredFlywheelVelocity() {
+    double heightMeters = FieldConstants.positionDetails.getTargetHeight();
+    double distanceMeters = VisionSystem.distanceToTargetFromTurret; // Use distance from turret instead of robot center
+    // TODO: Continue work on implementation of momentum-based velocity calculation on new branch.
+    // double currentTime = NetworkTablesJNI.now();
+    // double timeDelta = currentTime - VisionSystem.lastTrackedTime;
+    // double distanceDelta = distanceMeters - VisionSystem.lastDistanceToTarget;
+    // double velocityDelta = distanceDelta / timeDelta;
+    setShotParams(heightMeters, distanceMeters);
     
-    System.out.println("Desired Ball Velocity (ft/sec): " + ballVelocity);
-    System.out.println("Desired Flywheel Velocity (rpm): " + desiredRPM);
-    return RPM.of(desiredRPM);
+    // Convert ball velocity (m/s) to flywheel RPM
+    // Relationship: ballVelocity = (flywheelRPM / 60) * π * flywheel_radius
+    // Therefore: flywheelRPM = (ballVelocity * 60) / (π * flywheel_diameter)
+    // desiredRPM is divided by 0.4 to account for external factors like air resistace and wheel slip.
+    double flywheelDiameterMeters = (FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters);
+    double desiredRPM = ((ballVelocity) * 60) / (Math.PI * flywheelDiameterMeters) * FlywheelConstants.SPEED_FACTOR;
+    return RPM.of(Math.max(2800, desiredRPM));
   }
 
-  public double lossFunction() {
-    return 0 * azimuth.magnitude();
-  }
-
-  public Angle getAzimuth() {
-    return azimuth;
+  public static Angle getDesiredHoodAngle() {
+    return Degrees.of(Math.toDegrees(hoodAngle.magnitude()));
   }
 
   public Command setDynamicVelocity () {
-    return flyWheel.setSpeed(this::getDesiredVelocity);
+    return flywheel.setSpeed(this::getDesiredFlywheelVelocity);
   }
 
   /**
@@ -169,7 +181,7 @@ public class FlywheelSystem extends SubsystemBase {
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
   public Command setVelocity (AngularVelocity speed) {
-    return flyWheel.setSpeed(speed); 
+    return flywheel.setSpeed(speed); 
   }
 
   
@@ -179,7 +191,9 @@ public class FlywheelSystem extends SubsystemBase {
    * @param dutyCycle DutyCycle to set.
    * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
    */
-  public Command set(double dutyCycle) {return flyWheel.set(dutyCycle);}
+  public Command set(double dutyCycle) {
+    return flywheel.set(dutyCycle);
+  }
 
   /** Creates a new FlywheelSystem. */
   public FlywheelSystem() {}
@@ -187,15 +201,20 @@ public class FlywheelSystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Flywheel Velocity", getVelocity().magnitude());
+
+    SmartDashboard.putNumber("Distance to Target", VisionSystem.distanceToTargetFromTurret);
+    SmartDashboard.putNumber("Target Height", FieldConstants.positionDetails.getTargetHeight());
+    SmartDashboard.putNumber("Ball Velocity (m/s)", ballVelocity);
+    SmartDashboard.putBoolean("Ball Velocity is NaN", Double.isNaN(ballVelocity));
     SmartDashboard.putNumber("Flywheel RPM", getVelocity().in(RPM));
-    flyWheel.updateTelemetry();
+    SmartDashboard.putNumber("Desired Flywheel Velocity", getDesiredFlywheelVelocity().in(RPM));
+    flywheel.updateTelemetry();
   }
 
     @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
-    flyWheel.simIterate();
+    flywheel.simIterate();
   }
 }
 

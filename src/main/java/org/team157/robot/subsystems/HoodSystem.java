@@ -16,6 +16,7 @@ import org.team157.robot.Constants;
 import org.team157.robot.Constants.HoodConstants;
 import org.team157.robot.Constants.IntakeConstants;
 import org.team157.robot.Constants.ModelConstants;
+import org.team157.robot.Constants.TelemetryConstants;
 import org.team157.utilities.PosUtils;
 
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
@@ -49,11 +50,12 @@ public class HoodSystem extends SubsystemBase {
   // Configure the hood motor controller for use with YAMS.
   private SmartMotorControllerConfig hoodPivotMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(HoodConstants.KP, HoodConstants.KI, HoodConstants.KD, (HoodConstants.ANGULAR_VELOCITY), (HoodConstants.ANGULAR_ACCELERATION)) //TODO: tune this PID
+      .withClosedLoopController(HoodConstants.KP, HoodConstants.KI, HoodConstants.KD, HoodConstants.ANGULAR_VELOCITY, HoodConstants.ANGULAR_ACCELERATION)
+      .withSimClosedLoopController(HoodConstants.SIM_KP, HoodConstants.SIM_KI, HoodConstants.SIM_KD, HoodConstants.ANGULAR_VELOCITY, HoodConstants.ANGULAR_ACCELERATION)
       .withIdleMode(MotorMode.BRAKE) //TODO: evaluate if coast or brake is better for this mechanism
       .withMotorInverted(false) //TODO: verify motor inversion
       .withGearing(HoodConstants.GEARING)
-      .withTelemetry("Hood Motor", TelemetryVerbosity.HIGH) 
+      .withTelemetry("Hood Motor", TelemetryConstants.TELEMETRY_VERBOSITY) 
       .withSoftLimit((HoodConstants.LOWER_SOFT_LIMIT), (HoodConstants.UPPER_SOFT_LIMIT))
       .withStatorCurrentLimit(HoodConstants.CURRENT_LIMIT) // TODO: Evaluate constant types (ie doubles or correct units)
       .withClosedLoopRampRate((HoodConstants.RAMP_RATE));
@@ -66,7 +68,7 @@ public class HoodSystem extends SubsystemBase {
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
       .withHardLimit((HoodConstants.LOWER_HARD_LIMIT), (HoodConstants.UPPER_HARD_LIMIT))
       //.withSoftLimits(Degrees.of(HoodConstants.LOWER_SOFT_LIMIT), Degrees.of(HoodConstants.UPPER_SOFT_LIMIT))
-      .withTelemetry("Hood", TelemetryVerbosity.HIGH)
+      .withTelemetry("Hood", TelemetryConstants.TELEMETRY_VERBOSITY)
       .withMOI(Meters.of(0.2), Kilograms.of(0.5));
 
   // Create the hood pivot system with the above configuration.
@@ -80,7 +82,7 @@ public class HoodSystem extends SubsystemBase {
   }
   public Command setDefault() {
     // return setRoller(0).
-    return setHood(0);
+    return set(0);
   }
   /**
    * Set the target angle of the hood.
@@ -100,8 +102,13 @@ public class HoodSystem extends SubsystemBase {
    * Move the hood up and down.
    * @param dutycycle [-1, 1] speed to set the hood too.
    */
-  public Command setHood(double dutycycle) { 
+  public Command set(double dutycycle) { 
     return hood.set(dutycycle);
+  }
+
+
+  public Command setDynamicHoodAngle() {
+    return hood.setAngle(FlywheelSystem::getDesiredHoodAngle);
   }
 
   /**
@@ -145,6 +152,13 @@ public class HoodSystem extends SubsystemBase {
     return hood.getAngle().in(Degrees);
   }
   /**
+   * Get the current angle of the hood, based on the YAMS pivot system, relative to the simulated zero position.
+   * @return The angle of the hood, in degrees, from -180 to 180, using the YAMS pivot system.
+   */
+  public double getScaledPosAngleSim() {
+    return PosUtils.mapRange(getScaledPosAngleYAMS(), HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE, HoodConstants.MAX_ANGLE, HoodConstants.MIN_ANGLE) - 40;
+  }
+  /**
    * Get the current angle of the hood, directly from the encoder value.
    * @return The angle of the hood, in degrees, from -180 to 180, using the encoder directly.
    */
@@ -169,10 +183,11 @@ public class HoodSystem extends SubsystemBase {
      *  marked for removal along with Shuffleboard for next season.
      *  Consider publishing to NT directly.
      */
+  if(TelemetryConstants.TELEMETRY_VERBOSITY == TelemetryVerbosity.HIGH) {
     SmartDashboard.putNumber("Hood Pos", getPos());
     SmartDashboard.putNumber("Scaled Hood Pos", getScaledPos());
-    SmartDashboard.putNumber("Hood Angle (YAMS)", getScaledPosAngleYAMS());
     SmartDashboard.putNumber("Hood Angle (Encoder)", getScaledPosAngleEncoder());
+  }
     hood.updateTelemetry();
   }
 
