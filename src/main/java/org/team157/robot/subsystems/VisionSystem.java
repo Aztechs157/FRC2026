@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import java.io.IOException;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -44,6 +45,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTablesJNI;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -69,7 +71,7 @@ public class VisionSystem extends SubsystemBase {
 
   // Publishes the turret's target point to NT for field zoning testing.
   public StructPublisher<Pose2d> targetPosePublisher = NetworkTableInstance.getDefault().getStructTopic("Target Pose", Pose2d.struct).publish();
-
+  public StructArrayPublisher<Pose3d> posesPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Cam_stuff", Pose3d.struct).publish();
   public boolean hasTag = false;
 
   public static double angleToTarget = 0;
@@ -106,81 +108,83 @@ public class VisionSystem extends SubsystemBase {
   private Supplier<Pose2d> currentPose;
 
   boolean isBlueAlliance = true;
-  
-  
-    /** Creates a new vision. */
-    public VisionSystem(Supplier<Pose2d> currentPose, Field2d field) {
-  
-      this.currentPose = currentPose;
-      this.field2d = field;
-      Shuffleboard.getTab("vision").add("vision based field", field2d).withWidget(BuiltInWidgets.kField);
-  
-      try {
-        fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2026RebuiltAndymark.m_resourceFile);
-      } catch (IOException exception) {
-        frontRightCamera.close();
-        frontLeftCamera.close();
-        topBackCamera.close();
-        turretCamera.close();
-        throw new RuntimeException(exception);
-      }
-
-      visionSim.addAprilTags(fieldLayout);
-    
-      PortForwarder.add(5800, "photonvision1.local", 5800);
-      PortForwarder.add(5800, "photonvision2.local", 5800);
-      setDefaultCommand(getDefaultCommand());
-    }
-  
-    public Command getDefaultCommand(DriveSystem drivetrain, TurretSystem turret) {
-      return run(() -> {
-        updatePoseEstimation(drivetrain);
-        turret.updateRelativeAngleToTag(FieldConstants.positionDetails.targetPose2d(drivetrain.getPose(), isBlueAlliance), drivetrain.getPose());
-        // turret.updateRelativeAngleToTag(26, drivetrain.getPose());
-  
-  
-      });
       
-    }
-    /** 
-     * Gets the aiming target of the turret, based on the current alliance, and the robot's current location on the field.
-     * @return the target point on the field the turret should be aiming at, as a Pose2d.
-     */
-    public Pose2d getDesiredPose() {
-      return FieldConstants.positionDetails.targetPose2d(currentPose.get(), isBlueAlliance);
-    }
+    
+      /** Creates a new vision. */
+      public VisionSystem(Supplier<Pose2d> currentPose, Field2d field) {
+    
+        this.currentPose = currentPose;
+        this.field2d = field;
+        Shuffleboard.getTab("vision").add("vision based field", field2d).withWidget(BuiltInWidgets.kField);
+    
+        try {
+          fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2026RebuiltAndymark.m_resourceFile);
+        } catch (IOException exception) {
+          frontRightCamera.close();
+          frontLeftCamera.close();
+          topBackCamera.close();
+          turretCamera.close();
+          throw new RuntimeException(exception);
+        }
   
-    public void updateAlliance() {
-      isBlueAlliance = DriverStation.getAlliance()
-        .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
-      SmartDashboard.putBoolean("Is Blue Alliance", isBlueAlliance);
-    }
-  
-      /**
-     * Calculates a target pose relative to an AprilTag on the field.
-     *
-     * @param aprilTag    The ID of the AprilTag.
-     * @param robotOffset The offset {@link Transform2d} of the robot to apply to the pose for the robot to position
-     *                    itself correctly.
-     * @return The target pose of the AprilTag.
-     */
-    public static Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset) {
-      Optional<Pose3d> aprilTagPose3d = fieldLayout.getTagPose(aprilTag);
-      if (aprilTagPose3d.isPresent()) {
-        return aprilTagPose3d.get().toPose2d().transformBy(robotOffset);
-      } else {
-        throw new RuntimeException("Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
+        visionSim.addAprilTags(fieldLayout);
+      
+        PortForwarder.add(5800, "photonvision1.local", 5800);
+        PortForwarder.add(5800, "photonvision2.local", 5800);
+        setDefaultCommand(getDefaultCommand());
       }
-  
-    }
-  
-      /**
-     * Update the pose estimation inside of {@link SwerveDrive} with all of the given poses.
-     *
-     * @param swerveDrive {@link SwerveDrive} instance.
-     */
-    public void updatePoseEstimation(DriveSystem swerveDrive) {
+    
+      public Command getDefaultCommand(DriveSystem drivetrain, TurretSystem turret) {
+        return run(() -> {
+          updatePoseEstimation(drivetrain);
+          turret.updateRelativeAngleToTag(FieldConstants.positionDetails.targetPose2d(drivetrain.getPose(), isBlueAlliance), drivetrain.getPose());
+          // turret.updateRelativeAngleToTag(26, drivetrain.getPose());
+    
+    
+        });
+        
+      }
+      /** 
+       * Gets the aiming target of the turret, based on the current alliance, and the robot's current location on the field.
+       * @return the target point on the field the turret should be aiming at, as a Pose2d.
+       */
+      public Pose2d getDesiredPose() {
+        return FieldConstants.positionDetails.targetPose2d(currentPose.get(), isBlueAlliance);
+      }
+    
+      public void updateAlliance() {
+        isBlueAlliance = DriverStation.getAlliance()
+          .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
+        SmartDashboard.putBoolean("Is Blue Alliance", isBlueAlliance);
+      }
+    
+        /**
+       * Calculates a target pose relative to an AprilTag on the field.
+       *
+       * @param aprilTag    The ID of the AprilTag.
+       * @param robotOffset The offset {@link Transform2d} of the robot to apply to the pose for the robot to position
+       *                    itself correctly.
+       * @return The target pose of the AprilTag.
+       */
+      public static Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset) {
+        Optional<Pose3d> aprilTagPose3d = fieldLayout.getTagPose(aprilTag);
+        if (aprilTagPose3d.isPresent()) {
+          return aprilTagPose3d.get().toPose2d().transformBy(robotOffset);
+        } else {
+          throw new RuntimeException("Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
+        }
+    
+      }
+    
+        /**
+       * Update the pose estimation inside of {@link SwerveDrive} with all of the given poses.
+       *
+       * @param swerveDrive {@link SwerveDrive} instance.
+       */
+      public void updatePoseEstimation(DriveSystem swerveDrive) {
+        var poses = new ArrayList<Pose3d>();
       for (Cameras camera : Cameras.values()) {
+  
          // ignore turretCamera for global positioning
         if(!camera.useForPositioning) {
           continue;
@@ -190,15 +194,22 @@ public class VisionSystem extends SubsystemBase {
           Optional<EstimatedRobotPose> filteredPose = filterPose(poseEst);
           if (filteredPose.isPresent()) {
             var pose = filteredPose.get();
-          
-            swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
+            poses.add(pose.estimatedPose);
+            if (Robot.isReal()){
+                          swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
                                             pose.timestampSeconds,
                                             camera.curStdDevs);
+            }
+
             field2d.getObject("Vision").setPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
             field2d.setRobotPose(swerveDrive.getPose()); // photon's pose combined with robot's known pose
           }
         }
       }
+
+      var p = poses.toArray(new Pose3d[poses.size()]);
+      posesPublisher.set(p);
+      SmartDashboard.putNumberArray("offsets", Arrays.stream(p).map(x -> x.toPose2d().getTranslation().getDistance(swerveDrive.getPose().getTranslation())).toArray(size -> new Double[size]));
   
     }
   
@@ -220,8 +231,11 @@ public class VisionSystem extends SubsystemBase {
           Optional<EstimatedRobotPose> filteredPose = filterPose(poseEst);
           if (filteredPose.isPresent()) {
             var pose = filteredPose.get();
-  
-            swerveDrive.resetPose(pose.estimatedPose.toPose2d());
+
+            if (Robot.isReal())
+            {
+              swerveDrive.resetPose(pose.estimatedPose.toPose2d());
+            }
   
             field2d.getObject("Vision").setPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
             field2d.setRobotPose(swerveDrive.getPose()); // photon's pose combined with robot's known pose
@@ -266,7 +280,7 @@ public class VisionSystem extends SubsystemBase {
         if (bestTargetAmbiguity > maximumAmbiguity) {
           return Optional.empty();
         }
-  
+
         //est pose is very far from recorded robot pose
         if (PhotonUtils.getDistanceToPose(currentPose.get(), pose.get().estimatedPose.toPose2d()) > 1) {
           longDistangePoseEstimationCount++;
@@ -590,7 +604,7 @@ public class VisionSystem extends SubsystemBase {
         mostRecentTimestamp = Math.max(mostRecentTimestamp, result.getTimestampSeconds());
       }
 
-        // resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults();
+        // resultsList = Robot.isReal() ? camera.getAllUnreadResults() : new ArrayList<>();
         resultsList = Robot.isReal() ? camera.getAllUnreadResults() : cameraSim.getCamera().getAllUnreadResults(); // ß
         lastReadTimestamp = currentTimestamp;
         resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
