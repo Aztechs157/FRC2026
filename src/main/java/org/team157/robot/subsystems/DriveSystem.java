@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
+import org.team157.robot.Constants.VisionConstants;
 import org.team157.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -347,5 +348,9 @@ public class DriveSystem extends TunerSwerveDrivetrain implements Subsystem {
 
     public Pose2d getPose() {
         return super.getStateCopy().Pose;
+    }
+
+    public Command resetPose() {
+        return runOnce(() -> resetPose(VisionConstants.MANUAL_RESET_POSE));
     }
 }

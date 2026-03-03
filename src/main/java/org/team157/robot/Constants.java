@@ -23,6 +23,7 @@ import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -193,6 +194,8 @@ public final class Constants {
     // How close the robot can be (bumper to tag, in meters) before losing the
     // ability to auto-align.
     public static final double MIN_DISTANCE_TO_TAG = 0.8;
+
+    public static final Pose2d MANUAL_RESET_POSE = new Pose2d();
   }
 
 

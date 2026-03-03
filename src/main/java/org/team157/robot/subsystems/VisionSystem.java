@@ -274,6 +274,13 @@ public class VisionSystem extends SubsystemBase {
       }
       return Optional.empty();
     }
+    public Command disableCams() {
+      return runOnce(() -> {
+        for (Cameras cam : Cameras.values()) {
+          cam.useForPositioning = false;
+        }
+      });
+    }
   
     /**
      * Get distance of the robot from the AprilTag pose.
