@@ -63,7 +63,7 @@ public class RobotContainer {
 
     public final Trigger intakeDeployTrigger = new Trigger(() -> intake.getDeployState());
 
-    private boolean manualOverride = false; // When true, allows manual control of the turret, hood, and flywheel, disabling any dynamic control.
+    public static boolean manualOverride = false; // When true, allows manual control of the turret, hood, and flywheel, disabling any dynamic control.
     
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
@@ -121,13 +121,11 @@ public class RobotContainer {
 
         // Disable turret movement when no other turret commands are running.
         turret.setDefaultCommand(turret.setDefault());
-        flywheel.setDefaultCommand(flywheel.set(0));
-
+        flywheel.setDefaultCommand(flywheel.setDefault());
         intake.setDefaultCommand(intake.setDefault()); 
         hopper.setDefaultCommand(hopper.setDefault());
         uptake.setDefaultCommand(uptake.setDefault());
         hood.setDefaultCommand(hood.setDefault());
-
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -163,7 +161,7 @@ public class RobotContainer {
         /////////////////////////
         
         operatorController.leftStick().and(operatorController.rightStick()).onTrue(toggleManualOverride()); // Toggle manual override with both sticks
-        driverController.leftStick().and(driverController.rightStick()).onTrue(toggleManualOverride()); // Toggle manual override with both sticks (driver controller as well for redundancy in case of operator controller failure)
+        driverController.a().onTrue(toggleManualOverride()); // Toggle manual override with both sticks (driver controller as well for redundancy in case of operator controller failure)
 
         // Disables automatic turret tracking when manual override is enabled, 
         // allowing the operator to control the turret without interference from vision tracking.
@@ -199,7 +197,7 @@ public class RobotContainer {
 
         
         // Enables dynamic control of the turret.
-        operatorController.x().toggleOnTrue(turret.trackTagGlobalRelative());
+        driverController.x().toggleOnTrue(turret.trackTagGlobalRelative());
         // Enables dynamic control of the flywheel and hood.
         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity().alongWith(hood.setDynamicHoodAngle()));
 

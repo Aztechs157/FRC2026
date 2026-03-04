@@ -118,6 +118,8 @@ public class Robot extends TimedRobot {
       new Pose3d(m_robotContainer.drivetrain.getPose()).plus(VisionConstants.BACK_CAMERA_PLACEMENT)
     };
     cameraPoses.set(cameras);
+
+    SmartDashboard.putBoolean("Manual Override", RobotContainer.manualOverride);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
