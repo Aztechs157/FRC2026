@@ -12,6 +12,7 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -79,9 +80,13 @@ public class RobotContainer {
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
 
         configureBindings();
+                // autoChooser = AutoBuilder.buildAutoChooser("New Auto");
+                // SmartDashboard.putData("Auto Chooser", autoChooser);
 
-        autoChooser = AutoBuilder.buildAutoChooser("New Auto");
-                SmartDashboard.putData("Auto Chooser", autoChooser);
+        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier("New Auto", 
+        stream -> stream.map(path -> new PathPlannerAuto(path.getName(), false)));
+
+        SmartDashboard.putData("Auto Chooser", autoChooser);
 
 
     }
