@@ -375,6 +375,8 @@ public class VisionSystem extends SubsystemBase {
      */
     public void setTargetParams(Pose2d targetPose, Pose2d robotPose) {
       distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, targetPose);
+      distanceToTargetFromTurret = PhotonUtils.getDistanceToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), targetPose);
+
       // TODO: Continue work on implementation of momentum-based velocity calculation on new branch.
       // lastDistanceToTarget = distanceToTarget;
       // lastTrackedTime = NetworkTablesJNI.now();
