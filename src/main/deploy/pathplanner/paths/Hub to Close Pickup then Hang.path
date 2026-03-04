@@ -1,0 +1,118 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.617967741935484,
+        "y": 4.0398763440860215
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.6423494623655923,
+        "y": 4.737193548387097
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.433715053765208,
+        "y": 5.970908602152599
+      },
+      "prevControl": {
+        "x": 1.2640806259130646,
+        "y": 6.5281276045130125
+      },
+      "nextControl": {
+        "x": 0.06311290322934032,
+        "y": 5.722215053767565
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.2769731182795705,
+        "y": 3.7765537634408606
+      },
+      "prevControl": {
+        "x": 2.7769731182795705,
+        "y": 3.7765537634408606
+      },
+      "nextControl": {
+        "x": 1.7769731182795705,
+        "y": 3.7765537634408606
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.4528709677419362,
+        "y": 3.7765537634408606
+      },
+      "prevControl": {
+        "x": 1.2028709677419362,
+        "y": 3.7765537634408606
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 179.35625428582466
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.7675276752767554,
+      "maxWaypointRelativePos": 1.3210332103321007,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Deploy Intake",
+      "waypointRelativePos": 0.7158671586715847,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Retract Intake",
+      "waypointRelativePos": 1.367773677736786,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "New Folder",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 90.55625222708065
+  },
+  "useDefaultConstraints": true
+}

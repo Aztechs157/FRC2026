@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -78,7 +79,8 @@ public class RobotContainer {
 
         configureBindings();
 
-        autoChooser = AutoBuilder.buildAutoChooser("New Auto");
+        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier("New Auto", 
+        stream -> stream.map(path -> new PathPlannerAuto(path.getName(), false)));
                 SmartDashboard.putData("Auto Chooser", autoChooser);
 
 
