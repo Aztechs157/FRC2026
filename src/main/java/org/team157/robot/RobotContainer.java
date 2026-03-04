@@ -80,7 +80,7 @@ public class RobotContainer {
         configureBindings();
 
         autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier("New Auto", 
-        stream -> stream.map(path -> new PathPlannerAuto(path.getName(), false)));
+        stream -> stream.map(path -> new PathPlannerAuto(path.getName(), false))); // change false to true to invert autos
                 SmartDashboard.putData("Auto Chooser", autoChooser);
 
 
