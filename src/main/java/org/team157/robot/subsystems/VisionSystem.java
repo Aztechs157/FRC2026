@@ -124,7 +124,7 @@ public class VisionSystem extends SubsystemBase {
       setDefaultCommand(getDefaultCommand());
     }
   
-    public Command getDefaultCommand(DriveSystem drivetrain, TurretSystem turret) {
+    public Command setDefault(DriveSystem drivetrain, TurretSystem turret) {
       return run(() -> {
         updatePoseEstimation(drivetrain);
         turret.updateRelativeAngleToTag(FieldConstants.positionDetails.targetPose2d(drivetrain.getPose(), isBlueAlliance), drivetrain.getPose());

@@ -14,6 +14,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -35,6 +36,8 @@ public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
+
+
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -42,28 +45,26 @@ public class RobotContainer {
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController driverController = new CommandXboxController(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
 
-
-    public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
-
-    public final FlywheelSystem flywheel = new FlywheelSystem();
-
-    public final VisionSystem visionSystem;
     public final TurretSystem turret;
+    public final VisionSystem visionSystem;
     public final HoodSystem hood = new HoodSystem();
     public final IntakeSystem intake = new IntakeSystem();
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
-
+    public final FlywheelSystem flywheel = new FlywheelSystem();
+    public final DriveSystem drivetrain = TunerConstants.createDrivetrain();    
 
     private final SendableChooser<Command> autoChooser;
 
     public final Trigger intakeDeployTrigger = new Trigger(() -> intake.getDeployState());
+
+    private boolean manualOverride = false; // When true, allows manual control of the turret, hood, and flywheel, disabling any dynamic control.
+    
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
         if (ModifierConstants.DEMO_MODE) {
@@ -85,9 +86,9 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-          ///////////////////////////
-         /// DRIVETRAIN COMMANDS ///
-        ///////////////////////////
+          ////////////////////////
+         /// DEFAULT COMMANDS ///
+        ////////////////////////
         
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -105,96 +106,104 @@ public class RobotContainer {
                         ControllerConstants.RIGHT_X_DEADBAND) * MaxAngularRate) // Drive counterclockwise with
                                                                                 // negative X (left)
         ));
-
+        final var idle = new SwerveRequest.Idle();
+        
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
-        final var idle = new SwerveRequest.Idle();
         RobotModeTriggers.disabled().whileTrue(
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
+        // Telemetry for the drivetrain.
+        drivetrain.registerTelemetry(logger::telemeterize);        
 
-        driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
+        // Update the pose estimation and turret tracking angle while no other vision commands are running. 
+        visionSystem.setDefaultCommand(visionSystem.setDefault(drivetrain, turret));
+
+        // Disable turret movement when no other turret commands are running.
+        turret.setDefaultCommand(turret.setDefault());
+        flywheel.setDefaultCommand(flywheel.set(0));
+
+        intake.setDefaultCommand(intake.setDefault()); 
+        hopper.setDefaultCommand(hopper.setDefault());
+        uptake.setDefaultCommand(uptake.setDefault());
+        hood.setDefaultCommand(hood.setDefault());
+
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
-        driverController.back().and(driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        driverController.back().and(driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
-        // Reset the field-centric heading on start button press.
-        driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-
-        drivetrain.registerTelemetry(logger::telemeterize);        
+        // driverController.back().and(driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        // driverController.back().and(driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        // driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        // driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
           ///////////////////////
-         /// VISION COMMANDS ///
+         /// DRIVER COMMANDS ///
         ///////////////////////
         
-        visionSystem.setDefaultCommand(visionSystem.getDefaultCommand(drivetrain, turret));
-
-          ///////////////////////
-         /// TURRET COMMANDS ///
-        ///////////////////////
+        // Reset the field-centric heading on start and back button press.
+        driverController.start().and(driverController.back()).onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
         
-        // Disable turret movement when no other commands are running.
-        turret.setDefaultCommand(turret.set(0));
-
-        driverController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
-        driverController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(130)));
-        operatorController.povLeft().whileTrue(turret.set(-0.25));
-        operatorController.povRight().whileTrue(turret.set(0.25));
-
-        ////////////////////////////////////////////////////////
-        /// FLYWHEEL COMMANDS
-        ///////////////////////////////////////////////////////
+        // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's preference.
+        if(ModifierConstants.MAYA_MODE) {
+            // Shooting on left trigger, intake on right trigger
+            driverController.leftTrigger().toggleOnTrue(hopper.setRoller(0.5)
+                    .alongWith(uptake.setRoller(1)));
+            driverController.rightTrigger().toggleOnTrue(intake.setRoller(0.75));
+        } else {
+            // Shooting on right trigger, intake on left trigger
+            driverController.rightTrigger().toggleOnTrue(hopper.setRoller(0.5)
+                    .alongWith(uptake.setRoller(1)));
+            driverController.leftTrigger().toggleOnTrue(intake.setRoller(0.75));
+        }        
         
-        // Disable flywheel when no commands are running.
-        flywheel.setDefaultCommand(flywheel.set(0));
+        driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
 
-        driverController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(5800)));
-        driverController.leftTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4500)));
+          /////////////////////////
+         /// OPERATOR COMMANDS ///
+        /////////////////////////
+        
+        operatorController.leftStick().and(operatorController.rightStick()).onTrue(toggleManualOverride()); // Toggle manual override with both sticks
+        driverController.leftStick().and(driverController.rightStick()).onTrue(toggleManualOverride()); // Toggle manual override with both sticks (driver controller as well for redundancy in case of operator controller failure)
 
-          ///////////////////////
-         /// INTAKE COMMANDS ///
-        ///////////////////////
+        // Disables automatic turret tracking when manual override is enabled, 
+        // allowing the operator to control the turret without interference from vision tracking.
+        manualOverrideTrigger().whileFalse(turret.trackTagGlobalRelative());
 
-        intake.setDefaultCommand(intake.setDefault()); 
+        if(!manualOverride) {
+            // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
+            operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
+            operatorController.povUpRight().toggleOnTrue(turret.setAngle(Degrees.of(-5)));
+            operatorController.povRight().whileTrue(turret.setAngle(Degrees.of(40)));
+            operatorController.povDownRight().toggleOnTrue(turret.setAngle(Degrees.of(85)));
+            operatorController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(130)));
+            operatorController.povDownLeft().toggleOnTrue(turret.setAngle(Degrees.of(175)));
+            operatorController.povLeft().whileTrue(turret.setAngle(Degrees.of(220)));
+            operatorController.povUpLeft().toggleOnTrue(turret.setAngle(Degrees.of(265)));
+            
+            // Set the flywheel to preset velocities based on the bumpers and triggers of the Operator controller.
+            operatorController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(5800)));
+            operatorController.rightBumper().toggleOnTrue(flywheel.setVelocity(RPM.of(3600)));
 
-        driverController.rightBumper().toggleOnTrue(intake.setRoller(0.75));
-        //intakeDeployTrigger.onTrue(intake.deployIntake()).onFalse(intake.retractIntake()); //TODO: decide on a button for this
+            // Set the hood to preset angles based on the bumpers and triggers of the Operator controller.
+            operatorController.leftTrigger().toggleOnTrue(hood.set(0.1));
+            operatorController.leftBumper().toggleOnTrue(hood.set(-0.1));
+        }
+       
+
+
+
         operatorController.a().toggleOnTrue(intake.deployIntake());
         operatorController.y().toggleOnTrue(intake.retractIntake());
-       
-          //////////////////////////////////
-         /// HOPPER AND UPTAKE COMMANDS ///
-        //////////////////////////////////
 
-        hopper.setDefaultCommand(hopper.setDefault());
-        uptake.setDefaultCommand(uptake.setDefault());
+        //intakeDeployTrigger.onTrue(intake.deployIntake()).onFalse(intake.retractIntake()); //TODO: decide on a button for this
 
-        driverController.leftBumper().toggleOnTrue(hopper.setRoller(0.5).alongWith(uptake.setRoller(1)));
-
-          /////////////////////
-         /// HOOD COMMANDS ///
-        /////////////////////
-        
-        hood.setDefaultCommand(hood.setDefault());
-        operatorController.povUp().toggleOnTrue(hood.set(0.1));
-        operatorController.povDown().toggleOnTrue(hood.set(-0.1));
-
-           ///////////////////////
-         /// DYNAMIC COMMANDS ///
-        ///////////////////////
         
         // Enables dynamic control of the turret.
-        // operatorController.y().toggleOnTrue(turret.trackHubTag());
         operatorController.x().toggleOnTrue(turret.trackTagGlobalRelative());
         // Enables dynamic control of the flywheel and hood.
         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity().alongWith(hood.setDynamicHoodAngle()));
 
     }
-
 
     public double modifySpeed(final double speed) {
         final var modifier = 1 - driverController.getRightTriggerAxis() * ModifierConstants.PRECISION_DRIVE_MODIFIER;
@@ -203,5 +212,19 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
+    }
+
+    /** 
+     * Inverts the state of manual override, allowing the operator to toggle between manual and dynamic control of the turret, hood, and flywheel.
+     * @return {@link InstantCommand} that toggles manual override when executed.
+     * */ 
+    private Command toggleManualOverride() {
+        return new InstantCommand(() -> {
+            manualOverride = !manualOverride;
+        });
+    }
+
+    private Trigger manualOverrideTrigger() {
+        return new Trigger(() -> manualOverride);
     }
 }

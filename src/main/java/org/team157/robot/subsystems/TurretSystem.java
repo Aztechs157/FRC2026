@@ -90,6 +90,10 @@ public class TurretSystem extends SubsystemBase {
    /// TURRET COMMANDS ///
   //////////////////////
   
+  public Command setDefault() {
+    return run(() -> set(0));
+  }
+
   /**
    * Set the target angle of the turret.
    * @param angle Angle to go to.
