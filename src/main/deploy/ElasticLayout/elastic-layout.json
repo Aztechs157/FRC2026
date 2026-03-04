@@ -17,7 +17,7 @@
             "properties": {
               "topic": "/Shuffleboard/vision/vision based field",
               "period": 0.06,
-              "field_game": "Reefscape",
+              "field_game": "Rebuilt (No Fuel)",
               "robot_width": 0.85,
               "robot_length": 0.85,
               "show_other_objects": true,
@@ -29,105 +29,11 @@
             }
           },
           {
-            "title": "photonvision_Port_1182_Output_MJPEG_Server",
-            "x": 768.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Camera Stream",
-            "properties": {
-              "topic": "/CameraPublisher/photonvision_Port_1182_Output_MJPEG_Server",
-              "period": 0.06,
-              "rotation_turns": 0
-            }
-          },
-          {
-            "title": "photonvision_Port_1184_Output_MJPEG_Server",
-            "x": 1024.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Camera Stream",
-            "properties": {
-              "topic": "/CameraPublisher/photonvision_Port_1184_Output_MJPEG_Server",
-              "period": 0.06,
-              "rotation_turns": 0
-            }
-          },
-          {
-            "title": "Intake Sensor",
-            "x": 0.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Shuffleboard/Sensor values/Intake Sensor",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "useAutoPosition",
-            "x": 0.0,
-            "y": 384.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Shuffleboard/Sensor values/useAutoPosition",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "hasTarget",
-            "x": 1024.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/photonvision/Microsoft_LifeCam_HD-3000_TopRight/hasTarget",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "hasTarget",
-            "x": 768.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/photonvision/Microsoft_LifeCam_HD-3000_Bottom/hasTarget",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
             "title": "Match Time",
-            "x": 128.0,
+            "x": 0.0,
             "y": 384.0,
             "width": 768.0,
-            "height": 256.0,
+            "height": 384.0,
             "type": "Match Time",
             "properties": {
               "topic": "/SmartDashboard/Match Time",
@@ -140,7 +46,7 @@
           },
           {
             "title": "Demo Mode",
-            "x": 896.0,
+            "x": 1024.0,
             "y": 384.0,
             "width": 128.0,
             "height": 128.0,
@@ -157,13 +63,121 @@
           },
           {
             "title": "Rookie Mode",
-            "x": 896.0,
-            "y": 512.0,
+            "x": 1152.0,
+            "y": 384.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Rookie Mode",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Turret Angle (YAMS)",
+            "x": 1280.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/Turret Angle (YAMS)",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": 180.0,
+              "end_angle": -180.0,
+              "min_value": -179.0,
+              "max_value": 179.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
+            }
+          },
+          {
+            "title": "Hood Angle (YAMS)",
+            "x": 1280.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/Hood Angle (YAMS)",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 40.0,
+              "max_value": 65.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
+            }
+          },
+          {
+            "title": "Flywheel RPM",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 512.0,
+            "height": 384.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/Flywheel RPM",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 0.0,
+              "max_value": 6000.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
+            }
+          },
+          {
+            "title": "Distance to Target",
+            "x": 1280.0,
+            "y": 640.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Distance to Target",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Hood Angle",
+            "x": 1152.0,
+            "y": 640.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Hood Angle",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Manual Override",
+            "x": 768.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Manual Override",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -181,24 +195,11 @@
         "layouts": [],
         "containers": [
           {
-            "title": "photonvision_Port_1182_Output_MJPEG_Server",
-            "x": 768.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Camera Stream",
-            "properties": {
-              "topic": "/CameraPublisher/photonvision_Port_1182_Output_MJPEG_Server",
-              "period": 0.06,
-              "rotation_turns": 0
-            }
-          },
-          {
             "title": "Auto Chooser",
             "x": 768.0,
-            "y": 0.0,
-            "width": 512.0,
-            "height": 128.0,
+            "y": 512.0,
+            "width": 768.0,
+            "height": 256.0,
             "type": "ComboBox Chooser",
             "properties": {
               "topic": "/SmartDashboard/Auto Chooser",
@@ -207,24 +208,11 @@
             }
           },
           {
-            "title": "photonvision_Port_1184_Output_MJPEG_Server",
-            "x": 1024.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Camera Stream",
-            "properties": {
-              "topic": "/CameraPublisher/photonvision_Port_1184_Output_MJPEG_Server",
-              "period": 0.06,
-              "rotation_turns": 0
-            }
-          },
-          {
             "title": "Match Time",
             "x": 0.0,
             "y": 384.0,
             "width": 768.0,
-            "height": 256.0,
+            "height": 384.0,
             "type": "Match Time",
             "properties": {
               "topic": "/SmartDashboard/Match Time",
@@ -254,7 +242,7 @@
           },
           {
             "title": "Rookie Mode",
-            "x": 896.0,
+            "x": 1152.0,
             "y": 384.0,
             "width": 128.0,
             "height": 128.0,
@@ -271,15 +259,15 @@
           },
           {
             "title": "Field",
-            "x": 384.0,
-            "y": 128.0,
-            "width": 384.0,
-            "height": 256.0,
+            "x": 0.0,
+            "y": 0.0,
+            "width": 768.0,
+            "height": 384.0,
             "type": "Field",
             "properties": {
               "topic": "/SmartDashboard/Field",
               "period": 0.06,
-              "field_game": "Reefscape",
+              "field_game": "Rebuilt (No Fuel)",
               "robot_width": 0.85,
               "robot_length": 0.85,
               "show_other_objects": true,
@@ -288,6 +276,69 @@
               "robot_color": 4294198070,
               "trajectory_color": 4294967295,
               "show_robot_outside_widget": true
+            }
+          },
+          {
+            "title": "Flywheel RPM",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 512.0,
+            "height": 384.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/Flywheel RPM",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 0.0,
+              "max_value": 6000.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
+            }
+          },
+          {
+            "title": "Turret Angle (YAMS)",
+            "x": 1280.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/Turret Angle (YAMS)",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": 180.0,
+              "end_angle": -180.0,
+              "min_value": -179.0,
+              "max_value": 179.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
+            }
+          },
+          {
+            "title": "Hood Angle (YAMS)",
+            "x": 1280.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/Hood Angle (YAMS)",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 40.0,
+              "max_value": 65.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
             }
           }
         ]
@@ -359,6 +410,52 @@
               "wrap_value": false,
               "show_pointer": true,
               "show_ticks": true
+            }
+          },
+          {
+            "title": "Desired Flywheel Velocity",
+            "x": 640.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Desired Flywheel Velocity",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Flywheel RPM",
+            "x": 256.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/SmartDashboard/Flywheel RPM",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
+            }
+          },
+          {
+            "title": "Desired Flywheel Velocity",
+            "x": 512.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/SmartDashboard/Desired Flywheel Velocity",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4292083712,
+              "line_width": 2.0
             }
           }
         ]
