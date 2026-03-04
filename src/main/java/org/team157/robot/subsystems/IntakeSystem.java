@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -249,6 +250,10 @@ public class IntakeSystem extends SubsystemBase {
     return smartIntakePivotMotor.getMechanismVelocity().in(DegreesPerSecond);
   }
 
+  public double getRollerVelocity() {
+    return intakeRollers.getSpeed().in(RPM);
+  }
+
   public Command setDefault() {
     // return setRoller(0).
     return run(() -> {
@@ -270,6 +275,7 @@ public class IntakeSystem extends SubsystemBase {
     SmartDashboard.putNumber("Scaled Intake Pivot Pos", getScaledPos());
     SmartDashboard.putNumber("Intake Pivot Angle (Encoder)", getScaledPosAngleEncoder());
     }
+    SmartDashboard.putBoolean("Intake Rollers Running", (getRollerVelocity() > 0.1));
     intakePivot.updateTelemetry();
   }
 

@@ -120,6 +120,7 @@ public class Robot extends TimedRobot {
     cameraPoses.set(cameras);
 
     SmartDashboard.putBoolean("Manual Override", RobotContainer.manualOverride);
+    SmartDashboard.putBoolean("Hub Active?", m_robotContainer.isHubActive());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
