@@ -1,0 +1,93 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.451466666666667,
+        "y": 6.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.8311559933149075,
+        "y": 5.92733953022968
+      },
+      "isLocked": false,
+      "linkedName": "BallPickupLeft"
+    },
+    {
+      "anchor": {
+        "x": 3.056722222222222,
+        "y": 5.584366666666666
+      },
+      "prevControl": {
+        "x": 3.5194077471469383,
+        "y": 5.894077338956864
+      },
+      "nextControl": {
+        "x": 2.503621363103462,
+        "y": 5.214134122759377
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.9945777777777782,
+        "y": 4.424777777777778
+      },
+      "prevControl": {
+        "x": 2.1932996261026876,
+        "y": 4.576467022611852
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "LeftShoot"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Stop Intaking",
+      "waypointRelativePos": 0.38312655086848885,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stop Intaking"
+        }
+      }
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 1.6853598014887938,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Shoot"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

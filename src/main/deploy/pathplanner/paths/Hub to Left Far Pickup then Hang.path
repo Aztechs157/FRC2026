@@ -84,8 +84,8 @@
         "y": 3.7424193548387104
       },
       "prevControl": {
-        "x": 2.6674865985756853,
-        "y": 3.7212193972385834
+        "x": 2.667486598575689,
+        "y": 3.721219397238583
       },
       "nextControl": {
         "x": 1.9600107526881727,
@@ -111,7 +111,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 2,
-      "rotationDegrees": -52.00126755749557
+      "rotationDegrees": -52.001267557495574
     },
     {
       "waypointRelativePos": 3,
@@ -161,7 +161,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "New Folder",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
