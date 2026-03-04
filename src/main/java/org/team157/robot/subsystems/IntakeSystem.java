@@ -131,6 +131,11 @@ public class IntakeSystem extends SubsystemBase {
     return intakeRollers.set(dutyCycle);
   }
 
+  /** Run the intake at a set speed. Used for autonomous and button bindings. */
+  public Command runIntake() {
+    return setRoller(0.75);
+  }
+
   /** Creates a new IntakeSystem */
   public IntakeSystem() {
     

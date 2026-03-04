@@ -89,27 +89,13 @@ public class RobotContainer {
           ////////////////////////
          /// DEFAULT COMMANDS ///
         ////////////////////////
+
         
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() -> drive
-                .withVelocityX(MathUtil.applyDeadband(-driverController.getLeftY(),
-                        ControllerConstants.LEFT_Y_DEADBAND) * modifySpeed(MaxSpeed)) // Drive forward with
-                                                                                        // negative Y
-                // (forward)
-                .withVelocityY(MathUtil.applyDeadband(-driverController.getLeftX(),
-                        ControllerConstants.LEFT_X_DEADBAND) * modifySpeed(MaxSpeed)) // Drive left with
-                                                                                        // negative X (left)
-                .withRotationalRate(MathUtil.applyDeadband(-driverController.getRightX(),
-                        ControllerConstants.RIGHT_X_DEADBAND) * MaxAngularRate) // Drive counterclockwise with
-                                                                                // negative X (left)
-        ));
-        final var idle = new SwerveRequest.Idle();
         
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
+        
+        final var idle = new SwerveRequest.Idle();
         RobotModeTriggers.disabled().whileTrue(
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
@@ -138,6 +124,23 @@ public class RobotContainer {
          /// DRIVER COMMANDS ///
         ///////////////////////
         
+        // Note that X is defined as forward according to WPILib convention,
+        // and Y is defined as to the left according to WPILib convention.
+        drivetrain.setDefaultCommand(
+            // Drivetrain will execute this command periodically
+            drivetrain.applyRequest(() -> drive
+                .withVelocityX(MathUtil.applyDeadband(-driverController.getLeftY(),
+                        ControllerConstants.LEFT_Y_DEADBAND) * modifySpeed(MaxSpeed)) // Drive forward with
+                                                                                        // negative Y
+                // (forward)
+                .withVelocityY(MathUtil.applyDeadband(-driverController.getLeftX(),
+                        ControllerConstants.LEFT_X_DEADBAND) * modifySpeed(MaxSpeed)) // Drive left with
+                                                                                        // negative X (left)
+                .withRotationalRate(MathUtil.applyDeadband(-driverController.getRightX(),
+                        ControllerConstants.RIGHT_X_DEADBAND) * MaxAngularRate) // Drive counterclockwise with
+                                                                                // negative X (left)
+        ));
+
         // Reset the field-centric heading on start and back button press.
         driverController.start().and(driverController.back()).onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
         
@@ -146,27 +149,34 @@ public class RobotContainer {
             // Shooting on left trigger, intake on right trigger
             driverController.leftTrigger().toggleOnTrue(hopper.setRoller(0.5)
                     .alongWith(uptake.setRoller(1)));
-            driverController.rightTrigger().toggleOnTrue(intake.setRoller(0.75));
+            driverController.rightTrigger().toggleOnTrue(intake.runIntake());
         } else {
             // Shooting on right trigger, intake on left trigger
             driverController.rightTrigger().toggleOnTrue(hopper.setRoller(0.5)
                     .alongWith(uptake.setRoller(1)));
-            driverController.leftTrigger().toggleOnTrue(intake.setRoller(0.75));
-        }        
-        
+            driverController.leftTrigger().toggleOnTrue(intake.runIntake());
+        }
+
+        // Toggle manual override (on driver A for testing without controller)
+        driverController.a().onTrue(toggleManualOverride());
+        // When the B button is held, the robot will brake in place, holding its position against external forces. 
         driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
+        // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
+        driverController.y().toggleOnTrue(forceOuttake());
 
           /////////////////////////
          /// OPERATOR COMMANDS ///
         /////////////////////////
         
+        // Toggle manual override with both sticks to prevent accidental activation during teleop.
         operatorController.leftStick().and(operatorController.rightStick()).onTrue(toggleManualOverride()); // Toggle manual override with both sticks
-        driverController.a().onTrue(toggleManualOverride()); // Toggle manual override with both sticks (driver controller as well for redundancy in case of operator controller failure)
 
         // Disables automatic turret tracking when manual override is enabled, 
         // allowing the operator to control the turret without interference from vision tracking.
-        manualOverrideTrigger().whileFalse(turret.trackTagGlobalRelative());
+        // manualOverrideTrigger().whileFalse(turret.trackTagGlobalRelative());
 
+       turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());  
+               
         // Only enable manual control of turret, hood and flywheel when manual override is enabled
         if(manualOverride) {
             // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
@@ -192,19 +202,27 @@ public class RobotContainer {
         operatorController.y().and(operatorController.back()).toggleOnTrue(intake.retractIntake());
 
         //intakeDeployTrigger.onTrue(intake.deployIntake()).onFalse(intake.retractIntake()); //TODO: decide on a button for this
-
         
-        // Enables dynamic control of the turret.
-        // driverController.x().toggleOnTrue(turret.trackTagGlobalRelative());
         driverController.x().toggleOnTrue(intake.wiggleIntake());
         // Enables dynamic control of the flywheel and hood.
         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity().alongWith(hood.setDynamicHoodAngle()));
 
     }
 
+    // Old trigger-based precision mode that scales speed based on how much the right trigger is pressed. 
+    // Replaced by button-based toggle due to lack of available triggers.
+    // public double modifySpeed(final double speed) {
+    //     final var modifier = 1 - driverController.getRightTriggerAxis() * ModifierConstants.PRECISION_DRIVE_MODIFIER;
+    //     return speed * modifier;
+    // }
+
+    // If the A button is held, apply the precision modifier of 0.5x speed.
     public double modifySpeed(final double speed) {
-        final var modifier = 1 - driverController.getRightTriggerAxis() * ModifierConstants.PRECISION_DRIVE_MODIFIER;
-        return speed * modifier;
+        if (driverController.a().getAsBoolean()) { 
+            return speed * ModifierConstants.PRECISION_DRIVE_MODIFIER;
+        } else {
+            return speed;
+        }
     }
 
     public Command getAutonomousCommand() {
@@ -221,7 +239,18 @@ public class RobotContainer {
         });
     }
 
-    private Trigger manualOverrideTrigger() {
-        return new Trigger(() -> manualOverride);
+    // A simple command that runs the intake, hopper, and uptake rollers in reverse at a low speed to clear any jams. 
+    // TODO: remove from RobotContainer and into eventual Superstructure subsystem once it exists.
+    private Command forceOuttake() {
+        return uptake.setRoller(-0.25).alongWith(hopper.setRoller(-0.25)).alongWith(intake.setRoller(-0.25));
+    }
+
+    /** 
+     * Trigger used for tracking a target location with the turret
+     * @return {@link Trigger} that is true when the robot is in teleop or autonomous and manual override 
+     * is not enabled, allowing the turret to track targets when those conditions are met.
+     */
+    private Trigger turretTrackingTrigger() {
+        return new Trigger(() -> (RobotModeTriggers.teleop().getAsBoolean() || RobotModeTriggers.autonomous().getAsBoolean()) && !manualOverride);
     }
 }
