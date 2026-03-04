@@ -167,7 +167,8 @@ public class RobotContainer {
         // allowing the operator to control the turret without interference from vision tracking.
         manualOverrideTrigger().whileFalse(turret.trackTagGlobalRelative());
 
-        if(!manualOverride) {
+        // Only enable manual control of turret, hood and flywheel when manual override is enabled
+        if(manualOverride) {
             // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
             operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
             operatorController.povUpRight().toggleOnTrue(turret.setAngle(Degrees.of(-5)));
@@ -186,18 +187,16 @@ public class RobotContainer {
             operatorController.leftTrigger().toggleOnTrue(hood.set(0.1));
             operatorController.leftBumper().toggleOnTrue(hood.set(-0.1));
         }
-       
-
-
-
-        operatorController.a().toggleOnTrue(intake.deployIntake());
-        operatorController.y().toggleOnTrue(intake.retractIntake());
+       // Deploy and retract the intake with the A and Y buttons, but only when the back button is held to prevent accidental activation during teleop.
+        operatorController.a().and(operatorController.back()).toggleOnTrue(intake.deployIntake());
+        operatorController.y().and(operatorController.back()).toggleOnTrue(intake.retractIntake());
 
         //intakeDeployTrigger.onTrue(intake.deployIntake()).onFalse(intake.retractIntake()); //TODO: decide on a button for this
 
         
         // Enables dynamic control of the turret.
-        driverController.x().toggleOnTrue(turret.trackTagGlobalRelative());
+        // driverController.x().toggleOnTrue(turret.trackTagGlobalRelative());
+        driverController.x().toggleOnTrue(intake.wiggleIntake());
         // Enables dynamic control of the flywheel and hood.
         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity().alongWith(hood.setDynamicHoodAngle()));
 
