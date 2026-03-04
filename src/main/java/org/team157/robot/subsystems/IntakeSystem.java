@@ -28,6 +28,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -250,8 +251,11 @@ public class IntakeSystem extends SubsystemBase {
     return smartIntakePivotMotor.getMechanismVelocity().in(DegreesPerSecond);
   }
 
-  public double getRollerVelocity() {
-    return intakeRollers.getSpeed().in(RPM);
+  public AngularVelocity getRollerVelocity() {
+    return intakeRollers.getSpeed();
+  }
+  public boolean isIntakeRunning(){
+    return !intakeRollers.gte(DegreesPerSecond.of(1)).getAsBoolean();
   }
 
   public Command setDefault() {
@@ -275,7 +279,9 @@ public class IntakeSystem extends SubsystemBase {
     SmartDashboard.putNumber("Scaled Intake Pivot Pos", getScaledPos());
     SmartDashboard.putNumber("Intake Pivot Angle (Encoder)", getScaledPosAngleEncoder());
     }
-    SmartDashboard.putBoolean("Intake Rollers Running", (getRollerVelocity() > 0.1));
+    SmartDashboard.putNumber("Intake Roller Velocity", getRollerVelocity().in(RPM));
+    SmartDashboard.putBoolean("Intake Rollers Running", (isIntakeRunning()));
+    
     intakePivot.updateTelemetry();
   }
 

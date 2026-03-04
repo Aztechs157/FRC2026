@@ -40,8 +40,6 @@ public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-
-
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -153,16 +151,16 @@ public class RobotContainer {
             // Shooting on left trigger, intake on right trigger
             driverController.leftTrigger().toggleOnTrue(hopper.setRoller(0.5)
                     .alongWith(uptake.setRoller(1)));
-            driverController.rightTrigger().toggleOnTrue(intake.runIntake());
+            driverController.rightTrigger().toggleOnTrue(intake.runIntake().alongWith(hopper.setRoller(0.25)));
         } else {
             // Shooting on right trigger, intake on left trigger
             driverController.rightTrigger().toggleOnTrue(hopper.setRoller(0.5)
                     .alongWith(uptake.setRoller(1)));
-            driverController.leftTrigger().toggleOnTrue(intake.runIntake());
+            driverController.leftTrigger().toggleOnTrue(intake.runIntake().alongWith(hopper.setRoller(0.25)));
         }
 
         // Toggle manual override (on driver A for testing without controller)
-        driverController.a().onTrue(toggleManualOverride());
+        // driverController.a().onTrue(toggleManualOverride());
         // When the B button is held, the robot will brake in place, holding its position against external forces. 
         driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
@@ -180,26 +178,24 @@ public class RobotContainer {
        turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());  
                
         // Only enable manual control of turret, hood and flywheel when manual override is enabled
-        if(manualOverride) {
-            // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
-            operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
-            operatorController.povUpRight().toggleOnTrue(turret.setAngle(Degrees.of(-5)));
-            operatorController.povRight().whileTrue(turret.setAngle(Degrees.of(40)));
-            operatorController.povDownRight().toggleOnTrue(turret.setAngle(Degrees.of(85)));
-            operatorController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(130)));
-            operatorController.povDownLeft().toggleOnTrue(turret.setAngle(Degrees.of(175)));
-            operatorController.povLeft().whileTrue(turret.setAngle(Degrees.of(220)));
-            operatorController.povUpLeft().toggleOnTrue(turret.setAngle(Degrees.of(265)));
-            
-            // Set the flywheel to preset velocities based on the bumpers and triggers of the Operator controller.
-            operatorController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(5800)));
-            operatorController.rightBumper().toggleOnTrue(flywheel.setVelocity(RPM.of(3600)));
+        // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
+        operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
+        operatorController.povUpRight().toggleOnTrue(turret.setAngle(Degrees.of(-5)));
+        operatorController.povRight().whileTrue(turret.setAngle(Degrees.of(40)));
+        operatorController.povDownRight().toggleOnTrue(turret.setAngle(Degrees.of(85)));
+        operatorController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(130)));
+        operatorController.povDownLeft().toggleOnTrue(turret.setAngle(Degrees.of(175)));
+        operatorController.povLeft().whileTrue(turret.setAngle(Degrees.of(220)));
+        operatorController.povUpLeft().toggleOnTrue(turret.setAngle(Degrees.of(265)));
+        
+        // Set the flywheel to preset velocities based on the bumpers and triggers of the Operator controller.
+        operatorController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(5800)));
+        operatorController.rightBumper().toggleOnTrue(flywheel.setVelocity(RPM.of(3600)));
 
-            // Set the hood to preset angles based on the bumpers and triggers of the Operator controller.
-            // TODO: decide on preset angles for this instead of directly running the motor.
-            operatorController.leftTrigger().toggleOnTrue(hood.set(0.1));
-            operatorController.leftBumper().toggleOnTrue(hood.set(-0.1));
-        }
+        // Set the hood to preset angles based on the bumpers and triggers of the Operator controller.
+        // TODO: decide on preset angles for this instead of directly running the motor.
+        operatorController.leftTrigger().toggleOnTrue(hood.set(0.1));
+        operatorController.leftBumper().toggleOnTrue(hood.set(-0.1));
        // Deploy and retract the intake with the A and Y buttons, but only when the back button is held to prevent accidental activation during teleop.
         operatorController.a().and(operatorController.back()).toggleOnTrue(intake.deployIntake());
         operatorController.y().and(operatorController.back()).toggleOnTrue(intake.retractIntake());
