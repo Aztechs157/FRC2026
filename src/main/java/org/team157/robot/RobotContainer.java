@@ -12,9 +12,12 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.networktables.BooleanSubscriber;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -60,11 +63,13 @@ public class RobotContainer {
     public final IntakeSystem intake = new IntakeSystem();
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
+    
 
 
-    private final SendableChooser<Command> autoChooser;
+    private SendableChooser<Command> autoChooser;
 
     public final Trigger intakeDeployTrigger = new Trigger(() -> intake.getDeployState());
+    public final Trigger updateAutos = new Trigger(()->SmartDashboard.getBoolean("is left?", false));
     public RobotContainer() {
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
         if (ModifierConstants.DEMO_MODE) {
@@ -80,10 +85,20 @@ public class RobotContainer {
         configureBindings();
 
         autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier("New Auto", 
-        stream -> stream.map(path -> new PathPlannerAuto(path.getName(), false)));
+        stream -> stream.map(path -> new PathPlannerAuto(path.getName(), true)));
                 SmartDashboard.putData("Auto Chooser", autoChooser);
+        updateAutos.onTrue(modifyAutos(true)).onFalse(modifyAutos(false));
+        SmartDashboard.putBoolean("is left?", false);
 
+    }
 
+    private Command modifyAutos(boolean left) {
+        return new InstantCommand(() -> {
+            autoChooser.close();
+        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier("New Auto", 
+        stream -> stream.map(path -> new PathPlannerAuto(path.getName(), left)));
+                SmartDashboard.putData("Auto Chooser", autoChooser);
+        }).ignoringDisable(true);
     }
 
     private void configureBindings() {
