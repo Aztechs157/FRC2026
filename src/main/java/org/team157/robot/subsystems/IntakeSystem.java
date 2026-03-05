@@ -82,7 +82,7 @@ public class IntakeSystem extends SubsystemBase {
   private SmartMotorControllerConfig intakePivotMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
       .withClosedLoopController(IntakeConstants.KP, IntakeConstants.KI, IntakeConstants.KD, IntakeConstants.ANGULAR_VELOCITY, IntakeConstants.ANGULAR_ACCELERATION) //TODO: tune this PID
-      .withIdleMode(MotorMode.COAST)
+      .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(true)
       .withGearing(IntakeConstants.PIVOT_GEARING)
       .withTelemetry("Intake Pivot Motor", TelemetryConstants.TELEMETRY_VERBOSITY) 

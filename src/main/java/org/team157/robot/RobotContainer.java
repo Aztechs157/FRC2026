@@ -74,6 +74,7 @@ public class RobotContainer {
             MaxAngularRate = MaxAngularRate * ModifierConstants.DEMO_DRIVE_MODIFIER;
         } else if (ModifierConstants.ROOKIE_MODE) {
             MaxSpeed = MaxSpeed * ModifierConstants.ROOKIE_DRIVE_MODIFIER;
+            
         }
 
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
@@ -139,7 +140,7 @@ public class RobotContainer {
                         ControllerConstants.LEFT_X_DEADBAND) * modifySpeed(MaxSpeed)) // Drive left with
                                                                                         // negative X (left)
                 .withRotationalRate(MathUtil.applyDeadband(-driverController.getRightX(),
-                        ControllerConstants.RIGHT_X_DEADBAND) * MaxAngularRate) // Drive counterclockwise with
+                        ControllerConstants.RIGHT_X_DEADBAND) * modifySpeed(MaxAngularRate)) // Drive counterclockwise with
                                                                                 // negative X (left)
         ));
 
@@ -149,14 +150,14 @@ public class RobotContainer {
         // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's preference.
         if(ModifierConstants.MAYA_MODE) {
             // Shooting on left trigger, intake on right trigger
-            driverController.leftTrigger().toggleOnTrue(hopper.setRoller(0.5)
-                    .alongWith(uptake.setRoller(1)));
-            driverController.rightTrigger().toggleOnTrue(intake.runIntake().alongWith(hopper.setRoller(0.25)));
+            driverController.leftTrigger().toggleOnTrue(uptake.setRoller(1));
+            driverController.rightTrigger().toggleOnTrue(intake.runIntake());
+            driverController.leftTrigger().toggleOnTrue(hopper.setRoller(0.5));
         } else {
             // Shooting on right trigger, intake on left trigger
-            driverController.rightTrigger().toggleOnTrue(hopper.setRoller(0.5)
-                    .alongWith(uptake.setRoller(1)));
-            driverController.leftTrigger().toggleOnTrue(intake.runIntake().alongWith(hopper.setRoller(0.25)));
+            driverController.rightTrigger().toggleOnTrue(uptake.setRoller(1));
+            driverController.leftTrigger().toggleOnTrue(intake.runIntake());
+            driverController.rightTrigger().toggleOnTrue(hopper.setRoller(0.5));
         }
 
         // Toggle manual override (on driver A for testing without controller)
@@ -175,7 +176,7 @@ public class RobotContainer {
         
         // Disables automatic turret tracking when manual override is enabled, 
         // allowing the operator to control the turret without interference from vision tracking.
-       turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());  
+       turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative().alongWith(flywheel.setDynamicVelocity()).alongWith(hood.setDynamicHoodAngle()));  
                
         // Only enable manual control of turret, hood and flywheel when manual override is enabled
         // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
@@ -217,7 +218,7 @@ public class RobotContainer {
 
     // If the A button is held, apply the precision modifier of 0.5x speed.
     public double modifySpeed(final double speed) {
-        if (driverController.a().getAsBoolean()) { 
+        if (driverController.rightBumper().getAsBoolean()) { 
             return speed * ModifierConstants.PRECISION_DRIVE_MODIFIER;
         } else {
             return speed;
