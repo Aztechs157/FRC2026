@@ -184,9 +184,8 @@ public class RobotContainer {
         
         // Disables automatic turret tracking when manual override is enabled, 
         // allowing the operator to control the turret without interference from vision tracking.
-       turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative().alongWith(flywheel.setDynamicVelocity()).alongWith(hood.setDynamicHoodAngle()));  
-               
-        
+       turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());;  
+       turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity().alongWith(hood.setDynamicHoodAngle()));        
           /////////////////////////
          /// MANUAL FLYWHEEL /////
         // Only enable manual control of turret, hood and flywheel when manual override is enabled
