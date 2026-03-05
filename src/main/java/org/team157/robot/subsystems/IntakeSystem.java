@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -27,6 +28,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -80,7 +82,7 @@ public class IntakeSystem extends SubsystemBase {
   private SmartMotorControllerConfig intakePivotMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
       .withClosedLoopController(IntakeConstants.KP, IntakeConstants.KI, IntakeConstants.KD, IntakeConstants.ANGULAR_VELOCITY, IntakeConstants.ANGULAR_ACCELERATION) //TODO: tune this PID
-      .withIdleMode(MotorMode.COAST)
+      .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(true)
       .withGearing(IntakeConstants.PIVOT_GEARING)
       .withTelemetry("Intake Pivot Motor", TelemetryConstants.TELEMETRY_VERBOSITY) 
@@ -131,6 +133,11 @@ public class IntakeSystem extends SubsystemBase {
     return intakeRollers.set(dutyCycle);
   }
 
+  /** Run the intake at a set speed. Used for autonomous and button bindings. */
+  public Command runIntake() {
+    return setRoller(0.75);
+  }
+
   /** Creates a new IntakeSystem */
   public IntakeSystem() {
     
@@ -156,6 +163,11 @@ public class IntakeSystem extends SubsystemBase {
 
   public Command retractIntake() {
     return setAngleThenStop(Degrees.of(78));
+  }
+
+  /** Quickly moves the intake upd and down to agitate fuel. */
+  public Command wiggleIntake() {
+    return setAngleThenStop(Degrees.of(20)).andThen(setAngleThenStop(Degrees.of(0)));
   }
 
   /**
@@ -239,6 +251,13 @@ public class IntakeSystem extends SubsystemBase {
     return smartIntakePivotMotor.getMechanismVelocity().in(DegreesPerSecond);
   }
 
+  public AngularVelocity getRollerVelocity() {
+    return intakeRollers.getSpeed();
+  }
+  public boolean isIntakeRunning(){
+    return !intakeRollers.gte(DegreesPerSecond.of(1)).getAsBoolean();
+  }
+
   public Command setDefault() {
     // return setRoller(0).
     return run(() -> {
@@ -260,6 +279,9 @@ public class IntakeSystem extends SubsystemBase {
     SmartDashboard.putNumber("Scaled Intake Pivot Pos", getScaledPos());
     SmartDashboard.putNumber("Intake Pivot Angle (Encoder)", getScaledPosAngleEncoder());
     }
+    SmartDashboard.putNumber("Intake Roller Velocity", getRollerVelocity().in(RPM));
+    SmartDashboard.putBoolean("Intake Rollers Running", (isIntakeRunning()));
+    
     intakePivot.updateTelemetry();
   }
 

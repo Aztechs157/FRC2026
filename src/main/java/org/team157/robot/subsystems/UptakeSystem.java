@@ -6,6 +6,7 @@ package org.team157.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.RPM;
 
 import org.team157.robot.Constants;
 import org.team157.robot.Constants.TelemetryConstants;
@@ -14,6 +15,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.mechanisms.config.FlyWheelConfig;
@@ -67,6 +69,10 @@ public class UptakeSystem extends SubsystemBase {
     
   }
 
+  public double getRollerVelocity() {
+    return uptakeRollers.getSpeed().in(RPM);
+  }
+
   public Command setDefault() {
     // return setRoller(0).
     return run(() -> {
@@ -84,6 +90,8 @@ public class UptakeSystem extends SubsystemBase {
      *  Consider publishing to NT directly.
      */
     uptakeRollers.updateTelemetry();
+    SmartDashboard.putNumber("Uptake Roller Velocity", getRollerVelocity());
+    SmartDashboard.putBoolean("Uptake Running", getRollerVelocity() > 10); // Arbitrary threshold to determine if the uptake is running.
   }
 
 }

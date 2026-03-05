@@ -195,6 +195,15 @@ public class FlywheelSystem extends SubsystemBase {
     return flywheel.set(dutyCycle);
   }
 
+  /**
+   * Disable flywheel output when no other commands are running.
+   * @return {@link edu.wpi.first.wpilibj2.command.RunCommand} setting the flywheel to 0 duty cycle
+   */
+  // TODO: consider setting a default RPM instead of stopping the flywheel completely, to enable faster spin-up and lower power consumption when going from idle to active.
+  public Command setDefault() {
+    return set(0);
+  }
+
   /** Creates a new FlywheelSystem. */
   public FlywheelSystem() {}
 
