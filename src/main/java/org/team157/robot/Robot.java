@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private String autoName, newAutoName;
   private Optional<Alliance> alliance, newAlliance;
+  private boolean isLeft = false, newIsLeft;
   private Command m_autonomousCommand;
 
   public static Pose3d[] zeroArray = new Pose3d[4]; //TODO: make 5 poses and make climber getter once climber system exists
@@ -138,9 +139,11 @@ public class Robot extends TimedRobot {
 
     newAlliance = DriverStation.getAlliance();
     newAutoName = m_robotContainer.getAutonomousCommand().getName();
-    if (autoName != newAutoName || alliance != newAlliance) {
+    newIsLeft = SmartDashboard.getBoolean("is left?", false);
+    if (autoName != newAutoName || alliance != newAlliance || isLeft != newIsLeft) {
       autoName = newAutoName;
       alliance = newAlliance;
+      isLeft = newIsLeft;
       if (AutoBuilder.getAllAutoNames().contains(autoName)) {
         try {
           List<PathPlannerPath> pathPlannerPaths = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
@@ -149,8 +152,8 @@ public class Robot extends TimedRobot {
             if (alliance.isPresent() && alliance.get() == Alliance.Red) {
               path = path.flipPath();
             }
-            if(SmartDashboard.getBoolean("is left?", false)){
-              path.mirrorPath();
+            if(isLeft){
+              path = path.mirrorPath();
             }
             poses.addAll(path.getAllPathPoints().stream()
                 .map(point -> new Pose2d(point.position.getX(), point.position.getY(), new Rotation2d()))
@@ -160,6 +163,7 @@ public class Robot extends TimedRobot {
         } catch (IOException | org.json.simple.parser.ParseException e) {
           e.printStackTrace();
         }
+        SmartDashboard.putData("field", m_field);
       }
     } 
 
