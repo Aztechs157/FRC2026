@@ -93,8 +93,6 @@ public class RobotContainer {
          /// DEFAULT COMMANDS ///
         ////////////////////////
 
-        
-        
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
         
@@ -123,9 +121,9 @@ public class RobotContainer {
         // driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-          ///////////////////////
-         /// DRIVER COMMANDS ///
-        ///////////////////////
+          //////////////////////////////////////////////
+         ///            DRIVER COMMANDS             ///
+        //////////////////////////////////////////////
         
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -146,9 +144,16 @@ public class RobotContainer {
 
         // Reset the field-centric heading on start and back button press.
         driverController.start().and(driverController.back()).onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-        
+        // When the B button is held, the robot will brake in place, holding its position against external forces. 
+        driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
 
-        /////////////////////////
+
+        ////////////////////////////
+        ///     FlYWHEEL HOOD   ///
+        // Enables dynamic control of the flywheel and hood.
+        driverController.a().toggleOnTrue(flywheel.setDynamicVelocity().alongWith(hood.setDynamicHoodAngle()));
+
+          ////////////////////////////
          /// INTAKE UPTAKE HOPPER ///
         // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's preference.
         if(ModifierConstants.MAYA_MODE) {
@@ -162,17 +167,17 @@ public class RobotContainer {
             driverController.leftTrigger().toggleOnTrue(intake.runIntake());
             driverController.rightTrigger().toggleOnTrue(hopper.setRoller(0.5));
         }
-
-        // Toggle manual override (on driver A for testing without controller)
-        // driverController.a().onTrue(toggleManualOverride());
-        // When the B button is held, the robot will brake in place, holding its position against external forces. 
-        driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
         driverController.y().toggleOnTrue(forceOuttake());
+        // Wiggles the intake up and down to free up stuck balls
+        driverController.x().toggleOnTrue(intake.wiggleIntake());
+        // Toggle manual override (on driver A for testing without controller)
+        // driverController.a().onTrue(toggleManualOverride());
 
-          /////////////////////////
-         /// OPERATOR COMMANDS ///
-        /////////////////////////
+
+          //////////////////////////////////////////////////
+         ///            OPERATOR COMMANDS               ///
+        //////////////////////////////////////////////////
         
         // Toggle manual override with both sticks to prevent accidental activation during teleop.
         operatorController.leftStick().and(operatorController.rightStick()).onTrue(toggleManualOverride()); // Toggle manual override with both sticks
@@ -181,10 +186,11 @@ public class RobotContainer {
         // allowing the operator to control the turret without interference from vision tracking.
        turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative().alongWith(flywheel.setDynamicVelocity()).alongWith(hood.setDynamicHoodAngle()));  
                
+        
+          /////////////////////////
+         /// MANUAL FLYWHEEL /////
         // Only enable manual control of turret, hood and flywheel when manual override is enabled
         // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
-        /////////////////////////
-         /// MANUAL FLYWHEEL ///
         operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
         operatorController.povUpRight().toggleOnTrue(turret.setAngle(Degrees.of(-5)));
         operatorController.povRight().whileTrue(turret.setAngle(Degrees.of(40)));
@@ -194,38 +200,31 @@ public class RobotContainer {
         operatorController.povLeft().whileTrue(turret.setAngle(Degrees.of(220)));
         operatorController.povUpLeft().toggleOnTrue(turret.setAngle(Degrees.of(265)));
         
-        // /////////////////////////
-         /// MANUAl FLYWHEEL ///
+          ///////////////////////////
+         /// MANUAl FLYWHEEL ///////
         // Set the flywheel to preset velocities based on the bumpers and triggers of the Operator controller.
-        operatorController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(5800)));
-        operatorController.rightBumper().toggleOnTrue(flywheel.setVelocity(RPM.of(3600)));
+        operatorController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4800)));
+        operatorController.rightBumper().toggleOnTrue(flywheel.setVelocity(RPM.of(2800)));
 
-        // Set the hood to preset angles based on the bumpers and triggers of the Operator controller.
-        // TODO: decide on preset angles for this instead of directly running the motor.
-        //////////////////////////
-         /// MANUAL HOOD ///
-        operatorController.leftTrigger().toggleOnTrue(hood.set(0.1));
-        operatorController.leftBumper().toggleOnTrue(hood.set(-0.1));
-       // Deploy and retract the intake with the A and Y buttons, but only when the back button is held to prevent accidental activation during teleop.
-        /////////////////////////
-         /// INTAKE COMMANDS ///
+        
+          //////////////////////////
+         /// MANUAL HOOD //////////
+         // Set the hood to preset angles based on the bumpers and triggers of the Operator controller.
+        operatorController.leftTrigger().toggleOnTrue(hood.setAngle(Degrees.of(45)));
+        operatorController.leftBumper().toggleOnTrue(hood.setAngle(Degrees.of(60)));
+       
+          /////////////////////////
+         /// INTAKE COMMANDS /////
+         // Deploy and retract the intake with the A and Y buttons, but only when the back button is held to prevent accidental activation during teleop. 
         operatorController.a().and(operatorController.back()).toggleOnTrue(intake.deployIntake());
         operatorController.y().and(operatorController.back()).toggleOnTrue(intake.retractIntake());
 
-        //intakeDeployTrigger.onTrue(intake.deployIntake()).onFalse(intake.retractIntake()); //TODO: decide on a button for this
-        
-        driverController.x().toggleOnTrue(intake.wiggleIntake());
-        // Enables dynamic control of the flywheel and hood.
-        driverController.a().toggleOnTrue(flywheel.setDynamicVelocity().alongWith(hood.setDynamicHoodAngle()));
-
     } 
 
-    // Old trigger-based precision mode that scales speed based on how much the right trigger is pressed. 
-    // Replaced by button-based toggle due to lack of available triggers.
-    // public double modifySpeed(final double speed) {
-    //     final var modifier = 1 - driverController.getRightTriggerAxis() * ModifierConstants.PRECISION_DRIVE_MODIFIER;
-    //     return speed * modifier;
-    // }
+
+          //////////////////////////////////////////////////
+         ///            HELPER FUNCTIONS                ///
+        //////////////////////////////////////////////////
 
     // If the A button is held, apply the precision modifier of 0.5x speed.
     public double modifySpeed(final double speed) {
@@ -234,7 +233,13 @@ public class RobotContainer {
         } else {
             return speed;
         }
-    }
+    } 
+    // Old trigger-based precision mode that scales speed based on how much the right trigger is pressed. 
+    // Replaced by button-based toggle due to lack of available triggers.
+    // public double modifySpeed(final double speed) {
+    //     final var modifier = 1 - driverController.getRightTriggerAxis() * ModifierConstants.PRECISION_DRIVE_MODIFIER;
+    //     return speed * modifier;
+    // }
 
     public boolean isHubActive() {
         Optional<Alliance> alliance = DriverStation.getAlliance();
