@@ -148,7 +148,8 @@ public class RobotContainer {
         driverController.start().and(driverController.back()).onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
         
 
-        // INTAKE AND SHOOTING
+        /////////////////////////
+         /// INTAKE UPTAKE HOPPER ///
         // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's preference.
         if(ModifierConstants.MAYA_MODE) {
             // Shooting on left trigger, intake on right trigger
@@ -182,7 +183,8 @@ public class RobotContainer {
                
         // Only enable manual control of turret, hood and flywheel when manual override is enabled
         // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
-        // MANUAL TURRET
+        /////////////////////////
+         /// MANUAL FLYWHEEL ///
         operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
         operatorController.povUpRight().toggleOnTrue(turret.setAngle(Degrees.of(-5)));
         operatorController.povRight().whileTrue(turret.setAngle(Degrees.of(40)));
@@ -192,18 +194,21 @@ public class RobotContainer {
         operatorController.povLeft().whileTrue(turret.setAngle(Degrees.of(220)));
         operatorController.povUpLeft().toggleOnTrue(turret.setAngle(Degrees.of(265)));
         
-        // MANUAL FLYWHEEL
+        // /////////////////////////
+         /// MANUAl FLYWHEEL ///
         // Set the flywheel to preset velocities based on the bumpers and triggers of the Operator controller.
         operatorController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(5800)));
         operatorController.rightBumper().toggleOnTrue(flywheel.setVelocity(RPM.of(3600)));
 
         // Set the hood to preset angles based on the bumpers and triggers of the Operator controller.
         // TODO: decide on preset angles for this instead of directly running the motor.
-        // MANUAL HOOD
+        //////////////////////////
+         /// MANUAL HOOD ///
         operatorController.leftTrigger().toggleOnTrue(hood.set(0.1));
         operatorController.leftBumper().toggleOnTrue(hood.set(-0.1));
        // Deploy and retract the intake with the A and Y buttons, but only when the back button is held to prevent accidental activation during teleop.
-        //INTAKE
+        /////////////////////////
+         /// INTAKE COMMANDS ///
         operatorController.a().and(operatorController.back()).toggleOnTrue(intake.deployIntake());
         operatorController.y().and(operatorController.back()).toggleOnTrue(intake.retractIntake());
 
