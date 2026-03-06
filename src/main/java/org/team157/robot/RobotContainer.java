@@ -89,6 +89,8 @@ public class RobotContainer {
 
         autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier("New Auto", 
         stream -> stream.map(path -> new PathPlannerAuto(path.getName(), true)));
+        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier("New Auto", 
+        stream -> stream.map(path -> new PathPlannerAuto(path.getName(), true)));
                 SmartDashboard.putData("Auto Chooser", autoChooser);
         updateAutos.onTrue(modifyAutos(true)).onFalse(modifyAutos(false));
         SmartDashboard.putBoolean("is left?", false);
