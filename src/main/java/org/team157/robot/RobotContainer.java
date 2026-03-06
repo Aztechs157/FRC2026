@@ -12,6 +12,8 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.auto.NamedCommands;
+
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -73,6 +75,9 @@ public class RobotContainer {
     
     public final Trigger updateAutos = new Trigger(()->SmartDashboard.getBoolean("is left?", false));
     public RobotContainer() {
+
+        NamedCommands.registerCommand("DeployIntake", intake.deployIntake());
+
          // Adjusts drive speed based on if the robot is in rookie/demo mode.
         if (ModifierConstants.DEMO_MODE) {
             MaxSpeed = MaxSpeed * ModifierConstants.DEMO_DRIVE_MODIFIER;
