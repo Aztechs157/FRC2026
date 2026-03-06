@@ -9,8 +9,10 @@ import static edu.wpi.first.units.Units.*;
 import java.util.Optional;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.fasterxml.jackson.databind.util.Named;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -79,6 +81,11 @@ public class RobotContainer {
 
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
         turret = new TurretSystem(visionSystem);
+
+        NamedCommands.registerCommand("DeployIntake", intake.deployIntake());
+        NamedCommands.registerCommand("RunIntake", intake.runIntake());
+        NamedCommands.registerCommand("RunHopper", hopper.setRoller(0.5));
+        NamedCommands.registerCommand("ShootBalls", uptake.setRoller(1));
 
         configureBindings();
 
