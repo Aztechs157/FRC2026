@@ -188,6 +188,7 @@ public class HoodSystem extends SubsystemBase {
     SmartDashboard.putNumber("Scaled Hood Pos", getScaledPos());
     SmartDashboard.putNumber("Hood Angle (Encoder)", getScaledPosAngleEncoder());
   }
+    SmartDashboard.putNumber("Hood Angle (YAMS)", getScaledPosAngleYAMS());
     hood.updateTelemetry();
   }
 

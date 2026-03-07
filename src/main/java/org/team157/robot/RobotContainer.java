@@ -158,26 +158,27 @@ public class RobotContainer {
         ////////////////////////////
         ///     FlYWHEEL HOOD   ///
         // Enables dynamic control of the flywheel and hood.
-        driverController.a().toggleOnTrue(flywheel.setDynamicVelocity().alongWith(hood.setDynamicHoodAngle()));
+        driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
+        driverController.a().toggleOnTrue(hood.setDynamicHoodAngle());
 
           ////////////////////////////
          /// INTAKE UPTAKE HOPPER ///
         // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's preference.
         if(ModifierConstants.MAYA_MODE) {
             // Shooting on left trigger, intake on right trigger
-            driverController.leftTrigger().toggleOnTrue(uptake.setRoller(1));
-            driverController.rightTrigger().toggleOnTrue(intake.runIntake());
-            driverController.leftTrigger().toggleOnTrue(hopper.setRoller(0.5));
+            driverController.leftTrigger().whileTrue(uptake.setRoller(1));
+            driverController.rightTrigger().whileTrue(intake.runIntake());
+            driverController.leftTrigger().whileTrue(hopper.setRoller(0.5));
         } else {
             // Shooting on right trigger, intake on left trigger
-            driverController.rightTrigger().toggleOnTrue(uptake.setRoller(1));
-            driverController.leftTrigger().toggleOnTrue(intake.runIntake());
-            driverController.rightTrigger().toggleOnTrue(hopper.setRoller(0.5));
+            driverController.rightTrigger().whileTrue(uptake.setRoller(1));
+            driverController.leftTrigger().whileTrue(intake.runIntake());
+            driverController.rightTrigger().whileTrue(hopper.setRoller(0.5));
         }
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
         driverController.y().toggleOnTrue(forceOuttake());
         // Wiggles the intake up and down to free up stuck balls
-        driverController.x().toggleOnTrue(intake.wiggleIntake());
+        driverController.x().toggleOnTrue(intake.wiggleIntake().andThen(intake.runIntake()));
         // Toggle manual override (on driver A for testing without controller)
         // driverController.a().onTrue(toggleManualOverride());
 
@@ -192,7 +193,8 @@ public class RobotContainer {
         // Disables automatic turret tracking when manual override is enabled, 
         // allowing the operator to control the turret without interference from vision tracking.
        turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());;  
-       turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity().alongWith(hood.setDynamicHoodAngle()));        
+       turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
+       turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());        
           /////////////////////////
          /// MANUAL FLYWHEEL /////
         // Only enable manual control of turret, hood and flywheel when manual override is enabled

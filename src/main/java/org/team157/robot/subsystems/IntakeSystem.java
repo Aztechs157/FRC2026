@@ -167,7 +167,7 @@ public class IntakeSystem extends SubsystemBase {
 
   /** Quickly moves the intake upd and down to agitate fuel. */
   public Command wiggleIntake() {
-    return setAngleThenStop(Degrees.of(20)).andThen(setAngleThenStop(Degrees.of(0)));
+    return setAngleThenStop(Degrees.of(40)).andThen(setAngleThenStop(Degrees.of(0)));
   }
 
   /**
