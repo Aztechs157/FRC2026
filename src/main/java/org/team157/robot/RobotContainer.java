@@ -86,6 +86,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("RunIntake", intake.runIntake());
         NamedCommands.registerCommand("RunHopper", hopper.setRoller(0.5));
         NamedCommands.registerCommand("ShootBalls", uptake.setRoller(1));
+        NamedCommands.registerCommand("Wiggle", intake.wiggleIntake());
 
         configureBindings();
 
@@ -176,7 +177,7 @@ public class RobotContainer {
             driverController.rightTrigger().whileTrue(hopper.setRoller(0.5));
         }
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
-        driverController.y().toggleOnTrue(forceOuttake());
+        driverController.y().whileTrue(forceOuttake());
         // Wiggles the intake up and down to free up stuck balls
         driverController.x().toggleOnTrue(intake.wiggleIntake().andThen(intake.runIntake()));
         // Toggle manual override (on driver A for testing without controller)
