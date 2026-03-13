@@ -127,6 +127,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Manual Override", RobotContainer.manualOverride);
     // Gets the match time from the FMS to display for the driver.
     SmartDashboard.putNumber("Match Time", Timer.getMatchTime());
+    // Gets hub activity status to display on the dashboard.
+    SmartDashboard.putBoolean("Hub Active?", m_robotContainer.isHubActive());
 
   }
 
@@ -172,7 +174,6 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-       SmartDashboard.putBoolean("Hub Active?", m_robotContainer.isHubActive());
 
   }
 
