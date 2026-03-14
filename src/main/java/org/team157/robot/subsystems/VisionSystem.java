@@ -54,7 +54,6 @@ import yams.mechanisms.swerve.SwerveDrive;
 
 import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.ModelConstants;
-import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.Constants.VisionConstants;
 import org.team157.robot.Robot;
 
@@ -377,7 +376,7 @@ public class VisionSystem extends SubsystemBase {
       distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, targetPose);
       distanceToTargetFromTurret = PhotonUtils.getDistanceToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), targetPose);
 
-      // TODO: Continue work on implementation of momentum-based velocity calculation on new branch.
+  
       // lastDistanceToTarget = distanceToTarget;
       // lastTrackedTime = NetworkTablesJNI.now();
       angleToTarget = PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();

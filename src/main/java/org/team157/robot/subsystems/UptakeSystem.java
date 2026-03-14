@@ -13,7 +13,6 @@ import org.team157.robot.Constants.TelemetryConstants;
 import org.team157.robot.Constants.UptakeConstants;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,32 +23,31 @@ import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
-import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class UptakeSystem extends SubsystemBase {
-    //////////////////////
-   /// UPTAKE ROLLER ///
+  //////////////////////
+  /// UPTAKE ROLLER ///
   /////////////////////
-  private TalonFX rollerMotor  = new TalonFX(UptakeConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
+  private TalonFX rollerMotor = new TalonFX(UptakeConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
 
   private SmartMotorControllerConfig uptakeRollerMotorConfig = new SmartMotorControllerConfig(this)
-    .withControlMode(ControlMode.OPEN_LOOP)
-    .withTelemetry("UptakeRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
-    .withGearing(1)
-    .withMotorInverted(false)
-    .withIdleMode(MotorMode.COAST)
-    .withStatorCurrentLimit((UptakeConstants.CURRENT_LIMIT))
-    .withGearing(UptakeConstants.GEARING);
-
+      .withControlMode(ControlMode.OPEN_LOOP)
+      .withTelemetry("UptakeRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
+      .withGearing(1)
+      .withMotorInverted(false)
+      .withIdleMode(MotorMode.COAST)
+      .withStatorCurrentLimit((UptakeConstants.CURRENT_LIMIT))
+      .withGearing(UptakeConstants.GEARING);
 
   // vendor motor controller object
-  private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX44(1), uptakeRollerMotorConfig);
+  private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX44(1),
+      uptakeRollerMotorConfig);
 
   private final FlyWheelConfig uptakeRollerConfig = new FlyWheelConfig(smartRollerMotor)
-  .withTelemetry("Uptake", TelemetryConstants.TELEMETRY_VERBOSITY)
-  .withMass(Kilograms.of(0.5)) //TODO: measure mass of the uptake roller and update this constant
-  .withDiameter(Inches.of(2));
+      .withTelemetry("Uptake", TelemetryConstants.TELEMETRY_VERBOSITY)
+      .withMass(Kilograms.of(0.5))
+      .withDiameter(Inches.of(2));
 
   // flywheel mechanism
   private FlyWheel uptakeRollers = new FlyWheel(uptakeRollerConfig);
@@ -66,7 +64,7 @@ public class UptakeSystem extends SubsystemBase {
 
   /** Creates a new UptakeSystem */
   public UptakeSystem() {
-    
+
   }
 
   public double getRollerVelocity() {
@@ -85,13 +83,15 @@ public class UptakeSystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     // Send values to NT to display on Elastic.
-    /*  TODO: look into SmartDashboard alternatives, as it's deprecated, 
-     *  marked for removal along with Shuffleboard for next season.
-     *  Consider publishing to NT directly.
+    /*
+     * TODO: look into SmartDashboard alternatives, as it's deprecated,
+     * marked for removal along with Shuffleboard for next season.
+     * Consider publishing to NT directly.
      */
     uptakeRollers.updateTelemetry();
     SmartDashboard.putNumber("Uptake Roller Velocity", getRollerVelocity());
-    SmartDashboard.putBoolean("Uptake Running", getRollerVelocity() > 10); // Arbitrary threshold to determine if the uptake is running.
+    SmartDashboard.putBoolean("Uptake Running", getRollerVelocity() > 10); // Arbitrary threshold to determine if the
+                                                                           // uptake is running.
   }
 
 }

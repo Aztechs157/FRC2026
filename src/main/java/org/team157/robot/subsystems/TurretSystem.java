@@ -57,12 +57,14 @@ public class TurretSystem extends SubsystemBase {
   // Configure the turret motor controller for use with YAMS.
   private SmartMotorControllerConfig turretMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)
-      .withSimClosedLoopController(TurretConstants.SIM_KP, TurretConstants.SIM_KI, TurretConstants.SIM_KD, TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)  
+      .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD,
+          TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)
+      .withSimClosedLoopController(TurretConstants.SIM_KP, TurretConstants.SIM_KI, TurretConstants.SIM_KD,
+          TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(true)
       .withGearing(TurretConstants.GEARING)
-      .withTelemetry("Turret Motor", TelemetryConstants.TELEMETRY_VERBOSITY) 
+      .withTelemetry("Turret Motor", TelemetryConstants.TELEMETRY_VERBOSITY)
       .withStatorCurrentLimit((TurretConstants.CURRENT_LIMIT))
       .withClosedLoopRampRate((TurretConstants.RAMP_RATE))
       .withSoftLimit((TurretConstants.LOWER_SOFT_LIMIT), (TurretConstants.UPPER_SOFT_LIMIT));
@@ -84,48 +86,51 @@ public class TurretSystem extends SubsystemBase {
   public TurretSystem(VisionSystem visionSystem) {
     this.visionSystem = visionSystem;
     var configurator = motor.getConfigurator();
-    configurator.refresh(new SoftwareLimitSwitchConfigs().withForwardSoftLimitEnable(true).withReverseSoftLimitEnable(true));
+    configurator
+        .refresh(new SoftwareLimitSwitchConfigs().withForwardSoftLimitEnable(true).withReverseSoftLimitEnable(true));
     configurator.refresh(new ClosedLoopGeneralConfigs().withContinuousWrap(false));
   }
-  
-     //////////////////////
-   /// TURRET COMMANDS ///
+
   //////////////////////
-  
+  /// TURRET COMMANDS ///
+  //////////////////////
+
   public Command setDefault() {
     return run(() -> set(0));
   }
 
   /**
    * Set the target angle of the turret.
+   * 
    * @param angle Angle to go to.
    */
-  public Command setAngle(Angle angle) { 
+  public Command setAngle(Angle angle) {
     return turret.setAngle(angle);
   }
-  
+
   public Command setAngleManualOverride(Angle angle) {
-    if(RobotContainer.manualOverride){
+    if (RobotContainer.manualOverride) {
       return turret.setAngle(angle);
     } else {
       return Commands.none();
     }
   }
 
-    /**
+  /**
    * Set the target angle of the turret.
+   * 
    * @param angle A supplier to obtain the desired angle to go to.
    */
-  public Command setAngle(Supplier<Angle> angle) { 
+  public Command setAngle(Supplier<Angle> angle) {
     return turret.setAngle(angle);
   }
 
-  
   /**
    * Move the arm up and down.
+   * 
    * @param dutycycle [-1, 1] speed to set the arm too.
    */
-  public Command set(double dutycycle) { 
+  public Command set(double dutycycle) {
     return turret.set(dutycycle);
   }
 
@@ -133,12 +138,15 @@ public class TurretSystem extends SubsystemBase {
    * Run sysId on the {@link TurretSystem}.
    * To be used for tuning
    */
-  public Command sysId() { 
+  public Command sysId() {
     return turret.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
   }
+
   /**
    * Track the hub tag using the turret's camera.
-   * @return Command either setting the turret angle to face the tag, or setting the turret power to 0 if the tag isn't present.
+   * 
+   * @return Command either setting the turret angle to face the tag, or setting
+   *         the turret power to 0 if the tag isn't present.
    */
   public Command trackHubTag() {
     return turret.setAngle(this::getAngleToHubFaceTag);
@@ -148,13 +156,14 @@ public class TurretSystem extends SubsystemBase {
     return turret.setAngle(this::getTrackingAngle);
   }
 
-     /////////////////////
-   /// TURRET METHODS ///
+  /////////////////////
+  /// TURRET METHODS ///
   /////////////////////
 
   /**
    * Set the duty cycle output of the turret motor.
    * Primarily used for manual control
+   * 
    * @param power The power to be applied to the motor.
    */
   public void runMotor(double power) {
@@ -163,6 +172,7 @@ public class TurretSystem extends SubsystemBase {
 
   /**
    * Get the raw position of the turret's encoder.
+   * 
    * @return The current position of the turret in encoder rotations.
    */
   public double getPos() {
@@ -175,6 +185,7 @@ public class TurretSystem extends SubsystemBase {
 
   /**
    * Get the scaled position of the turret from 0 to 1.
+   * 
    * @return The position of the turret scaled from 0 to 1.
    */
   public double getScaledPos() {
@@ -184,21 +195,28 @@ public class TurretSystem extends SubsystemBase {
 
   /**
    * Get the current angle of the turret, based on the YAMS pivot system.
-   * @return The angle of the turret, in degrees, from -180 to 180, using the YAMS pivot system.
+   * 
+   * @return The angle of the turret, in degrees, from -180 to 180, using the YAMS
+   *         pivot system.
    */
   public double getScaledPosAngleYAMS() {
     return turret.getAngle().in(Degrees);
   }
+
   /**
    * Get the current angle of the turret, directly from the encoder value.
-   * @return The angle of the turret, in degrees, from -135 to 135, using the encoder directly.
+   * 
+   * @return The angle of the turret, in degrees, from -135 to 135, using the
+   *         encoder directly.
    */
   public double getScaledPosAngleEncoder() {
-    return PosUtils.mapRange(getPos(), TurretConstants.MIN_ENCODER_POSITION, TurretConstants.MAX_ENCODER_POSITION, TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
+    return PosUtils.mapRange(getPos(), TurretConstants.MIN_ENCODER_POSITION, TurretConstants.MAX_ENCODER_POSITION,
+        TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
   }
 
   /**
    * Get the current velocity of the turret.
+   * 
    * @return The velocity of the turret, in degrees per second.
    */
   public double getVelocity() {
@@ -207,14 +225,15 @@ public class TurretSystem extends SubsystemBase {
 
   /**
    * Calculate the angle the turret needs to turn to face the target tag.
+   * 
    * @return The angle the turret needs to rotate to to face the target tag.
    */
-  public Angle getAngleToHubFaceTag(){
+  public Angle getAngleToHubFaceTag() {
     // The current angular offset of the tag, relative to the turret camera.
     double tagYaw = visionSystem.getHubTagYawFromTurretCam();
     SmartDashboard.putNumber("Target Yaw", tagYaw);
     // if the target tag is seen, at an arbitrary number indicating no target,
-    if(tagYaw != 157357){
+    if (tagYaw != 157357) {
       // Subtract the camera-to-tag angle from the turret angle
       // to find our new setpoint angle to face the tag.
       double finalAngle = getScaledPosAngleYAMS() - tagYaw;
@@ -227,21 +246,22 @@ public class TurretSystem extends SubsystemBase {
 
   /**
    * Calculate the angle the turret needs to turn to face the target tag.
+   * 
    * @return The angle the turret needs to rotate to to face the target tag.
    */
-  public void updateRelativeAngleToTag(int tagID, Pose2d robotPose){
+  public void updateRelativeAngleToTag(int tagID, Pose2d robotPose) {
     // The current angular offset of the tag, relative to the turret camera.
     visionSystem.setTargetParams(tagID, robotPose);
     double turretToRobotAngleOffset = VisionSystem.angleToTargetFromTurret + TurretConstants.TURRET_ANGLE_OFFSET;
-    if(Robot.isReal()){
-      if(turretToRobotAngleOffset > 180) {
+    if (Robot.isReal()) {
+      if (turretToRobotAngleOffset > 180) {
         turretToRobotAngleOffset = turretToRobotAngleOffset - 360;
       }
 
-      if(turretToRobotAngleOffset < -180) {
+      if (turretToRobotAngleOffset < -180) {
         turretToRobotAngleOffset = turretToRobotAngleOffset + 360;
       }
-    
+
       trackingAngle = Degrees.of(turretToRobotAngleOffset);
     } else {
       // Disable turret offset in simulation, as simulated 0 is forward.
@@ -251,21 +271,22 @@ public class TurretSystem extends SubsystemBase {
 
   /**
    * Calculate the angle the turret needs to turn to face the target tag.
+   * 
    * @return The angle the turret needs to rotate to to face the target tag.
    */
-  public void updateRelativeAngleToTag(Pose2d targetPose, Pose2d robotPose){
+  public void updateRelativeAngleToTag(Pose2d targetPose, Pose2d robotPose) {
     // The current angular offset of the tag, relative to the turret camera.
     visionSystem.setTargetParams(targetPose, robotPose);
     double turretToRobotAngleOffset = VisionSystem.angleToTargetFromTurret + TurretConstants.TURRET_ANGLE_OFFSET;
-    if(Robot.isReal()){
-      if(turretToRobotAngleOffset > 180) {
+    if (Robot.isReal()) {
+      if (turretToRobotAngleOffset > 180) {
         turretToRobotAngleOffset = turretToRobotAngleOffset - 360;
       }
 
-      if(turretToRobotAngleOffset < -180) {
+      if (turretToRobotAngleOffset < -180) {
         turretToRobotAngleOffset = turretToRobotAngleOffset + 360;
       }
-    
+
       trackingAngle = Degrees.of(turretToRobotAngleOffset);
     } else {
       // Disable turret offset in simulation, as simulated 0 is forward.
@@ -273,20 +294,20 @@ public class TurretSystem extends SubsystemBase {
     }
   }
 
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     // Send values to NT to display on Elastic.
-    /*  TODO: look into SmartDashboard alternatives, as it's deprecated, 
-     *  marked for removal along with Shuffleboard for next season.
-     *  Consider publishing to NT directly.
+    /*
+     * TODO: look into SmartDashboard alternatives, as it's deprecated,
+     * marked for removal along with Shuffleboard for next season.
+     * Consider publishing to NT directly.
      */
-     if(TelemetryConstants.TELEMETRY_VERBOSITY == TelemetryVerbosity.HIGH) {
+    if (TelemetryConstants.TELEMETRY_VERBOSITY == TelemetryVerbosity.HIGH) {
       SmartDashboard.putNumber("Turret Pos", getPos());
       SmartDashboard.putNumber("Scaled Turret Pos", getScaledPos());
       SmartDashboard.putNumber("Turret Angle (Encoder)", getScaledPosAngleEncoder());
-  }
+    }
     SmartDashboard.putNumber("Turret Angle", getScaledPosAngleYAMS());
     SmartDashboard.putNumber("where me going", trackingAngle.magnitude());
     turret.updateTelemetry();
@@ -300,17 +321,20 @@ public class TurretSystem extends SubsystemBase {
   }
 
   public Pose3d getBasePose() {
-    return new Pose3d(ModelConstants.ORIGIN_TO_TURRET_BASE_OFFSET, new Rotation3d(0, 0, Math.toRadians(getScaledPosAngleYAMS())));
+    return new Pose3d(ModelConstants.ORIGIN_TO_TURRET_BASE_OFFSET,
+        new Rotation3d(0, 0, Math.toRadians(getScaledPosAngleYAMS())));
   }
 
   public Transform3d getHoodPivotLocation() {
-    return new Transform3d(0.1245 * Math.cos(Math.toRadians(getScaledPosAngleYAMS())), 0.1245 * Math.sin(Math.toRadians(getScaledPosAngleYAMS())), 0.070, new Rotation3d(0, 0, Math.toRadians(getScaledPosAngleYAMS())));
+    return new Transform3d(0.1245 * Math.cos(Math.toRadians(getScaledPosAngleYAMS())),
+        0.1245 * Math.sin(Math.toRadians(getScaledPosAngleYAMS())), 0.070,
+        new Rotation3d(0, 0, Math.toRadians(getScaledPosAngleYAMS())));
   }
 
   public Pose3d getHoodPivotPose(Transform3d rotation) {
     return new Pose3d(ModelConstants.ORIGIN_TO_TURRET_BASE_OFFSET, new Rotation3d())
-    .transformBy(getHoodPivotLocation())
-    .transformBy(rotation);
+        .transformBy(getHoodPivotLocation())
+        .transformBy(rotation);
 
   }
 }
