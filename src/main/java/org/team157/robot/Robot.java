@@ -6,6 +6,7 @@ package org.team157.robot;
 
 import java.util.Optional;
 
+import org.littletonrobotics.junction.LoggedRobot;
 import org.team157.robot.Constants.VisionConstants;
 
 import com.ctre.phoenix6.HootAutoReplay;
@@ -22,7 +23,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,7 +34,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the TimedRobot documentation. If you change the name of this class or the package after creating
  * this project, you must also update the Main.java file in the project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private String autoName, newAutoName;
   private Optional<Alliance> alliance, newAlliance;
   private Command m_autonomousCommand;
