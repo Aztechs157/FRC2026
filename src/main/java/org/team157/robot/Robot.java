@@ -35,8 +35,7 @@ public class Robot extends TimedRobot {
   private Optional<Alliance> alliance, newAlliance;
   private Command m_autonomousCommand;
 
-  public static Pose3d[] zeroArray = new Pose3d[4]; // TODO: make 5 poses and make climber getter once climber system
-                                                    // exists
+  public static Pose3d[] zeroArray = new Pose3d[4];
   public static Pose3d[] finalArray = new Pose3d[4];
   public static Pose3d[] cameras = new Pose3d[3];
   // creates a publisher to send zeroed Pose3d values to NT for model calibration.
