@@ -119,7 +119,7 @@ public class FlywheelSystem extends SubsystemBase {
 
     ballVelocity = velocity;
     hoodAngle = Radians.of(theta);
-    ballTimeOfFlight = (velocity * Math.sin(theta) + Math.sqrt(Math.pow(velocity * Math.sin(theta),2) - 2 * 9.81 * (height - FlywheelConstants.HEIGHT.magnitude()))) / 9.81;
+    ballTimeOfFlight = (velocity * Math.sin(theta) - Math.sqrt(Math.pow(velocity * Math.sin(theta),2) - 2 * 9.81 * (height - FlywheelConstants.HEIGHT.magnitude()))) / 9.81;
 
     SmartDashboard.putNumber("Hood Angle", Math.toDegrees(hoodAngle.magnitude()));
   }
