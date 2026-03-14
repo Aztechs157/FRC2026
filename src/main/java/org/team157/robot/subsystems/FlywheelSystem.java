@@ -41,6 +41,7 @@ public class FlywheelSystem extends SubsystemBase {
   private TalonFX motor_follower = new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_ID, Constants.RIO_CAN_BUS);
   public static double ballVelocity = 0; // Meters per second for the ball to be launched
   public static Angle hoodAngle = Radians.of(0);
+  public static double ballTimeOfFlight = 0;
 
   private SmartMotorControllerConfig flywheelSystemConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.CLOSED_LOOP)
@@ -118,6 +119,8 @@ public class FlywheelSystem extends SubsystemBase {
 
     ballVelocity = velocity;
     hoodAngle = Radians.of(theta);
+    ballTimeOfFlight = (velocity * Math.sin(theta) + Math.sqrt(Math.pow(velocity * Math.sin(theta),2) - 2 * 9.81 * (height - FlywheelConstants.HEIGHT.magnitude()))) / 9.81;
+
     SmartDashboard.putNumber("Hood Angle", Math.toDegrees(hoodAngle.magnitude()));
   }
 
@@ -169,6 +172,10 @@ public class FlywheelSystem extends SubsystemBase {
 
   public static Angle getDesiredHoodAngle() {
     return Degrees.of(Math.toDegrees(hoodAngle.magnitude()));
+  }
+
+  public static double getBallTimeOfFlight() {
+    return ballTimeOfFlight;
   }
 
   public Command setDynamicVelocity () {
