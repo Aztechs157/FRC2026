@@ -33,6 +33,7 @@ import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class FlywheelSystem extends SubsystemBase {
@@ -45,7 +46,7 @@ public class FlywheelSystem extends SubsystemBase {
   private SmartMotorControllerConfig flywheelSystemConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
       .withClosedLoopController(FlywheelConstants.KP, FlywheelConstants.KI, FlywheelConstants.KD,
-          FlywheelConstants.ANGULAR_VELOCITY, FlywheelConstants.ANGULAR_ACCELERATION) // TODO: move to constants
+          FlywheelConstants.ANGULAR_VELOCITY, FlywheelConstants.ANGULAR_ACCELERATION)
       .withFeedforward(new SimpleMotorFeedforward(FlywheelConstants.KS, FlywheelConstants.KV, FlywheelConstants.KA))
       .withSimClosedLoopController(FlywheelConstants.SIM_KP, FlywheelConstants.SIM_KI, FlywheelConstants.SIM_KD,
           FlywheelConstants.ANGULAR_VELOCITY, FlywheelConstants.ANGULAR_ACCELERATION)
@@ -85,6 +86,9 @@ public class FlywheelSystem extends SubsystemBase {
     return flywheel.getSpeed();
   }
 
+  ///////////////////////////////////////////
+  /////// DYNAMIC VELOCITY CALCULATION //////
+  ///////////////////////////////////////////
   // Function to minimize (all parameters in metric units: meters, meters/second,
   // radians)
   // Calculates required ball velocity (m/s) for given distance, height, and
@@ -126,8 +130,6 @@ public class FlywheelSystem extends SubsystemBase {
     hoodAngle = Radians.of(theta);
     SmartDashboard.putNumber("Hood Angle", Math.toDegrees(hoodAngle.magnitude()));
   }
-
-
 
   public AngularVelocity getDesiredFlywheelVelocity() {
     double heightMeters = FieldConstants.positionDetails.getTargetHeight();
@@ -190,13 +192,14 @@ public class FlywheelSystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-
-    SmartDashboard.putNumber("Distance to Target", VisionSystem.distanceToTargetFromTurret);
-    SmartDashboard.putNumber("Target Height", FieldConstants.positionDetails.getTargetHeight());
-    SmartDashboard.putNumber("Ball Velocity (m/s)", ballVelocity);
-    SmartDashboard.putBoolean("Ball Velocity is NaN", Double.isNaN(ballVelocity));
-    SmartDashboard.putNumber("Flywheel RPM", getVelocity().in(RPM));
-    SmartDashboard.putNumber("Desired Flywheel Velocity", getDesiredFlywheelVelocity().in(RPM));
+    if (TelemetryConstants.TELEMETRY_VERBOSITY == TelemetryVerbosity.HIGH) {
+      SmartDashboard.putNumber("Distance to Target", VisionSystem.distanceToTargetFromTurret);
+      SmartDashboard.putNumber("Target Height", FieldConstants.positionDetails.getTargetHeight());
+      SmartDashboard.putNumber("Ball Velocity (m/s)", ballVelocity);
+      SmartDashboard.putBoolean("Ball Velocity is NaN", Double.isNaN(ballVelocity));
+      SmartDashboard.putNumber("Flywheel RPM", getVelocity().in(RPM));
+      SmartDashboard.putNumber("Desired Flywheel Velocity", getDesiredFlywheelVelocity().in(RPM));
+    }
     flywheel.updateTelemetry();
   }
 

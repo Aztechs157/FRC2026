@@ -4,8 +4,6 @@
 
 package org.team157.robot;
 
-import java.util.Optional;
-
 import com.ctre.phoenix6.HootAutoReplay;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -15,7 +13,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -31,8 +28,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
-  private String autoName, newAutoName;
-  private Optional<Alliance> alliance, newAlliance;
+
   private Command m_autonomousCommand;
 
   public static Pose3d[] zeroArray = new Pose3d[4];

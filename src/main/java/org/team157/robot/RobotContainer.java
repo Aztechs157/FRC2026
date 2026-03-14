@@ -139,16 +139,16 @@ public class RobotContainer {
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() -> drive
                         .withVelocityX(MathUtil.applyDeadband(-driverController.getLeftY(),
-                                ControllerConstants.LEFT_Y_DEADBAND) * modifySpeed(MaxSpeed)) // Drive forward with
-                                                                                              // negative Y
+                                ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxSpeed)) // Drive forward with
+                                                                                                // negative Y
                         // (forward)
                         .withVelocityY(MathUtil.applyDeadband(-driverController.getLeftX(),
-                                ControllerConstants.LEFT_X_DEADBAND) * modifySpeed(MaxSpeed)) // Drive left with
-                                                                                              // negative X (left)
+                                ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxSpeed)) // Drive left with
+                                                                                                // negative X (left)
                         .withRotationalRate(MathUtil.applyDeadband(-driverController.getRightX(),
-                                ControllerConstants.RIGHT_X_DEADBAND) * modifySpeed(MaxAngularRate)) // Drive
-                                                                                                     // counterclockwise
-                                                                                                     // with
+                                ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxAngularRate)) // Drive
+                                                                                                      // counterclockwise
+                                                                                                      // with
                 // negative X (left)
                 ));
 
@@ -160,14 +160,17 @@ public class RobotContainer {
 
         ///////////////////////////
         /// FlYWHEEL HOOD ///
+        //////////////////////////
+
         // Enables dynamic control of the flywheel and hood.
         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
         driverController.a().toggleOnTrue(hood.setDynamicHoodAngle());
 
         ////////////////////////////
         /// INTAKE UPTAKE HOPPER ///
-        // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's
-        //////////////////////////// preference.
+        ////////////////////////////
+
+        // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's preference.
         if (ModifierConstants.MAYA_MODE) {
             // Shooting on left trigger, intake on right trigger
             driverController.leftTrigger().whileTrue(uptake.setRoller(1));
@@ -205,12 +208,13 @@ public class RobotContainer {
         ;
         turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
         turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());
+
         ///////////////////////
         /// MANUAL FLYWHEEL ///
-        // Only enable manual control of turret, hood and flywheel when manual override
-        /////////////////////// is enabled
-        // Set the turret to preset robot-relative angles based on the D-Pad input of
-        /////////////////////// the Operator controller.
+        ///////////////////////
+
+        // Only enable manual control of turret, hood and flywheel when manual override is enabled
+        // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
         operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
         operatorController.povUpRight().toggleOnTrue(turret.setAngle(Degrees.of(-5)));
         operatorController.povRight().whileTrue(turret.setAngle(Degrees.of(40)));
@@ -222,23 +226,25 @@ public class RobotContainer {
 
         ////////////////////////
         /// MANUAl FLYWHEEL ///
-        // Set the flywheel to preset velocities based on the bumpers and triggers of
-        //////////////////////// the Operator controller.
+        ////////////////////////
+        
+        // Set the flywheel to preset velocities based on the bumpers and triggers ofthe Operator controller.
         operatorController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4800)));
         operatorController.rightBumper().toggleOnTrue(flywheel.setVelocity(RPM.of(2800)));
 
         ////////////////////
         /// MANUAL HOOD ///
-        // Set the hood to preset angles based on the bumpers and triggers of the
-        //////////////////// Operator controller.
+        ////////////////////
+
+        // Set the hood to preset angles based on the bumpers and triggers of the Operator controller.
         operatorController.leftTrigger().toggleOnTrue(hood.setAngle(Degrees.of(45)));
         operatorController.leftBumper().toggleOnTrue(hood.setAngle(Degrees.of(60)));
 
         ///////////////////////
         /// INTAKE COMMANDS ///
-        // Deploy and retract the intake with the A and Y buttons, but only when the
-        /////////////////////// back button is held to prevent accidental activation
-        /////////////////////// during teleop.
+        ///////////////////////
+
+        // Deploy and retract the intake with the A and Y buttons, but only when the back button is held to prevent accidental activation during teleop.
         operatorController.a().and(operatorController.back()).toggleOnTrue(intake.deployIntake());
         operatorController.y().and(operatorController.back()).toggleOnTrue(intake.retractIntake());
 

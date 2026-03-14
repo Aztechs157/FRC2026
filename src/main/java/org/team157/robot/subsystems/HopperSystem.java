@@ -69,7 +69,6 @@ public class HopperSystem extends SubsystemBase {
   public Command setDefault() {
     // return setRoller(0).
     return run(() -> {
-      // hopperPivot.setDutyCycleSetpoint(0);
       hopperRollers.setDutyCycleSetpoint(0);
     });
   }
@@ -78,11 +77,6 @@ public class HopperSystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     // Send values to NT to display on Elastic.
-    /*
-     * TODO: look into SmartDashboard alternatives, as it's deprecated,
-     * marked for removal along with Shuffleboard for next season.
-     * Consider publishing to NT directly.
-     */
     hopperRollers.updateTelemetry();
   }
 

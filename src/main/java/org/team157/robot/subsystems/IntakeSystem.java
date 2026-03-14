@@ -183,6 +183,7 @@ public class IntakeSystem extends SubsystemBase {
 
   /**
    * Run sysId on the {@link HoodSystem}.
+   * Base code from YAMS Template
    */
   public Command sysId() {
     return intakePivot.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
@@ -295,9 +296,9 @@ public class IntakeSystem extends SubsystemBase {
       SmartDashboard.putNumber("Intake Pivot Pos", getPos());
       SmartDashboard.putNumber("Scaled Intake Pivot Pos", getScaledPos());
       SmartDashboard.putNumber("Intake Pivot Angle (Encoder)", getScaledPosAngleEncoder());
+      SmartDashboard.putNumber("Intake Roller Velocity", getRollerVelocity().in(RPM));
+      SmartDashboard.putBoolean("Intake Rollers Running", (isIntakeRunning()));
     }
-    SmartDashboard.putNumber("Intake Roller Velocity", getRollerVelocity().in(RPM));
-    SmartDashboard.putBoolean("Intake Rollers Running", (isIntakeRunning()));
 
     intakePivot.updateTelemetry();
   }

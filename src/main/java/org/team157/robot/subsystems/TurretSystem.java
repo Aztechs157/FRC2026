@@ -137,6 +137,7 @@ public class TurretSystem extends SubsystemBase {
   /**
    * Run sysId on the {@link TurretSystem}.
    * To be used for tuning
+   * Default code from YAMS Template
    */
   public Command sysId() {
     return turret.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
@@ -249,32 +250,7 @@ public class TurretSystem extends SubsystemBase {
    * 
    * @return The angle the turret needs to rotate to to face the target tag.
    */
-  public void updateRelativeAngleToTag(int tagID, Pose2d robotPose) {
-    // The current angular offset of the tag, relative to the turret camera.
-    visionSystem.setTargetParams(tagID, robotPose);
-    double turretToRobotAngleOffset = VisionSystem.angleToTargetFromTurret + TurretConstants.TURRET_ANGLE_OFFSET;
-    if (Robot.isReal()) {
-      if (turretToRobotAngleOffset > 180) {
-        turretToRobotAngleOffset = turretToRobotAngleOffset - 360;
-      }
-
-      if (turretToRobotAngleOffset < -180) {
-        turretToRobotAngleOffset = turretToRobotAngleOffset + 360;
-      }
-
-      trackingAngle = Degrees.of(turretToRobotAngleOffset);
-    } else {
-      // Disable turret offset in simulation, as simulated 0 is forward.
-      trackingAngle = Degrees.of(VisionSystem.angleToTargetFromTurret);
-    }
-  }
-
-  /**
-   * Calculate the angle the turret needs to turn to face the target tag.
-   * 
-   * @return The angle the turret needs to rotate to to face the target tag.
-   */
-  public void updateRelativeAngleToTag(Pose2d targetPose, Pose2d robotPose) {
+  public void updateRelativeAngleToTarget(Pose2d targetPose, Pose2d robotPose) {
     // The current angular offset of the tag, relative to the turret camera.
     visionSystem.setTargetParams(targetPose, robotPose);
     double turretToRobotAngleOffset = VisionSystem.angleToTargetFromTurret + TurretConstants.TURRET_ANGLE_OFFSET;
@@ -307,9 +283,10 @@ public class TurretSystem extends SubsystemBase {
       SmartDashboard.putNumber("Turret Pos", getPos());
       SmartDashboard.putNumber("Scaled Turret Pos", getScaledPos());
       SmartDashboard.putNumber("Turret Angle (Encoder)", getScaledPosAngleEncoder());
+      SmartDashboard.putNumber("Turret Angle", getScaledPosAngleYAMS());
+      SmartDashboard.putNumber("where me going", trackingAngle.magnitude());
     }
-    SmartDashboard.putNumber("Turret Angle", getScaledPosAngleYAMS());
-    SmartDashboard.putNumber("where me going", trackingAngle.magnitude());
+
     turret.updateTelemetry();
   }
 

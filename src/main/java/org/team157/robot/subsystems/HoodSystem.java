@@ -54,7 +54,7 @@ public class HoodSystem extends SubsystemBase {
       .withSimClosedLoopController(HoodConstants.SIM_KP, HoodConstants.SIM_KI, HoodConstants.SIM_KD,
           HoodConstants.ANGULAR_VELOCITY, HoodConstants.ANGULAR_ACCELERATION)
       .withIdleMode(MotorMode.BRAKE)
-      .withMotorInverted(false) 
+      .withMotorInverted(false)
       .withGearing(HoodConstants.GEARING)
       .withTelemetry("Hood Motor", TelemetryConstants.TELEMETRY_VERBOSITY)
       .withSoftLimit((HoodConstants.LOWER_SOFT_LIMIT), (HoodConstants.UPPER_SOFT_LIMIT))
@@ -69,8 +69,6 @@ public class HoodSystem extends SubsystemBase {
   private PivotConfig hoodConfig = new PivotConfig(smartHoodMotor)
       .withStartingPosition(Degrees.of(getScaledPosAngleEncoder()))
       .withHardLimit((HoodConstants.LOWER_HARD_LIMIT), (HoodConstants.UPPER_HARD_LIMIT))
-      // .withSoftLimits(Degrees.of(HoodConstants.LOWER_SOFT_LIMIT),
-      // Degrees.of(HoodConstants.UPPER_SOFT_LIMIT))
       .withTelemetry("Hood", TelemetryConstants.TELEMETRY_VERBOSITY)
       .withMOI(Meters.of(0.2), Kilograms.of(0.5));
 
@@ -120,6 +118,7 @@ public class HoodSystem extends SubsystemBase {
 
   /**
    * Run sysId on the {@link HoodSystem}.
+   * Default code from YAMS Template
    */
   public Command sysId() {
     return hood.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
@@ -210,8 +209,9 @@ public class HoodSystem extends SubsystemBase {
       SmartDashboard.putNumber("Hood Pos", getPos());
       SmartDashboard.putNumber("Scaled Hood Pos", getScaledPos());
       SmartDashboard.putNumber("Hood Angle (Encoder)", getScaledPosAngleEncoder());
+      SmartDashboard.putNumber("Hood Angle (YAMS)", getScaledPosAngleYAMS());
     }
-    SmartDashboard.putNumber("Hood Angle (YAMS)", getScaledPosAngleYAMS());
+
     hood.updateTelemetry();
   }
 
@@ -227,3 +227,5 @@ public class HoodSystem extends SubsystemBase {
   }
 
 }
+
+// seal gyu

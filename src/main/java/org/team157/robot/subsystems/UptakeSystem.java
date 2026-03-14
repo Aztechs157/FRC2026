@@ -23,6 +23,7 @@ import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class UptakeSystem extends SubsystemBase {
@@ -72,9 +73,7 @@ public class UptakeSystem extends SubsystemBase {
   }
 
   public Command setDefault() {
-    // return setRoller(0).
     return run(() -> {
-      // uptakePivot.setDutyCycleSetpoint(0);
       uptakeRollers.setDutyCycleSetpoint(0);
     });
   }
@@ -88,10 +87,12 @@ public class UptakeSystem extends SubsystemBase {
      * marked for removal along with Shuffleboard for next season.
      * Consider publishing to NT directly.
      */
+    if (TelemetryConstants.TELEMETRY_VERBOSITY == TelemetryVerbosity.HIGH) {
+      SmartDashboard.putNumber("Uptake Roller Velocity", getRollerVelocity());
+      SmartDashboard.putBoolean("Uptake Running", getRollerVelocity() > 10); // Arbitrary threshold to determine if the
+                                                                             // uptake is running.
+    }
     uptakeRollers.updateTelemetry();
-    SmartDashboard.putNumber("Uptake Roller Velocity", getRollerVelocity());
-    SmartDashboard.putBoolean("Uptake Running", getRollerVelocity() > 10); // Arbitrary threshold to determine if the
-                                                                           // uptake is running.
   }
 
 }

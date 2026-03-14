@@ -64,19 +64,14 @@ public final class Constants {
     // Ports for the Joysticks, as set in Driver Station
     public static final int DRIVER_CONTROLLER_PORT = 0, OPERATOR_CONTROLLER_PORT = 1;
     // Joystick Deadband
-    // TODO: since these are all the same, could we not just have a single DEADBAND
-    // constant?
-    public static final double LEFT_X_DEADBAND = 0.05;
-    public static final double LEFT_Y_DEADBAND = 0.05;
-    public static final double RIGHT_X_DEADBAND = 0.05;
+    public static final double JOYSTICK_DEADBAND = 0.05;
   }
 
   public static class IntakeConstants {
     // Pivot
     public static final int PIVOT_MOTOR_ID = 15;
     public static final int PIVOT_ENCODER_ID = 1;
-    // public static final MechanismGearing PIVOT_GEARING = new
-    // MechanismGearing(GearBox.fromReductionStages(1, 95.83));
+
     public static final MechanismGearing PIVOT_GEARING = new MechanismGearing(GearBox.fromStages("23:1", "50:12"));
     public static final double KP = 157, KI = 0, KD = 0;
     public static final double SIM_KP = 157, SIM_KI = 0, SIM_KD = 0;
@@ -199,11 +194,6 @@ public final class Constants {
     public static final Translation3d TURRET_CAMERA_TRANSLATION = new Translation3d(0.2602992, 0, 0.126);
     public static final Transform3d TURRET_CAMERA_PLACEMENT = new Transform3d(
         TURRET_CAMERA_TRANSLATION, TURRET_CAMERA_ROTATION);
-
-    public static final PIDController AIMING_PID = new PIDController(0.05, 0, 0.01);
-    // How close the robot can be (bumper to tag, in meters) before losing the
-    // ability to auto-align.
-    public static final double MIN_DISTANCE_TO_TAG = 0.8;
   }
 
   public static class TelemetryConstants {
