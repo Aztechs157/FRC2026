@@ -170,7 +170,8 @@ public class RobotContainer {
         /// INTAKE UPTAKE HOPPER ///
         ////////////////////////////
 
-        // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's preference.
+        // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's
+        // preference.
         if (ModifierConstants.MAYA_MODE) {
             // Shooting on left trigger, intake on right trigger
             driverController.leftTrigger().whileTrue(uptake.setRoller(1));
@@ -195,11 +196,7 @@ public class RobotContainer {
 
         // Toggle manual override with both sticks to prevent accidental activation
         // during teleop.
-        operatorController.leftStick().and(operatorController.rightStick()).onTrue(toggleManualOverride()); // Toggle
-                                                                                                            // manual
-                                                                                                            // override
-                                                                                                            // with both
-                                                                                                            // sticks
+        operatorController.leftStick().and(operatorController.rightStick()).onTrue(toggleManualOverride());
 
         // Disables automatic turret tracking when manual override is enabled,
         // allowing the operator to control the turret without interference from vision
@@ -213,8 +210,10 @@ public class RobotContainer {
         /// MANUAL FLYWHEEL ///
         ///////////////////////
 
-        // Only enable manual control of turret, hood and flywheel when manual override is enabled
-        // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
+        // Only enable manual control of turret, hood and flywheel when manual override
+        // is enabled
+        // Set the turret to preset robot-relative angles based on the D-Pad input of
+        // the Operator controller.
         operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
         operatorController.povUpRight().toggleOnTrue(turret.setAngle(Degrees.of(-5)));
         operatorController.povRight().whileTrue(turret.setAngle(Degrees.of(40)));
@@ -227,8 +226,9 @@ public class RobotContainer {
         ////////////////////////
         /// MANUAl FLYWHEEL ///
         ////////////////////////
-        
-        // Set the flywheel to preset velocities based on the bumpers and triggers ofthe Operator controller.
+
+        // Set the flywheel to preset velocities based on the bumpers and triggers of the
+        // Operator controller.
         operatorController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4800)));
         operatorController.rightBumper().toggleOnTrue(flywheel.setVelocity(RPM.of(2800)));
 
@@ -236,7 +236,8 @@ public class RobotContainer {
         /// MANUAL HOOD ///
         ////////////////////
 
-        // Set the hood to preset angles based on the bumpers and triggers of the Operator controller.
+        // Set the hood to preset angles based on the bumpers and triggers of the
+        // Operator controller.
         operatorController.leftTrigger().toggleOnTrue(hood.setAngle(Degrees.of(45)));
         operatorController.leftBumper().toggleOnTrue(hood.setAngle(Degrees.of(60)));
 
@@ -244,7 +245,8 @@ public class RobotContainer {
         /// INTAKE COMMANDS ///
         ///////////////////////
 
-        // Deploy and retract the intake with the A and Y buttons, but only when the back button is held to prevent accidental activation during teleop.
+        // Deploy and retract the intake with the A and Y buttons, but only when the
+        // back button is held to prevent accidental activation during teleop.
         operatorController.a().and(operatorController.back()).toggleOnTrue(intake.deployIntake());
         operatorController.y().and(operatorController.back()).toggleOnTrue(intake.retractIntake());
 
@@ -352,7 +354,7 @@ public class RobotContainer {
     // TODO: remove from RobotContainer and into eventual Superstructure subsystem
     // once it exists.
     private Command forceOuttake() {
-        return uptake.setRoller(-0.25).alongWith(hopper.setRoller(-0.25)).alongWith(intake.setRoller(-0.25));
+        return uptake.setRoller(-0.5).alongWith(hopper.setRoller(-0.5)).alongWith(intake.setRoller(-0.5));
     }
 
     /**

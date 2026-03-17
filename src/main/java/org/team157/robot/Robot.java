@@ -115,7 +115,7 @@ public class Robot extends TimedRobot {
     // Send mechanism poses to NT.
     finalPoses.set(finalArray);
 
-    // // used for camera position calibration
+    // // used for model camera position calibration
     // cameras = new Pose3d[] {
     // new
     // Pose3d(m_robotContainer.drivetrain.getPose()).plus(VisionConstants.FRONTLEFT_CAMERA_PLACEMENT),
