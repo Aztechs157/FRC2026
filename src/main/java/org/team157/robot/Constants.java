@@ -86,6 +86,7 @@ public final class Constants {
     public static final Time RAMP_RATE = Seconds.of(0.00157);
 
     public static final int ROLLER_MOTOR_ID = 14;
+    public static final int FOLLOWER_MOTOR_ID = 28;
   }
 
   public static class HopperConstants {

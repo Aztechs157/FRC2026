@@ -108,9 +108,9 @@ public class Robot extends TimedRobot {
       m_robotContainer.turret.getHoodPivotPose(new Transform3d(0,0,0, 
         new Rotation3d(0, Math.toRadians(m_robotContainer.hood.getScaledPosAngleSim()), 0))),
       // intake pivot
-      m_robotContainer.intake.getIntakePivotPose(), 
+      m_robotContainer.intakePivot.getIntakePivotPose(), 
       // hopper walls
-      m_robotContainer.intake.getHopperWallsPose() 
+      m_robotContainer.intakePivot.getHopperWallsPose() 
     };
     // Send mechanism poses to NT.
     finalPoses.set(finalArray);

@@ -45,32 +45,7 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
-public class IntakeSystem extends SubsystemBase {
-  
-    //////////////////////
-   /// INTAKE ROLLER ///
-  /////////////////////
-  private TalonFX rollerMotor  = new TalonFX(IntakeConstants.ROLLER_MOTOR_ID, Constants.RIO_CAN_BUS);
-
-  private SmartMotorControllerConfig intakeRollerMotorConfig = new SmartMotorControllerConfig(this)
-    .withControlMode(ControlMode.OPEN_LOOP)
-    .withTelemetry("IntakeRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
-    .withGearing(1)
-    .withMotorInverted(true)
-    .withIdleMode(MotorMode.COAST)
-    .withStatorCurrentLimit(Amps.of(40));
-
-  // vendor motor controller object
-  private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX60(1), intakeRollerMotorConfig);
-
-  private final FlyWheelConfig intakeRollerConfig = new FlyWheelConfig(smartRollerMotor)
-  .withTelemetry("Intake", TelemetryConstants.TELEMETRY_VERBOSITY)
-  .withDiameter(Inches.of(3))
-  .withMass(Kilograms.of(0.5)); //TODO: measure mass of the intake roller and update this constant
-
-  // flywheel mechanism
-  private FlyWheel intakeRollers = new FlyWheel(intakeRollerConfig);
-
+public class IntakePivotSystem extends SubsystemBase {
   
     ////////////////////
    /// INTAKE PIVOT ///
@@ -123,28 +98,16 @@ public class IntakeSystem extends SubsystemBase {
   }
 
 
-  /**
-   * Set the dutycycle of the intake.
-   *
-   * @param dutyCycle DutyCycle to set.
-   * @return {@link edu.wpi.first.wpilibj2.command.RunCommand}
-   */
-  public Command setRoller(double dutyCycle) {
-    return intakeRollers.set(dutyCycle);
-  }
 
-  /** Run the intake at a set speed. Used for autonomous and button bindings. */
-  public Command runIntake() {
-    return setRoller(1);
-  } 
+
 
   /** Creates a new IntakeSystem */
-  public IntakeSystem() {
+  public IntakePivotSystem() {
     
   }
 
   /**
-   * Set the target angle of the hood.
+   * Set the target angle of the intake pivot.
    * @param angle Angle to go to.
    */
   public Command setAngle(Angle angle) {
@@ -251,18 +214,10 @@ public class IntakeSystem extends SubsystemBase {
     return smartIntakePivotMotor.getMechanismVelocity().in(DegreesPerSecond);
   }
 
-  public AngularVelocity getRollerVelocity() {
-    return intakeRollers.getSpeed();
-  }
-  public boolean isIntakeRunning(){
-    return !intakeRollers.gte(DegreesPerSecond.of(1)).getAsBoolean();
-  }
 
   public Command setDefault() {
-    // return setRoller(0).
     return run(() -> {
       // intakePivot.setDutyCycleSetpoint(0);
-      intakeRollers.setDutyCycleSetpoint(0);
     });
   }
 
@@ -279,8 +234,7 @@ public class IntakeSystem extends SubsystemBase {
     SmartDashboard.putNumber("Scaled Intake Pivot Pos", getScaledPos());
     SmartDashboard.putNumber("Intake Pivot Angle (Encoder)", getScaledPosAngleEncoder());
     }
-    SmartDashboard.putNumber("Intake Roller Velocity", getRollerVelocity().in(RPM));
-    SmartDashboard.putBoolean("Intake Rollers Running", (isIntakeRunning()));
+
     
     intakePivot.updateTelemetry();
   }
