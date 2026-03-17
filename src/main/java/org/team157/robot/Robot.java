@@ -31,16 +31,16 @@ public class Robot extends TimedRobot {
 
   private Command m_autonomousCommand;
 
-  public static Pose3d[] zeroArray = new Pose3d[4];
-  public static Pose3d[] finalArray = new Pose3d[4];
-  public static Pose3d[] cameras = new Pose3d[3];
+  public Pose3d[] zeroArray = new Pose3d[4];
+  public Pose3d[] finalArray = new Pose3d[4];
+  public Pose3d[] cameras = new Pose3d[3];
   // creates a publisher to send zeroed Pose3d values to NT for model calibration.
-  public static StructArrayPublisher<Pose3d> zeroedPoses = NetworkTableInstance.getDefault()
+  public StructArrayPublisher<Pose3d> zeroedPoses = NetworkTableInstance.getDefault()
       .getStructArrayTopic("ZeroedComponentPoses", Pose3d.struct).publish();
-  public static StructArrayPublisher<Pose3d> finalPoses = NetworkTableInstance.getDefault()
+  public StructArrayPublisher<Pose3d> finalPoses = NetworkTableInstance.getDefault()
       .getStructArrayTopic("FinalComponentPoses", Pose3d.struct).publish();
 
-  public static StructArrayPublisher<Pose3d> cameraPoses = NetworkTableInstance.getDefault()
+  public StructArrayPublisher<Pose3d> cameraPoses = NetworkTableInstance.getDefault()
       .getStructArrayTopic("CameraPoses", Pose3d.struct).publish();
 
   public static final Field2d m_field = new Field2d();

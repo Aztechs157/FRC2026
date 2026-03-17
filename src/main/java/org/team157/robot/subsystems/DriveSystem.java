@@ -38,14 +38,14 @@ import org.team157.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  * https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tuner-swerve/index.html
  */
 public class DriveSystem extends TunerSwerveDrivetrain implements Subsystem {
-    private static final double kSimLoopPeriod = 0.004; // 4 ms
+    private final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
-    private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
+    private final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
     /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
-    private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
+    private final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
 
