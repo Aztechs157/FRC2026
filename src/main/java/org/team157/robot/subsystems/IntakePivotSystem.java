@@ -121,8 +121,12 @@ public class IntakePivotSystem extends SubsystemBase {
 
   public Command deployIntake() {
     return setAngleThenStop(Degrees.of(0));
-    // return setAngle(Degrees.of(0));
   }
+
+  public Command deployIntakeAndHold() {
+    return setAngleThenStop(Degrees.of(0)).andThen(setPivot(IntakeConstants.PIVOT_HOLD));
+  }
+
 
   public Command retractIntake() {
     return setAngleThenStop(Degrees.of(78));

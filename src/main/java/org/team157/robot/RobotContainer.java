@@ -227,7 +227,7 @@ public class RobotContainer {
            ///////////////////////
           /// INTAKE COMMANDS ///
          // Deploy and retract the intake with the A and Y buttons, but only when the back button is held to prevent accidental activation during teleop. 
-        operatorController.a().and(operatorController.back()).toggleOnTrue(intakePivot.deployIntake());
+        operatorController.a().and(operatorController.back()).toggleOnTrue(intakePivot.deployIntakeAndHold());
         operatorController.y().and(operatorController.back()).toggleOnTrue(intakePivot.retractIntake());
 
     } 

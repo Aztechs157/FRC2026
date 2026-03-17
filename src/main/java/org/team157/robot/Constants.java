@@ -84,6 +84,7 @@ public final class Constants {
     public static final Angle LOWER_HARD_LIMIT = Degrees.of(0), UPPER_HARD_LIMIT = Degrees.of(80);
     public static final Current CURRENT_LIMIT = Amps.of(40);
     public static final Time RAMP_RATE = Seconds.of(0.00157);
+    public static final double PIVOT_HOLD = 0.0157;
 
     public static final int ROLLER_MOTOR_ID = 14;
     public static final int FOLLOWER_MOTOR_ID = 28;
