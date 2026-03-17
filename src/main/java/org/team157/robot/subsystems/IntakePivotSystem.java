@@ -4,13 +4,10 @@
 
 package org.team157.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -28,16 +25,13 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.config.PivotConfig;
 import yams.mechanisms.positional.Pivot;
-import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
@@ -87,18 +81,12 @@ public class IntakePivotSystem extends SubsystemBase {
 
 
   /**
-   * 
-   * 
-   * 
    * @param 
    * @return
    */
   public Command invertDeployState(){
     return new InstantCommand(() -> deployState = !deployState);
   }
-
-
-
 
 
   /** Creates a new IntakeSystem */
@@ -124,7 +112,7 @@ public class IntakePivotSystem extends SubsystemBase {
   }
 
   public Command deployIntakeAndHold() {
-    return setAngleThenStop(Degrees.of(0)).andThen(setPivot(IntakeConstants.PIVOT_HOLD));
+    return setAngle(Degrees.of(0)); //TODO: confirm weither we still need the hold current and/or/also consider setting the angle to a negative to constantly press intake down and have pid at the same time
   }
 
 
