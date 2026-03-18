@@ -32,6 +32,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -436,7 +437,7 @@ public class VisionSystem extends SubsystemBase {
         .minus(vShooter.scale(ballTOF));
 
     Pose2d adjustedTargetPose = new Pose2d(adjustedTargetPoseMatrix.get(0, 0), adjustedTargetPoseMatrix.get(1, 0),
-        targetPose.getRotation());
+        targetPose.getRotation()).rotateAround(targetPose.getTranslation(), new Rotation2d(driveFieldRotation));
 
     distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, adjustedTargetPose);
     distanceToTargetFromTurret = PhotonUtils
