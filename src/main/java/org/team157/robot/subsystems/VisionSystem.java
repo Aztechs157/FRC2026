@@ -57,6 +57,7 @@ import yams.mechanisms.swerve.SwerveDrive;
 import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.VisionConstants;
+import org.team157.robot.parsing.PositionDetails;
 import org.team157.robot.Robot;
 
 @Logged(strategy = Strategy.OPT_OUT)
@@ -435,10 +436,18 @@ public class VisionSystem extends SubsystemBase {
 
     SimpleMatrix adjustedTargetPoseMatrix = new SimpleMatrix(2, 1, true, targetPose.getX(), targetPose.getY())
         .minus(vShooter.scale(ballTOF));
-
+    
     Pose2d adjustedTargetPose = new Pose2d(adjustedTargetPoseMatrix.get(0, 0), adjustedTargetPoseMatrix.get(1, 0),
-        targetPose.getRotation()).rotateAround(targetPose.getTranslation(), new Rotation2d(driveFieldRotation));
+        targetPose.getRotation());
 
+    // If the hub is the target, rotate the target about the hub by the drive orientation
+    if(Math.round(targetPose.getY()) == Math.round(FieldConstants.FIELD_WIDTH.magnitude()/2))
+    {
+      adjustedTargetPose = adjustedTargetPose.rotateAround(targetPose.getTranslation(), new Rotation2d(driveFieldRotation));
+    }
+    else {
+      adjustedTargetPose = adjustedTargetPose.rotateAround(targetPose.getTranslation(), new Rotation2d(Math.PI - driveFieldRotation));
+    }
     distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, adjustedTargetPose);
     distanceToTargetFromTurret = PhotonUtils
         .getDistanceToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), adjustedTargetPose);
