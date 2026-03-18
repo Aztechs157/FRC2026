@@ -17,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "TrenchToHuman"
+                  "pathName": "TrenchToHP"
                 }
               },
               {
@@ -101,6 +101,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Human Player",
   "choreoAuto": false
 }

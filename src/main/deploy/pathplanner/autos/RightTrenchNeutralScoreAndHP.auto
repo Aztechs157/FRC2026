@@ -17,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "MoveToIntakeFromDepotCenter"
+                  "pathName": "RightTrenchToNeutralAndReturn"
                 }
               },
               {
@@ -42,7 +42,45 @@
               {
                 "type": "named",
                 "data": {
+                  "name": "RunHopper"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShootBalls"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "RightTrenchReturnToHP"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
                   "name": "RunIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
                 }
               },
               {
@@ -73,13 +111,38 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 5.0
+                  "waitTime": 2.5
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "RunIntake"
+                  "name": "RunHopper"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShootBalls"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Wiggle"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 2.5
                 }
               },
               {
@@ -101,6 +164,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Depot",
+  "folder": "Neutral Zone",
   "choreoAuto": false
 }
