@@ -37,10 +37,8 @@ import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
 
 public class RobotContainer {
-    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
-                                                                                        // speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second
-                                                                                      // max angular velocity
+    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -67,8 +65,7 @@ public class RobotContainer {
 
     public final Trigger intakeDeployTrigger = new Trigger(() -> intake.getDeployState());
 
-    public static boolean manualOverride = false; // When true, allows manual control of the turret, hood, and flywheel,
-                                                  // disabling any dynamic control.
+    public static boolean manualOverride = false; // When true, allows manual control of the turret, hood, and flywheel, disabling any dynamic control.
 
     public RobotContainer() {
         // Adjusts drive speed based on if the robot is in rookie/demo mode.
@@ -101,8 +98,7 @@ public class RobotContainer {
         /// DEFAULT COMMANDS ///
         ////////////////////////
 
-        // Idle while the robot is disabled. This ensures the configured
-        // neutral mode is applied to the drive motors while disabled.
+        // Idle while the robot is disabled. This ensures the configured neutral mode is applied to the drive motors while disabled.
 
         final var idle = new SwerveRequest.Idle();
         RobotModeTriggers.disabled().whileTrue(
@@ -110,8 +106,7 @@ public class RobotContainer {
         // Telemetry for the drivetrain.
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        // Update the pose estimation and turret tracking angle while no other vision
-        // commands are running.
+        // Update the pose estimation and turret tracking angle while no other vision commands are running.
         visionSystem.setDefaultCommand(visionSystem.setDefault(drivetrain, turret));
 
         // Disable turret movement when no other turret commands are running.
@@ -133,8 +128,7 @@ public class RobotContainer {
         /// DRIVER COMMANDS ///
         //////////////////////////////////////////////
 
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
+        // Note that X is defined as forward according to WPILib convention, and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() -> drive
@@ -154,8 +148,8 @@ public class RobotContainer {
 
         // Reset the field-centric heading on start and back button press.
         driverController.start().and(driverController.back()).onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-        // When the B button is held, the robot will brake in place, holding its
-        // position against external forces.
+        // When the B button is held, the robot will brake in place,
+        //holding its position against external forces.
         driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
 
         ///////////////////////////
@@ -170,8 +164,7 @@ public class RobotContainer {
         /// INTAKE UPTAKE HOPPER ///
         ////////////////////////////
 
-        // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's
-        // preference.
+        // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's peference.
         if (ModifierConstants.MAYA_MODE) {
             // Shooting on left trigger, intake on right trigger
             driverController.leftTrigger().whileTrue(uptake.setRoller(1));
@@ -194,13 +187,11 @@ public class RobotContainer {
         /// OPERATOR COMMANDS ///
         //////////////////////////////////////////////////
 
-        // Toggle manual override with both sticks to prevent accidental activation
-        // during teleop.
+        // Toggle manual override with both sticks to prevent accidental activation during teleop.
         operatorController.leftStick().and(operatorController.rightStick()).onTrue(toggleManualOverride());
 
         // Disables automatic turret tracking when manual override is enabled,
-        // allowing the operator to control the turret without interference from vision
-        // tracking.
+        // allowing the operator to control the turret without interference from vision tracking.
         turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
         ;
         turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
@@ -210,10 +201,8 @@ public class RobotContainer {
         /// MANUAL FLYWHEEL ///
         ///////////////////////
 
-        // Only enable manual control of turret, hood and flywheel when manual override
-        // is enabled
-        // Set the turret to preset robot-relative angles based on the D-Pad input of
-        // the Operator controller.
+        // Only enable manual control of turret, hood and flywheel when manual override is enabled
+        // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
         operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
         operatorController.povUpRight().toggleOnTrue(turret.setAngle(Degrees.of(-5)));
         operatorController.povRight().whileTrue(turret.setAngle(Degrees.of(40)));
@@ -264,8 +253,7 @@ public class RobotContainer {
             return speed;
         }
     }
-    // Old trigger-based precision mode that scales speed based on how much the
-    // right trigger is pressed.
+    // Old trigger-based precision mode that scales speed based on how much the right trigger is pressed.
     // Replaced by button-based toggle due to lack of available triggers.
     // public double modifySpeed(final double speed) {
     // final var modifier = 1 - driverController.getRightTriggerAxis() *
@@ -351,8 +339,7 @@ public class RobotContainer {
 
     // A simple command that runs the intake, hopper, and uptake rollers in reverse
     // at a low speed to clear any jams.
-    // TODO: remove from RobotContainer and into eventual Superstructure subsystem
-    // once it exists.
+    // TODO: remove from RobotContainer and into eventual Superstructure subsystem once it exists.
     private Command forceOuttake() {
         return uptake.setRoller(-0.5).alongWith(hopper.setRoller(-0.5)).alongWith(intake.setRoller(-0.5));
     }
@@ -360,10 +347,8 @@ public class RobotContainer {
     /**
      * Trigger used for tracking a target location with the turret
      * 
-     * @return {@link Trigger} that is true when the robot is in teleop or
-     *         autonomous and manual override
-     *         is not enabled, allowing the turret to track targets when those
-     *         conditions are met.
+     * @return {@link Trigger} that is true when the robot is in teleop or autonomous and manual override
+     * is not enabled, allowing the turret to track targets when those conditions are met.
      */
     private Trigger turretTrackingTrigger() {
         return new Trigger(

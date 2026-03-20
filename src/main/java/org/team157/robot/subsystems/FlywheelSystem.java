@@ -89,10 +89,10 @@ public class FlywheelSystem extends SubsystemBase {
   ///////////////////////////////////////////
   /////// DYNAMIC VELOCITY CALCULATION //////
   ///////////////////////////////////////////
-  // Function to minimize (all parameters in metric units: meters, meters/second,
-  // radians)
-  // Calculates required ball velocity (m/s) for given distance, height, and
-  // launch angle
+  // Function to minimize (all parameters in metric units: 
+  // meters, meters/second, radians)
+  // Calculates required ball velocity (m/s) 
+  // for given distance, height, and launch angle
   // Using projectile motion equations: y = x*tan(θ) - (g*x²)/(2*v₀²*cos²(θ))
   // Solving for v₀: v₀ = sqrt((g*x²)/(2*cos²(θ)*(x*tan(θ) - y)))
   static double velocityFunction(double distance, double height, double theta) {
@@ -140,8 +140,8 @@ public class FlywheelSystem extends SubsystemBase {
     // Convert ball velocity (m/s) to flywheel RPM
     // Relationship: ballVelocity = (flywheelRPM / 60) * π * flywheel_radius
     // Therefore: flywheelRPM = (ballVelocity * 60) / (π * flywheel_diameter)
-    // desiredRPM is divided by 0.4 to account for external factors like air
-    // resistace and wheel slip.
+    // desiredRPM is divided by 0.4 to account for 
+    //external factors like air resistace and wheel slip.
     double flywheelDiameterMeters = (FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters);
     double desiredRPM = ((ballVelocity) * 60) / (Math.PI * flywheelDiameterMeters) * FlywheelConstants.SPEED_FACTOR;
     return RPM.of(Math.max(2800, desiredRPM));

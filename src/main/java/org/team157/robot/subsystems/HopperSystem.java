@@ -75,8 +75,8 @@ public class HopperSystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    // Send values to NT to display on Elastic.
+    // This method will be called once per scheduler 
+    // run. Send values to NT to display on Elastic.
     hopperRollers.updateTelemetry();
   }
 

@@ -523,8 +523,7 @@ public class VisionSystem extends SubsystemBase {
 
     /**
      * Get the result with the least ambiguity from the best tracked target within
-     * the Cache. This may not be the most
-     * recent result!
+     * the Cache. This may not be the most recent result!
      *
      * @return The result in the cache with the least ambiguous best tracked target.
      *         This is not the most recent result!
@@ -558,9 +557,9 @@ public class VisionSystem extends SubsystemBase {
     }
 
     /**
-     * Get the estimated robot pose. Updates the current robot pose estimation,
-     * standard deviations, and flushes the
-     * cache of results.
+     * Get the estimated robot pose. Updates the current
+     * robot pose estimation standard deviations
+     * and flushes the cache of results.
      *
      * @return Estimated pose.
      */
@@ -618,8 +617,8 @@ public class VisionSystem extends SubsystemBase {
     }
 
     /**
-     * Calculates new standard deviations This algorithm is a heuristic that creates
-     * dynamic standard deviations based
+     * Calculates new standard deviations. This algorithm is 
+     * a heuristic that creates dynamic standard deviations based
      * on number of tags, estimation strategy, and distance from the tags.
      *
      * @param estimatedPose The estimated pose to guess standard deviations for.

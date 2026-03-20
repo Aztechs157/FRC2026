@@ -305,8 +305,8 @@ public class IntakeSystem extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-    // Updates the intake pivot simulation's values,
+    // This method will be called once per scheduler run during 
+    // simulation. Updates the intake pivot simulation's values,
     intakePivot.simIterate();
   }
 

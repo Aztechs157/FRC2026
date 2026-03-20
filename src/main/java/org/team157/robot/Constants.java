@@ -51,10 +51,10 @@ public final class Constants {
     public static final boolean DEMO_MODE = false;
     public static final double DEMO_DRIVE_MODIFIER = 0.25;
     /**
-     * When true, swaps the intake and shooting triggers, per Maya's preference.
-     * Makes no change to drivetrain speed.
-     * For future reference, avoid making catches for specific user edge cases like
-     * this, make decisions off general consensus.
+     * When true, swaps the intake and shooting triggers, 
+     * per Maya's preference. Makes no change to drivetrain speed.
+     * For future reference, avoid making catches for specific 
+     * user edge cases like this, make decisions off general consensus.
      */
     public static final boolean MAYA_MODE = false;
 
@@ -115,8 +115,7 @@ public final class Constants {
     public static final Time RAMP_RATE = Seconds.of(0.00157);
     public static final Angle LOWER_SOFT_LIMIT = Degrees.of(-179), UPPER_SOFT_LIMIT = Degrees.of(179);
     public static final Angle LOWER_HARD_LIMIT = Degrees.of(-179), UPPER_HARD_LIMIT = Degrees.of(179);
-    // Angle offset to account for misalignment between turret zero position and
-    // robot forward, in degrees.
+    // Angle offset to account for misalignment between turret zero position and robot forward, in degrees.
     public static final double TURRET_ANGLE_OFFSET = 130;
   }
 
@@ -163,8 +162,7 @@ public final class Constants {
     // Flywheel RPM limits for safety, in... RPM.
     public static final AngularVelocity FLYWHEEL_RPM_LIMIT_UPPER = RPM.of(5800),
         FLYWHEEL_RPM_LIMIT_LOWER = RPM.of(-5800);
-    // RPM multiplier to account for external factors like air resistance and wheel
-    // slip. This is determined experimentally.
+    // RPM multiplier to account for external factors like air resistance and wheel slip. This is determined experimentally.
     public static final double SPEED_FACTOR = 1 / 0.385;
     public static final Current CURRENT_LIMIT = Amps.of(40);
 

@@ -201,8 +201,8 @@ public class HoodSystem extends SubsystemBase {
     // This method will be called once per scheduler run
     // Send values to NT to display on Elastic.
     /*
-     * TODO: look into SmartDashboard alternatives, as it's deprecated,
-     * marked for removal along with Shuffleboard for next season.
+     * TODO: look into SmartDashboard alternatives, as 
+     * it's deprecated, marked for removal along with Shuffleboard for next season.
      * Consider publishing to NT directly.
      */
     if (TelemetryConstants.TELEMETRY_VERBOSITY == TelemetryVerbosity.HIGH) {

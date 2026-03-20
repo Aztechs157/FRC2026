@@ -292,8 +292,8 @@ public class TurretSystem extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-    // Updates the turret simulation's values,
+    // This method will be called once per scheduler run during 
+    // simulation. Updates the turret simulation's values,
     turret.simIterate();
   }
 
