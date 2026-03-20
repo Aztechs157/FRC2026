@@ -151,6 +151,7 @@ public class FlywheelSystem extends SubsystemBase {
   public AngularVelocity getDesiredFlywheelVelocity() {
     double heightMeters = FieldConstants.positionDetails.getTargetHeight();
     double distanceMeters = VisionSystem.distanceToTargetFromTurret; // Use distance from turret instead of robot center
+    // TODO: Continue work on implementation of momentum-based velocity calculation on new branch.
     // double currentTime = NetworkTablesJNI.now();
     // double timeDelta = currentTime - VisionSystem.lastTrackedTime;
     // double distanceDelta = distanceMeters - VisionSystem.lastDistanceToTarget;
@@ -192,6 +193,15 @@ public class FlywheelSystem extends SubsystemBase {
    */
   public Command set(double dutyCycle) {
     return flywheel.set(dutyCycle);
+  }
+
+  /**
+   * Disable flywheel output when no other commands are running.
+   * @return {@link edu.wpi.first.wpilibj2.command.RunCommand} setting the flywheel to 0 duty cycle
+   */
+  // TODO: consider setting a default RPM instead of stopping the flywheel completely, to enable faster spin-up and lower power consumption when going from idle to active.
+  public Command setDefault() {
+    return set(0);
   }
 
   /** Creates a new FlywheelSystem. */

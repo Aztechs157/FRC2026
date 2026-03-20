@@ -43,14 +43,20 @@ public final class Constants {
 
   public static class ModifierConstants {
     // Reduces drive speed by this factor when precision mode is active.
-    public static final double PRECISION_DRIVE_MODIFIER = 0.75;
+    public static final double PRECISION_DRIVE_MODIFIER = 0.5;
     // When true, reduces drive speed by 50%.
-    public static final boolean ROOKIE_MODE = true;
+    public static final boolean ROOKIE_MODE = false;
     public static final double ROOKIE_DRIVE_MODIFIER = 0.5;
-    // When true, reduces drive speed by 75% and disables auto positioning.
+    // When true, reduces drive speed by 75%.
     // Overrides ROOKIE_MODE.
     public static final boolean DEMO_MODE = false;
     public static final double DEMO_DRIVE_MODIFIER = 0.25;
+    /** 
+     * When true, swaps the intake and shooting triggers, per Maya's preference. Makes no change to drivetrain speed.
+     * For future reference, avoid making catches for specific user edge cases like this, make decisions off general consensus.
+     * */ 
+    public static final boolean MAYA_MODE = false;
+
   }
 
   public static class ControllerConstants {
@@ -103,7 +109,7 @@ public final class Constants {
     public static final double MIN_ENCODER_POSITION = 0.99, MAX_ENCODER_POSITION = 0.014;
     public static final double MIN_ANGLE = -179, MAX_ANGLE = 179;
     public static final double KP = 157, KI = 0, KD = 0;
-    public static final double SIM_KP = 157, SIM_KI = 0, SIM_KD = 0;
+    public static final double SIM_KP = 5, SIM_KI = 0, SIM_KD = 0;
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
     public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(2880);
     public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("28:1"));
@@ -157,7 +163,7 @@ public final class Constants {
     // Flywheel RPM limits for safety, in... RPM.
     public static final AngularVelocity FLYWHEEL_RPM_LIMIT_UPPER = RPM.of(5800), FLYWHEEL_RPM_LIMIT_LOWER = RPM.of(-5800);
     // RPM multiplier to account for external factors like air resistance and wheel slip. This is determined experimentally.
-    public static final double SPEED_FACTOR = 1 / 0.4;
+    public static final double SPEED_FACTOR = 1 / 0.385;
     public static final Current CURRENT_LIMIT = Amps.of(40);
 
   }

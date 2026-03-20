@@ -23,6 +23,7 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -86,19 +87,20 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-    // these are just for model calibration
-    zeroArray = new Pose3d[] {
-      // turret base 
-      new Pose3d(), 
-      // turret hood
-      new Pose3d(),
-      // intake pivot
-      new Pose3d(), 
-      // hopper walls
-      new Pose3d() 
-    };
-    zeroedPoses.set(zeroArray);
+    // // these are just for model calibration
+    // zeroArray = new Pose3d[] {
+    //   // turret base 
+    //   new Pose3d(), 
+    //   // turret hood
+    //   new Pose3d(),
+    //   // intake pivot
+    //   new Pose3d(), 
+    //   // hopper walls
+    //   new Pose3d() 
+    // };
+    // zeroedPoses.set(zeroArray);
     
+    // Gets mechanism poses to be used for the AdvantageScope model.
     finalArray = new Pose3d[] {
       // turret base 
       m_robotContainer.turret.getBasePose(), 
@@ -110,14 +112,24 @@ public class Robot extends TimedRobot {
       // hopper walls
       m_robotContainer.intake.getHopperWallsPose() 
     };
+    // Send mechanism poses to NT.
     finalPoses.set(finalArray);
 
-    cameras = new Pose3d[] {
-      new Pose3d(m_robotContainer.drivetrain.getPose()).plus(VisionConstants.FRONTLEFT_CAMERA_PLACEMENT),
-      new Pose3d(m_robotContainer.drivetrain.getPose()).plus(VisionConstants.FRONTRIGHT_CAMERA_PLACEMENT),
-      new Pose3d(m_robotContainer.drivetrain.getPose()).plus(VisionConstants.BACK_CAMERA_PLACEMENT)
-    };
-    cameraPoses.set(cameras);
+    // // used for camera position calibration
+    // cameras = new Pose3d[] {
+    //   new Pose3d(m_robotContainer.drivetrain.getPose()).plus(VisionConstants.FRONTLEFT_CAMERA_PLACEMENT),
+    //   new Pose3d(m_robotContainer.drivetrain.getPose()).plus(VisionConstants.FRONTRIGHT_CAMERA_PLACEMENT),
+    //   new Pose3d(m_robotContainer.drivetrain.getPose()).plus(VisionConstants.BACK_CAMERA_PLACEMENT)
+    // };
+    // cameraPoses.set(cameras);
+
+    // Gets the manual override status from RobotContainer to display on the dashboard.
+    SmartDashboard.putBoolean("Manual Override", RobotContainer.manualOverride);
+    // Gets the match time from the FMS to display for the driver.
+    SmartDashboard.putNumber("Match Time", Timer.getMatchTime());
+    // Gets hub activity status to display on the dashboard.
+    SmartDashboard.putBoolean("Hub Active?", m_robotContainer.isHubActive());
+
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -162,7 +174,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-   
+
   }
 
   @Override

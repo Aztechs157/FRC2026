@@ -19,6 +19,7 @@ import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.TelemetryConstants;
 import org.team157.robot.Constants.TurretConstants;
 import org.team157.robot.Robot;
+import org.team157.robot.RobotContainer;
 import org.team157.utilities.PosUtils;
 
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
@@ -34,6 +35,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import yams.mechanisms.config.PivotConfig;
@@ -90,12 +92,24 @@ public class TurretSystem extends SubsystemBase {
    /// TURRET COMMANDS ///
   //////////////////////
   
+  public Command setDefault() {
+    return run(() -> set(0));
+  }
+
   /**
    * Set the target angle of the turret.
    * @param angle Angle to go to.
    */
   public Command setAngle(Angle angle) { 
     return turret.setAngle(angle);
+  }
+  
+  public Command setAngleManualOverride(Angle angle) {
+    if(RobotContainer.manualOverride){
+      return turret.setAngle(angle);
+    } else {
+      return Commands.none();
+    }
   }
 
     /**
@@ -271,9 +285,9 @@ public class TurretSystem extends SubsystemBase {
      if(TelemetryConstants.TELEMETRY_VERBOSITY == TelemetryVerbosity.HIGH) {
       SmartDashboard.putNumber("Turret Pos", getPos());
       SmartDashboard.putNumber("Scaled Turret Pos", getScaledPos());
-      //SmartDashboard.putNumber("Turret Angle (YAMS)", getScaledPosAngleYAMS());
       SmartDashboard.putNumber("Turret Angle (Encoder)", getScaledPosAngleEncoder());
   }
+    SmartDashboard.putNumber("Turret Angle", getScaledPosAngleYAMS());
     SmartDashboard.putNumber("where me going", trackingAngle.magnitude());
     turret.updateTelemetry();
   }
