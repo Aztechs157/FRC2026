@@ -93,9 +93,9 @@ public interface PosUtils {
     return(value > target-tolerance && value < target+tolerance);
   }
 
-  final StringTopic selectedTabTopic =
+  static final StringTopic selectedTabTopic =
       NetworkTableInstance.getDefault().getStringTopic("/Elastic/SelectedTab");
-  final StringPublisher selectedTabPublisher =
+  static final StringPublisher selectedTabPublisher =
       selectedTabTopic.publish(PubSubOption.keepDuplicates(true));
 
       public static void selectTab(String tabName) {

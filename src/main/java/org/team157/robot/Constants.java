@@ -139,7 +139,7 @@ public final class Constants {
 
   }
 
-  public class FlywheelConstants {
+  public static class FlywheelConstants {
     // IDs of both motors powering the flywheel.
     public static final int MOTOR_ID = 20, FOLLOWER_MOTOR_ID = 21;
     // Closed-loop control values for the flywheel.
@@ -170,46 +170,46 @@ public final class Constants {
 
   }
 
-  public class VisionConstants {
+  public static class VisionConstants {
     public static final String FRONTLEFT_CAMERA_NICKNAME = "frontLeftCam";
     public static final Rotation3d FRONTLEFT_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(65));
     public static final Translation3d FRONTLEFT_CAMERA_TRANSLATION = new Translation3d(-0.128, 0.329, 0.394);
-    public final Transform3d FRONTLEFT_CAMERA_PLACEMENT = new Transform3d(
+    public static final Transform3d FRONTLEFT_CAMERA_PLACEMENT = new Transform3d(
         FRONTLEFT_CAMERA_TRANSLATION, FRONTLEFT_CAMERA_ROTATION);
 
     public static final String FRONTRIGHT_CAMERA_NICKNAME = "frontRightCam";
     public static final Rotation3d FRONTRIGHT_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(-65));
     public static final Translation3d FRONTRIGHT_CAMERA_TRANSLATION = new Translation3d(-0.128, -0.329, 0.394);
-    public final Transform3d FRONTRIGHT_CAMERA_PLACEMENT = new Transform3d(
+    public static final Transform3d FRONTRIGHT_CAMERA_PLACEMENT = new Transform3d(
         FRONTRIGHT_CAMERA_TRANSLATION, FRONTRIGHT_CAMERA_ROTATION);
 
     public static final String BACK_CAMERA_NICKNAME = "backCam";
     public static final Rotation3d BACK_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(180));
     public static final Translation3d BACK_CAMERA_TRANSLATION = new Translation3d(-0.322, 0, 0.381);
-    public final Transform3d BACK_CAMERA_PLACEMENT = new Transform3d(
+    public static final Transform3d BACK_CAMERA_PLACEMENT = new Transform3d(
         BACK_CAMERA_TRANSLATION, BACK_CAMERA_ROTATION);
 
     public static final String TURRET_CAMERA_NICKNAME = "turretCam";
     public static final Rotation3d TURRET_CAMERA_ROTATION = new Rotation3d(0, 0, 0);
     public static final Translation3d TURRET_CAMERA_TRANSLATION = new Translation3d(0.2602992, 0, 0.126);
-    public final Transform3d TURRET_CAMERA_PLACEMENT = new Transform3d(
+    public static final Transform3d TURRET_CAMERA_PLACEMENT = new Transform3d(
         TURRET_CAMERA_TRANSLATION, TURRET_CAMERA_ROTATION);
   }
 
-  public class TelemetryConstants {
+  public static class TelemetryConstants {
     public static final TelemetryVerbosity TELEMETRY_VERBOSITY = TelemetryVerbosity.LOW;
 
   }
 
-  public class FieldConstants {
-    public final Distance FIELD_LENGTH = Meters.of(16.54175);
-    public final Distance FIELD_WIDTH = Meters.of(8.0137);
+  public static class FieldConstants {
+    public static final Distance FIELD_LENGTH = Meters.of(16.54175);
+    public static final Distance FIELD_WIDTH = Meters.of(8.0137);
 
     public static final PositionDetails positionDetails = new PositionDetails();
 
   }
 
-  public class ModelConstants {
+  public static class ModelConstants {
     // 3D offsets from the robot's origin (center of rotation) to various key points
     // on the robot, used for mechanism visualization on the AdvantageScope model.
     public static final Translation3d ORIGIN_TO_TURRET_BASE_OFFSET = new Translation3d(-0.171, 0, 0.460);

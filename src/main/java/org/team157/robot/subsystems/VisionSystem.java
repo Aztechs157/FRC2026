@@ -66,12 +66,12 @@ public class VisionSystem extends SubsystemBase {
 
   public boolean hasTag = false;
 
-  public double angleToTarget = 0;
-  public double distanceToTarget = 0;
+  public static double angleToTarget = 0;
+  public static double distanceToTarget = 0;
   public static double distanceToTargetFromTurret = 0;
   public static double angleToTargetFromTurret = 0;
-  public double lastDistanceToTarget = 0;
-  public double lastTrackedTime = 0;
+  public static double lastDistanceToTarget = 0;
+  public static double lastTrackedTime = 0;
 
   final PoseStrategy poseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
   final PoseStrategy fallbackStrategy = PoseStrategy.LOWEST_AMBIGUITY;
@@ -158,7 +158,7 @@ public class VisionSystem extends SubsystemBase {
    *                    itself correctly.
    * @return The target pose of the AprilTag.
    */
-  public Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset) {
+  public static Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset) {
     Optional<Pose3d> aprilTagPose3d = fieldLayout.getTagPose(aprilTag);
     if (aprilTagPose3d.isPresent()) {
       return aprilTagPose3d.get().toPose2d().transformBy(robotOffset);
