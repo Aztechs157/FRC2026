@@ -125,7 +125,7 @@ public class RobotContainer {
         // driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         //////////////////////////////////////////////
-        /// DRIVER COMMANDS ///
+        ///             DRIVER COMMANDS            ///
         //////////////////////////////////////////////
 
         // Note that X is defined as forward according to WPILib convention, and Y is defined as to the left according to WPILib convention.
@@ -153,7 +153,7 @@ public class RobotContainer {
         driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
 
         ///////////////////////////
-        /// FlYWHEEL HOOD ///
+        ///     FlYWHEEL HOOD  ///
         //////////////////////////
 
         // Enables dynamic control of the flywheel and hood.
@@ -184,7 +184,7 @@ public class RobotContainer {
         // driverController.a().onTrue(toggleManualOverride());
 
         //////////////////////////////////////////////////
-        /// OPERATOR COMMANDS ///
+        ///             OPERATOR COMMANDS              ///
         //////////////////////////////////////////////////
 
         // Toggle manual override with both sticks to prevent accidental activation during teleop.
@@ -214,7 +214,7 @@ public class RobotContainer {
 
         ////////////////////////
         /// MANUAl FLYWHEEL ///
-        ////////////////////////
+        //////////////////////
 
         // Set the flywheel to preset velocities based on the bumpers and triggers of the
         // Operator controller.
@@ -223,7 +223,7 @@ public class RobotContainer {
 
         ////////////////////
         /// MANUAL HOOD ///
-        ////////////////////
+        ///////////////////
 
         // Set the hood to preset angles based on the bumpers and triggers of the
         // Operator controller.
@@ -242,8 +242,8 @@ public class RobotContainer {
     }
 
     ///////////////////////////////////////////////////////
-    /// NON-CONTROL FUNCTIONS ///
-    //////////////////////////////////////////////////////
+    ///             NON-CONTROL FUNCTIONS              ///
+    /////////////////////////////////////////////////////
 
     // If the A button is held, apply the precision modifier of 0.5x speed.
     public double modifySpeed(final double speed) {

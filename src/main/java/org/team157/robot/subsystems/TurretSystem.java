@@ -158,7 +158,7 @@ public class TurretSystem extends SubsystemBase {
   }
 
   /////////////////////
-  /// TURRET METHODS ///
+  /// TURRET METHODS //
   /////////////////////
 
   /**

@@ -41,8 +41,8 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 public class HoodSystem extends SubsystemBase {
 
   ////////////////////
-  /// HOOD PIVOT ///
-  ////////////////////
+  ///  HOOD PIVOT ///
+  ///////////////////
   private TalonFX motor = new TalonFX(HoodConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
   private DutyCycleEncoder encoder = new DutyCycleEncoder(HoodConstants.ENCODER_ID);
 
