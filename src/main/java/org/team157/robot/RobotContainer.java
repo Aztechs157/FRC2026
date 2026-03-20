@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -87,6 +88,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("RunHopper", hopper.setRoller(0.5));
         NamedCommands.registerCommand("ShootBalls", uptake.setRoller(1));
         NamedCommands.registerCommand("Wiggle", intake.wiggleIntake());
+        NamedCommands.registerCommand("WiggleCubed", intake.wiggleIntake().andThen(new WaitCommand(1)).andThen(intake.wiggleIntake()).andThen(new WaitCommand(1)).andThen(intake.wiggleIntake()));
 
         configureBindings();
 
