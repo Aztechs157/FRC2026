@@ -27,6 +27,11 @@ public class PositionDetails {
     /** Location of the JSON file containting position information, placed inside the deploy directory. */
     private final String jsonPath = "/positionDetails.json";
 
+    /** Location representing the center of the blue alliance's Hub. */
+    public Location blueHubLocation;
+    /** Location representing the center of the red alliance's Hub. */
+    public Location redHubLocation;    
+    // TODO: Consider changing names of passing locations to not include the word 'zone' to avoid confusion with the actual passing zones defined as rectangles.
     /** Location representing an arbitrary point in the lower half of the blue alliance's passing zone. */
     public Location bluePassingZoneLowLocation;
     /** Location representing an arbitrary point in the upper half of the blue alliance's passing zone. */
@@ -35,27 +40,24 @@ public class PositionDetails {
     public Location redPassingZoneLowLocation;
     /** Location representing an arbitrary point in the upper half of the red alliance's passing zone. */
     public Location redPassingZoneHighLocation;
-    /** Location representing the center of the blue alliance's Hub. */
-    public Location blueHubLocation;
-    /** Location representing the center of the red alliance's Hub. */
-    public Location redHubLocation;
-    /** Rectangle representing the red alliance's zone. */
-	public Rectangle2d redAllianceZone;
-    /** Rectangle representing the blue alliance's zone. */
-	public Rectangle2d blueAllianceZone;
-    /** Rectangle representing the lower half of the neutral zone. */
-	public Rectangle2d neutralLowZone;
-    /** Rectangle representing the upper half of the neutral zone. */
-	public Rectangle2d neutralHighZone;
-	/** Rectangle representing the area underneath the blue alliance's lower trench. */
-    public Rectangle2d blueTrenchLow;
-	/** Rectangle representing the area underneath the blue alliance's upper trench. */
-	public Rectangle2d blueTrenchHigh;
-	/** Rectangle representing the area underneath the red alliance's lower trench. */
-	public Rectangle2d redTrenchLow;
-	/** Rectangle representing the area underneath the red alliance's upper trench. */
-	public Rectangle2d redTrenchHigh;
-    
+
+    /** Zone representing the red alliance's zone. */
+	public Zone redAllianceZone;
+    /** Zone representing the blue alliance's zone. */
+	public Zone blueAllianceZone;
+    /** Zone representing the lower half of the neutral zone. */
+	public Zone neutralLowZone;
+    /** Zone representing the upper half of the neutral zone. */
+	public Zone neutralHighZone;
+	/** Zone representing the area underneath the blue alliance's lower trench. */
+    public Zone blueTrenchLow;
+	/** Zone representing the area underneath the blue alliance's upper trench. */
+	public Zone blueTrenchHigh;
+	/** Zone representing the area underneath the red alliance's lower trench. */
+	public Zone redTrenchLow;
+	/** Zone representing the area underneath the red alliance's upper trench. */
+	public Zone redTrenchHigh;
+
     /** The height of the current shooting target, in meters. */
     public static double height = 0.0;
     
@@ -141,10 +143,18 @@ public class PositionDetails {
          * 
          * @return a Rectangle2d, defined by the minimum and maximum x and y coordinates of the zone.
          */
+        // TODO: This method is currently unused, but may be useful for debugging or visualization purposes in the future.
         public Rectangle2d getRectangle() {
             return this.rectangle;
         }
-
+        /** Checks if a given point is contained within the zone.
+         * 
+         * @param point A Translation2d representing the point to check for containment within the zone.
+         * @return true if the point is contained within the zone's rectangle, false otherwise.
+         */
+        public boolean contains(Translation2d point) {
+            return this.rectangle.contains(point);
+        }
     }
 
     public PositionDetails() {
@@ -168,19 +178,19 @@ public class PositionDetails {
 
             /// Targeting Zones ///
                 // Alliance Zones //
-            this.redAllianceZone = new Zone(root.get("zones").get("red")).getRectangle();
-            this.blueAllianceZone = new Zone(root.get("zones").get("blue")).getRectangle();
+            this.redAllianceZone = new Zone(root.get("zones").get("red"));
+            this.blueAllianceZone = new Zone(root.get("zones").get("blue"));
                 // Neutral Zones //
-            this.neutralLowZone = new Zone(root.get("zones").get("neutralLow")).getRectangle();
-            this.neutralHighZone = new Zone(root.get("zones").get("neutralHigh")).getRectangle();
+            this.neutralLowZone = new Zone(root.get("zones").get("neutralLow"));
+            this.neutralHighZone = new Zone(root.get("zones").get("neutralHigh"));
 
             /// Trench Zones ///
                 // Blue Trenches //
-            this.blueTrenchLow = new Zone(root.get("zones").get("blueTrenchLow")).getRectangle();
-            this.blueTrenchHigh = new Zone(root.get("zones").get("blueTrenchHigh")).getRectangle();
+            this.blueTrenchLow = new Zone(root.get("zones").get("blueTrenchLow"));
+            this.blueTrenchHigh = new Zone(root.get("zones").get("blueTrenchHigh"));
                 // Red Trenches //
-            this.redTrenchLow = new Zone(root.get("zones").get("redTrenchLow")).getRectangle();
-            this.redTrenchHigh = new Zone(root.get("zones").get("redTrenchHigh")).getRectangle();
+            this.redTrenchLow = new Zone(root.get("zones").get("redTrenchLow"));
+            this.redTrenchHigh = new Zone(root.get("zones").get("redTrenchHigh"));
 
         } catch(IOException e) {
             // Throw an IO exception if the file cannot be found or read, 
@@ -199,7 +209,7 @@ public class PositionDetails {
      * @param isBlue Whether the robot is on the blue alliance or not.
      * @return The Pose2d of the target location for shooting.
      */
-    public Pose2d targetPose2d(Pose2d currentPose, boolean isBlue) {
+    public Pose2d getTargetPose2d(Pose2d currentPose, boolean isBlue) {
        if(isBlue) {
             if(blueAllianceZone.contains(currentPose.getTranslation())) {
                 // Alliance Hub Target
@@ -239,6 +249,7 @@ public class PositionDetails {
             }
        }
     }
+
     /** 
      * Gets the current height of the robot's shooting target.
      * 

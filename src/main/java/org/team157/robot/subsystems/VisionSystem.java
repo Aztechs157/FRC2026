@@ -124,7 +124,7 @@ public class VisionSystem extends SubsystemBase {
   public Command setDefault(DriveSystem drivetrain, TurretSystem turret) {
     return run(() -> {
       updatePoseEstimation(drivetrain);
-      turret.updateRelativeAngleToTarget(FieldConstants.positionDetails.targetPose2d(drivetrain.getPose(), isBlueAlliance),
+      turret.updateRelativeAngleToTarget(FieldConstants.positionDetails.getTargetPose2d(drivetrain.getPose(), isBlueAlliance),
           drivetrain.getPose());
     });
 
@@ -138,7 +138,7 @@ public class VisionSystem extends SubsystemBase {
    *         Pose2d.
    */
   public Pose2d getDesiredPose() {
-    return FieldConstants.positionDetails.targetPose2d(currentPose.get(), isBlueAlliance);
+    return FieldConstants.positionDetails.getTargetPose2d(currentPose.get(), isBlueAlliance);
   }
 
   public void updateAlliance() {
