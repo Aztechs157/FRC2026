@@ -13,7 +13,6 @@ import org.team157.robot.Constants.TelemetryConstants;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,35 +22,34 @@ import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
-import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class HopperSystem extends SubsystemBase {
-    //////////////////////
-   /// HOPPER ROLLER ///
+  //////////////////////
+  /// HOPPER ROLLER ///
   /////////////////////
-  private TalonFX rollerMotor  = new TalonFX(HopperConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
+  private TalonFX rollerMotor = new TalonFX(HopperConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
 
   private SmartMotorControllerConfig hopperRollerMotorConfig = new SmartMotorControllerConfig(this)
-    .withControlMode(ControlMode.OPEN_LOOP)
-    .withTelemetry("HopperRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
-    .withGearing(1)
-    .withMotorInverted(true)
-    .withIdleMode(MotorMode.COAST)
-    .withStatorCurrentLimit((HopperConstants.CURRENT_LIMIT))
-    .withGearing(HopperConstants.GEARING);
+      .withControlMode(ControlMode.OPEN_LOOP)
+      .withTelemetry("HopperRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
+      .withGearing(1)
+      .withMotorInverted(true)
+      .withIdleMode(MotorMode.COAST)
+      .withStatorCurrentLimit((HopperConstants.CURRENT_LIMIT))
+      .withGearing(HopperConstants.GEARING);
 
   // vendor motor controller object
-  private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX44(1), hopperRollerMotorConfig);
+  private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX44(1),
+      hopperRollerMotorConfig);
 
   private final FlyWheelConfig hopperRollerConfig = new FlyWheelConfig(smartRollerMotor)
-    .withMass(Kilograms.of(0.5)) //TODO: measure mass of the hopper roller and update this constant
-    .withDiameter(Inches.of(1)) //TODO: measure diameter of the hopper roller and update this constant
-    .withTelemetry("Hopper", TelemetryConstants.TELEMETRY_VERBOSITY);
+      .withMass(Kilograms.of(0.5))
+      .withDiameter(Inches.of(1))
+      .withTelemetry("Hopper", TelemetryConstants.TELEMETRY_VERBOSITY);
 
   // flywheel mechanism
   private FlyWheel hopperRollers = new FlyWheel(hopperRollerConfig);
- 
 
   /**
    * Set the dutycycle of the hopper.
@@ -65,25 +63,20 @@ public class HopperSystem extends SubsystemBase {
 
   /** Creates a new HopperSystem */
   public HopperSystem() {
-    
+
   }
 
   public Command setDefault() {
     // return setRoller(0).
     return run(() -> {
-      // hopperPivot.setDutyCycleSetpoint(0);
       hopperRollers.setDutyCycleSetpoint(0);
     });
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    // Send values to NT to display on Elastic.
-    /*  TODO: look into SmartDashboard alternatives, as it's deprecated, 
-     *  marked for removal along with Shuffleboard for next season.
-     *  Consider publishing to NT directly.
-     */
+    // This method will be called once per scheduler 
+    // run. Send values to NT to display on Elastic.
     hopperRollers.updateTelemetry();
   }
 

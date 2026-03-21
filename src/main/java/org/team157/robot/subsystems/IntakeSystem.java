@@ -46,34 +46,34 @@ import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class IntakeSystem extends SubsystemBase {
-  
-    //////////////////////
-   /// INTAKE ROLLER ///
+
+  //////////////////////
+  /// INTAKE ROLLER ///
   /////////////////////
-  private TalonFX rollerMotor  = new TalonFX(IntakeConstants.ROLLER_MOTOR_ID, Constants.RIO_CAN_BUS);
+  private TalonFX rollerMotor = new TalonFX(IntakeConstants.ROLLER_MOTOR_ID, Constants.RIO_CAN_BUS);
 
   private SmartMotorControllerConfig intakeRollerMotorConfig = new SmartMotorControllerConfig(this)
-    .withControlMode(ControlMode.OPEN_LOOP)
-    .withTelemetry("IntakeRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
-    .withGearing(1)
-    .withMotorInverted(true)
-    .withIdleMode(MotorMode.COAST)
-    .withStatorCurrentLimit(Amps.of(40));
+      .withControlMode(ControlMode.OPEN_LOOP)
+      .withTelemetry("IntakeRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
+      .withGearing(1)
+      .withMotorInverted(true)
+      .withIdleMode(MotorMode.COAST)
+      .withStatorCurrentLimit(Amps.of(40));
 
   // vendor motor controller object
-  private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX60(1), intakeRollerMotorConfig);
+  private SmartMotorController smartRollerMotor = new TalonFXWrapper(rollerMotor, DCMotor.getKrakenX60(1),
+      intakeRollerMotorConfig);
 
   private final FlyWheelConfig intakeRollerConfig = new FlyWheelConfig(smartRollerMotor)
-  .withTelemetry("Intake", TelemetryConstants.TELEMETRY_VERBOSITY)
-  .withDiameter(Inches.of(3))
-  .withMass(Kilograms.of(0.5)); //TODO: measure mass of the intake roller and update this constant
+      .withTelemetry("Intake", TelemetryConstants.TELEMETRY_VERBOSITY)
+      .withDiameter(Inches.of(3))
+      .withMass(Kilograms.of(0.5));
 
   // flywheel mechanism
   private FlyWheel intakeRollers = new FlyWheel(intakeRollerConfig);
 
-  
-    ////////////////////
-   /// INTAKE PIVOT ///
+  ////////////////////
+  /// INTAKE PIVOT ///
   ////////////////////
   private TalonFX pivotMotor = new TalonFX(IntakeConstants.PIVOT_MOTOR_ID, Constants.RIO_CAN_BUS);
   private DutyCycleEncoder encoder = new DutyCycleEncoder(IntakeConstants.PIVOT_ENCODER_ID);
@@ -81,16 +81,18 @@ public class IntakeSystem extends SubsystemBase {
   // Configure the hood motor controller for use with YAMS.
   private SmartMotorControllerConfig intakePivotMotorConfig = new SmartMotorControllerConfig(this)
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withClosedLoopController(IntakeConstants.KP, IntakeConstants.KI, IntakeConstants.KD, IntakeConstants.ANGULAR_VELOCITY, IntakeConstants.ANGULAR_ACCELERATION) //TODO: tune this PID
+      .withClosedLoopController(IntakeConstants.KP, IntakeConstants.KI, IntakeConstants.KD,
+          IntakeConstants.ANGULAR_VELOCITY, IntakeConstants.ANGULAR_ACCELERATION)
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(true)
       .withGearing(IntakeConstants.PIVOT_GEARING)
-      .withTelemetry("Intake Pivot Motor", TelemetryConstants.TELEMETRY_VERBOSITY) 
+      .withTelemetry("Intake Pivot Motor", TelemetryConstants.TELEMETRY_VERBOSITY)
       .withStatorCurrentLimit(IntakeConstants.CURRENT_LIMIT)
       .withClosedLoopRampRate(IntakeConstants.RAMP_RATE);
 
   // Create the hood's motor controller with the above configuration.
-  private SmartMotorController smartIntakePivotMotor = new TalonFXWrapper(pivotMotor, DCMotor.getKrakenX44(1), intakePivotMotorConfig);
+  private SmartMotorController smartIntakePivotMotor = new TalonFXWrapper(pivotMotor, DCMotor.getKrakenX44(1),
+      intakePivotMotorConfig);
 
   // Configure the physical characteristics of the hood.
   private PivotConfig intakePivotConfig = new PivotConfig(smartIntakePivotMotor)
@@ -98,30 +100,28 @@ public class IntakeSystem extends SubsystemBase {
       .withHardLimit((IntakeConstants.LOWER_HARD_LIMIT), (IntakeConstants.UPPER_HARD_LIMIT))
       .withSoftLimits((IntakeConstants.LOWER_SOFT_LIMIT), (IntakeConstants.UPPER_SOFT_LIMIT))
       .withTelemetry("Intake Pivot", TelemetryConstants.TELEMETRY_VERBOSITY)
-      .withMOI(Meters.of(0.75), Kilograms.of(1)); //TODO: measure MOI of the intake pivot and update these constants
+      .withMOI(Meters.of(0.75), Kilograms.of(1));
 
   // Create the hood pivot system with the above configuration.
   private Pivot intakePivot = new Pivot(intakePivotConfig);
-  
+
   public boolean deployState = false;
 
-  public boolean getDeployState(){
-      return deployState;
+  public boolean getDeployState() {
+    return deployState;
 
   }
-
 
   /**
    * 
    * 
    * 
-   * @param 
+   * @param
    * @return
    */
-  public Command invertDeployState(){
+  public Command invertDeployState() {
     return new InstantCommand(() -> deployState = !deployState);
   }
-
 
   /**
    * Set the dutycycle of the intake.
@@ -136,15 +136,16 @@ public class IntakeSystem extends SubsystemBase {
   /** Run the intake at a set speed. Used for autonomous and button bindings. */
   public Command runIntake() {
     return setRoller(1);
-  } 
+  }
 
   /** Creates a new IntakeSystem */
   public IntakeSystem() {
-    
+
   }
 
   /**
    * Set the target angle of the hood.
+   * 
    * @param angle Angle to go to.
    */
   public Command setAngle(Angle angle) {
@@ -152,7 +153,8 @@ public class IntakeSystem extends SubsystemBase {
   }
 
   public Command setAngleThenStop(Angle angle) {
-        return setAngle(angle).until(()->PosUtils.isOscillating(angle.in(Degrees), intakePivot.getAngle().in(Degrees), 2.0 , 0.0, 1.0));
+    return setAngle(angle)
+        .until(() -> PosUtils.isOscillating(angle.in(Degrees), intakePivot.getAngle().in(Degrees), 2.0, 0.0, 1.0));
 
   }
 
@@ -172,22 +174,25 @@ public class IntakeSystem extends SubsystemBase {
 
   /**
    * Move the arm up and down.
+   * 
    * @param dutycycle [-1, 1] speed to set the arm too.
    */
-  public Command setPivot(double dutycycle) { 
+  public Command setPivot(double dutycycle) {
     return intakePivot.set(dutycycle);
   }
 
   /**
    * Run sysId on the {@link HoodSystem}.
+   * Base code from YAMS Template
    */
-  public Command sysId() { 
+  public Command sysId() {
     return intakePivot.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
   }
 
   /**
    * Set the duty cycle output of the hood motor.
    * Primarily used for manual control
+   * 
    * @param power The power to be applied to the motor.
    */
   public void runMotor(double power) {
@@ -201,6 +206,7 @@ public class IntakeSystem extends SubsystemBase {
 
   /**
    * Get the raw position of the hood's encoder.
+   * 
    * @return The current position of the hood in encoder rotations.
    */
   public double getPos() {
@@ -209,6 +215,7 @@ public class IntakeSystem extends SubsystemBase {
 
   /**
    * Get the scaled position of the hood from 0 to 1.
+   * 
    * @return The position of the hood scaled from 0 to 1.
    */
   public double getScaledPos() {
@@ -218,14 +225,19 @@ public class IntakeSystem extends SubsystemBase {
 
   /**
    * Get the current angle of the hood, based on the YAMS pivot system.
-   * @return The angle of the hood, in degrees, from -180 to 180, using the YAMS pivot system.
+   * 
+   * @return The angle of the hood, in degrees, from -180 to 180, using the YAMS
+   *         pivot system.
    */
   public double getScaledPosAngleYAMS() {
     return intakePivot.getAngle().in(Degrees);
   }
+
   /**
    * Get the current angle of the hood, directly from the encoder value.
-   * @return The angle of the hood, in degrees, from -180 to 180, using the encoder directly.
+   * 
+   * @return The angle of the hood, in degrees, from -180 to 180, using the
+   *         encoder directly.
    */
   public double getHopperWallsPosition() {
     return PosUtils.mapRange(getScaledPosAngleYAMS(), IntakeConstants.MIN_ANGLE, IntakeConstants.MAX_ANGLE, 0.3048, 0);
@@ -233,18 +245,22 @@ public class IntakeSystem extends SubsystemBase {
 
   /**
    * Get the current angle of the hood, directly from the encoder value.
-   * @return The angle of the hood, in degrees, from -180 to 180, using the encoder directly.
+   * 
+   * @return The angle of the hood, in degrees, from -180 to 180, using the
+   *         encoder directly.
    */
   public double getScaledPosAngleEncoder() {
-    if(!Robot.isReal()) {
+    if (!Robot.isReal()) {
       return 0;
     }
-    return PosUtils.mapRange(getPos(), IntakeConstants.MIN_ENCODER_POSITION, IntakeConstants.MAX_ENCODER_POSITION, IntakeConstants.MIN_ANGLE,
+    return PosUtils.mapRange(getPos(), IntakeConstants.MIN_ENCODER_POSITION, IntakeConstants.MAX_ENCODER_POSITION,
+        IntakeConstants.MIN_ANGLE,
         IntakeConstants.MAX_ANGLE);
   }
 
   /**
    * Get the current velocity of the hood.
+   * 
    * @return The velocity of the hood, in degrees per second.
    */
   public double getVelocity() {
@@ -254,7 +270,8 @@ public class IntakeSystem extends SubsystemBase {
   public AngularVelocity getRollerVelocity() {
     return intakeRollers.getSpeed();
   }
-  public boolean isIntakeRunning(){
+
+  public boolean isIntakeRunning() {
     return !intakeRollers.gte(DegreesPerSecond.of(1)).getAsBoolean();
   }
 
@@ -270,25 +287,26 @@ public class IntakeSystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     // Send values to NT to display on Elastic.
-    /*  TODO: look into SmartDashboard alternatives, as it's deprecated, 
-     *  marked for removal along with Shuffleboard for next season.
-     *  Consider publishing to NT directly.
+    /*
+     * TODO: look into SmartDashboard alternatives, as it's deprecated,
+     * marked for removal along with Shuffleboard for next season.
+     * Consider publishing to NT directly.
      */
-    if(TelemetryConstants.TELEMETRY_VERBOSITY == TelemetryVerbosity.HIGH) {
-    SmartDashboard.putNumber("Intake Pivot Pos", getPos());
-    SmartDashboard.putNumber("Scaled Intake Pivot Pos", getScaledPos());
-    SmartDashboard.putNumber("Intake Pivot Angle (Encoder)", getScaledPosAngleEncoder());
+    if (TelemetryConstants.TELEMETRY_VERBOSITY == TelemetryVerbosity.HIGH) {
+      SmartDashboard.putNumber("Intake Pivot Pos", getPos());
+      SmartDashboard.putNumber("Scaled Intake Pivot Pos", getScaledPos());
+      SmartDashboard.putNumber("Intake Pivot Angle (Encoder)", getScaledPosAngleEncoder());
+      SmartDashboard.putNumber("Intake Roller Velocity", getRollerVelocity().in(RPM));
+      SmartDashboard.putBoolean("Intake Rollers Running", (isIntakeRunning()));
     }
-    SmartDashboard.putNumber("Intake Roller Velocity", getRollerVelocity().in(RPM));
-    SmartDashboard.putBoolean("Intake Rollers Running", (isIntakeRunning()));
-    
+
     intakePivot.updateTelemetry();
   }
 
   @Override
   public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-    // Updates the intake pivot simulation's values,
+    // This method will be called once per scheduler run during 
+    // simulation. Updates the intake pivot simulation's values,
     intakePivot.simIterate();
   }
 
@@ -297,7 +315,8 @@ public class IntakeSystem extends SubsystemBase {
   }
 
   public Pose3d getIntakePivotPose() {
-    return new Pose3d(ModelConstants.ORIGIN_TO_INTAKE_PIVOT_POINT_OFFSET, new Rotation3d(0, -Math.toRadians(getScaledPosAngleYAMS()), 0));
+    return new Pose3d(ModelConstants.ORIGIN_TO_INTAKE_PIVOT_POINT_OFFSET,
+        new Rotation3d(0, -Math.toRadians(getScaledPosAngleYAMS()), 0));
   }
 
 }
