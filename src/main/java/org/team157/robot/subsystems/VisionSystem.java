@@ -71,14 +71,11 @@ public class VisionSystem extends SubsystemBase {
 
   public boolean hasTag = false;
 
-  public static double angleToTarget = 0;
-  public static double distanceToTarget = 0;
+  public double angleToTarget = 0;
+  public double distanceToTarget = 0;
   public static double distanceToTargetFromTurret = 0;
   public static double angleToTargetFromTurret = 0;
-  public static double lastDistanceToTarget = 0;
-  public static double lastTrackedTime = 0;
 
-  // TODO: move to constants.java
   final PoseStrategy poseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
   final PoseStrategy fallbackStrategy = PoseStrategy.LOWEST_AMBIGUITY;
 
@@ -142,7 +139,7 @@ public class VisionSystem extends SubsystemBase {
   public Command setDefault(DriveSystem drivetrain, TurretSystem turret) {
     return run(() -> {
       updatePoseEstimation(drivetrain);
-      turret.updateRelativeAngleToTag(FieldConstants.positionDetails.targetPose2d(drivetrain.getPose(), isBlueAlliance),
+      turret.updateRelativeAngleToTarget(FieldConstants.positionDetails.targetPose2d(drivetrain.getPose(), isBlueAlliance),
           drivetrain.getPose());
       driveLinearVelocityX = drivetrain.getStateCopy().Speeds.vxMetersPerSecond;
       driveLinearVelocityY = drivetrain.getStateCopy().Speeds.vyMetersPerSecond;
@@ -460,6 +457,7 @@ public class VisionSystem extends SubsystemBase {
   }
 
   /**
+  /**
    * Camera Enum to select each camera
    */
   enum Cameras {
@@ -573,7 +571,7 @@ public class VisionSystem extends SubsystemBase {
           PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
           robotToCamTransform);
       poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-
+      //TODO: evaluate whether we need turret cam at all, remove this code and all notions of turret cam if we dont want to use it for global positioning
       if (name.equals(VisionConstants.TURRET_CAMERA_NICKNAME)) {
         this.useForPositioning = false;
       }
@@ -588,6 +586,7 @@ public class VisionSystem extends SubsystemBase {
      * recent result!
      *
      * @return The result in the cache with the least ambiguous best tracked target.
+     *        
      *         This is not the most recent result!
      */
     public Optional<PhotonPipelineResult> getBestResult() {
@@ -619,9 +618,9 @@ public class VisionSystem extends SubsystemBase {
     }
 
     /**
-     * Get the estimated robot pose. Updates the current robot pose estimation,
-     * standard deviations, and flushes the
-     * cache of results.
+     * Get the estimated robot pose. Updates the current
+     * robot pose estimation standard deviations
+     * and flushes the cache of results.
      *
      * @return Estimated pose.
      */
@@ -679,8 +678,8 @@ public class VisionSystem extends SubsystemBase {
     }
 
     /**
-     * Calculates new standard deviations This algorithm is a heuristic that creates
-     * dynamic standard deviations based
+     * Calculates new standard deviations. This algorithm is 
+     * a heuristic that creates dynamic standard deviations based
      * on number of tags, estimation strategy, and distance from the tags.
      *
      * @param estimatedPose The estimated pose to guess standard deviations for.
