@@ -68,43 +68,51 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    // Pivot
-    public static final int PIVOT_MOTOR_ID = 15;
-    public static final int PIVOT_ENCODER_ID = 1;
-
+    /** Pivot motor and encoder IDs */
+    public static final int PIVOT_MOTOR_ID = 16, PIVOT_ENCODER_ID = 1;
+    /** Gearing for the pivot motor */
     public static final MechanismGearing PIVOT_GEARING = new MechanismGearing(GearBox.fromStages("23:1", "50:12"));
+    /** Closed loop control values for the pivot */
     public static final double KP = 157, KI = 0, KD = 0;
     public static final double SIM_KP = 157, SIM_KI = 0, SIM_KD = 0;
+    /** Angular velocity for the pivot motor */
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
+    /** Angular acceleration for the pivot motor */
     public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(540);
+    /** Minimum and maximum positions for the pivot encoder */
     public static final double MIN_ENCODER_POSITION = 0.01, MAX_ENCODER_POSITION = 0.91;
+    /** Minimum and maximum angles for the pivot */
     public static final double MIN_ANGLE = 0, MAX_ANGLE = 80;
+    /** Soft limits for the pivot angle */
     public static final Angle LOWER_SOFT_LIMIT = Degrees.of(0), UPPER_SOFT_LIMIT = Degrees.of(80);
+    /** Hard limits for the pivot angle */
     public static final Angle LOWER_HARD_LIMIT = Degrees.of(0), UPPER_HARD_LIMIT = Degrees.of(80);
+    /** Current limit for the pivot motor */
     public static final Current CURRENT_LIMIT = Amps.of(40);
+    /** Ramp rate for the pivot motor */
     public static final Time RAMP_RATE = Seconds.of(0.00157);
-    public static final double PIVOT_HOLD = 0.0157;
-
-    public static final int ROLLER_MOTOR_ID = 14;
-    public static final int FOLLOWER_MOTOR_ID = 28;
+    /** Duty cycle to hold the pivot in place */
+    public static final double PIVOT_HOLD = 0.0157; 
+    /** Roller motor IDs */
+    public static final int ROLLER_MOTOR_ID = 14, FOLLOWER_MOTOR_ID = 15;
   }
 
   public static class HopperConstants {
-    public static final int MOTOR_ID = 16;
+    public static final int MOTOR_ID = 17;
     public static final Current CURRENT_LIMIT = Amps.of(40);
     public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("2:1"));
 
   }
 
   public static class UptakeConstants {
-    public static final int MOTOR_ID = 17;
+    public static final int MOTOR_ID = 18;
     public static final Current CURRENT_LIMIT = Amps.of(40);
     public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("9:1"));
 
   }
 
   public static class TurretConstants {
-    public static final int MOTOR_ID = 18;
+    public static final int MOTOR_ID = 19;
     public static final int ENCODER_ID = 0;
     public static final double MIN_ENCODER_POSITION = 0.99, MAX_ENCODER_POSITION = 0.014;
     public static final double MIN_ANGLE = -179, MAX_ANGLE = 179;
@@ -123,7 +131,7 @@ public final class Constants {
 
   public static class HoodConstants {
 
-    public static final int MOTOR_ID = 19;
+    public static final int MOTOR_ID = 20;
     public static final int ENCODER_ID = 2;
 
     public static final double MIN_ENCODER_POSITION = 0.375, MAX_ENCODER_POSITION = 0.94;
@@ -142,7 +150,7 @@ public final class Constants {
 
   public static class FlywheelConstants {
     // IDs of both motors powering the flywheel.
-    public static final int MOTOR_ID = 20, FOLLOWER_MOTOR_ID = 21;
+    public static final int MOTOR_ID = 21, FOLLOWER_MOTOR_ID = 22;
     // Closed-loop control values for the flywheel.
     public static final double KP = 2, KI = 0, KD = 0;
     public static final double KS = 0.0, KV = 0.0, KA = 0.0;

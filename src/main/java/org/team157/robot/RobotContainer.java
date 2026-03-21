@@ -115,6 +115,7 @@ public class RobotContainer {
         turret.setDefaultCommand(turret.setDefault());
         flywheel.setDefaultCommand(flywheel.setDefault());
         intakePivot.setDefaultCommand(intakePivot.setDefault());
+        intakeRoller.setDefaultCommand(intakeRoller.setDefault());
         hopper.setDefaultCommand(hopper.setDefault());
         uptake.setDefaultCommand(uptake.setDefault());
         hood.setDefaultCommand(hood.setDefault());

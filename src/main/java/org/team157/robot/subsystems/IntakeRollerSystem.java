@@ -103,10 +103,10 @@ public class IntakeRollerSystem extends SubsystemBase {
      *  Consider publishing to NT directly.
      */
     if(TelemetryConstants.TELEMETRY_VERBOSITY == TelemetryVerbosity.HIGH) {
-
+      SmartDashboard.putNumber("Intake Roller Velocity", getRollerVelocity().in(RPM));
+      SmartDashboard.putBoolean("Intake Rollers Running", (isIntakeRunning()));
     }
-    SmartDashboard.putNumber("Intake Roller Velocity", getRollerVelocity().in(RPM));
-    SmartDashboard.putBoolean("Intake Rollers Running", (isIntakeRunning()));
+
     
     intakeRollers.updateTelemetry();
   }
