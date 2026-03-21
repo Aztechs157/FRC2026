@@ -66,12 +66,10 @@ public class VisionSystem extends SubsystemBase {
 
   public boolean hasTag = false;
 
-  public static double angleToTarget = 0;
-  public static double distanceToTarget = 0;
+  public double angleToTarget = 0;
+  public double distanceToTarget = 0;
   public static double distanceToTargetFromTurret = 0;
   public static double angleToTargetFromTurret = 0;
-  public static double lastDistanceToTarget = 0;
-  public static double lastTrackedTime = 0;
 
   final PoseStrategy poseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
   final PoseStrategy fallbackStrategy = PoseStrategy.LOWEST_AMBIGUITY;
