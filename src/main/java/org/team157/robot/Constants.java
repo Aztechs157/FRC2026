@@ -201,7 +201,6 @@ public final class Constants {
     // ability to auto-align.
     public static final double MIN_DISTANCE_TO_TAG = 0.8;
 
-    public static final Pose2d MANUAL_RESET_POSE = new Pose2d();
   }
 
 
@@ -213,7 +212,11 @@ public final class Constants {
   public static class FieldConstants {
     public static final Distance FIELD_LENGTH = Meters.of(16.54175);
     public static final Distance FIELD_WIDTH = Meters.of(8.0137); 
-    
+    /** Manual reset position in blue alliance HP corner */
+    public static final Pose2d MANUAL_RESET_POSE_BLUE = new Pose2d(0.441, 0.441, new Rotation2d());
+    /** Manual reset position in red alliance HP corner */
+    public static final Pose2d MANUAL_RESET_POSE_RED = new Pose2d(FieldConstants.FIELD_LENGTH.in(Meters) - 0.441, FieldConstants.FIELD_WIDTH.in(Meters) - 0.441, new Rotation2d(Degrees.of(180)));
+  
     public static final PositionDetails positionDetails = new PositionDetails();
     
 

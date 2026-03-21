@@ -152,18 +152,26 @@ public class RobotContainer {
 
         // Reset the field-centric heading on start and back button press.
         driverController.start().and(driverController.back()).onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        // Reset the robot pose to the alliance-specific manual reset pose when both start and back are pressed together on both controllers
+        operatorController.start().and(operatorController.back().and(driverController.start()
+              .and(driverController.back()))).onTrue(drivetrain.resetPose());
+
         // When the B button is held, the robot will brake in place, holding its position against external forces. 
         driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
 
 
-          ///////////////////////////
-         ///     FlYWHEEL HOOD   ///
+
+
+          /////////////////////
+         /// FlYWHEEL HOOD ///
+        /////////////////////
         // Enables dynamic control of the flywheel and hood.
         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
         driverController.a().toggleOnTrue(hood.setDynamicHoodAngle());
 
           ////////////////////////////
          /// INTAKE UPTAKE HOPPER ///
+        ////////////////////////////
         // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's preference.
         if(ModifierConstants.MAYA_MODE) {
             // Shooting on left trigger, intake on right trigger
@@ -198,6 +206,7 @@ public class RobotContainer {
        turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());        
           ///////////////////////
          /// MANUAL FLYWHEEL ///
+        ///////////////////////
         // Only enable manual control of turret, hood and flywheel when manual override is enabled
         // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
         operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
@@ -209,21 +218,24 @@ public class RobotContainer {
         operatorController.povLeft().whileTrue(turret.setAngle(Degrees.of(220)));
         operatorController.povUpLeft().toggleOnTrue(turret.setAngle(Degrees.of(265)));
         
-          ////////////////////////
+          ///////////////////////
          /// MANUAl FLYWHEEL ///
+        ///////////////////////
         // Set the flywheel to preset velocities based on the bumpers and triggers of the Operator controller.
         operatorController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4800)));
         operatorController.rightBumper().toggleOnTrue(flywheel.setVelocity(RPM.of(2800)));
 
         
-           ////////////////////
-          /// MANUAL HOOD ///
+          ///////////////////
+         /// MANUAL HOOD ///
+        ///////////////////
          // Set the hood to preset angles based on the bumpers and triggers of the Operator controller.
         operatorController.leftTrigger().toggleOnTrue(hood.setAngle(Degrees.of(45)));
         operatorController.leftBumper().toggleOnTrue(hood.setAngle(Degrees.of(60)));
        
-           ///////////////////////
-          /// INTAKE COMMANDS ///
+          ///////////////////////
+         /// INTAKE COMMANDS ///
+        /////////////////////// 
          // Deploy and retract the intake with the A and Y buttons, but only when the back button is held to prevent accidental activation during teleop. 
         operatorController.a().and(operatorController.back()).toggleOnTrue(intake.deployIntake());
         operatorController.y().and(operatorController.back()).toggleOnTrue(intake.retractIntake());
@@ -231,8 +243,8 @@ public class RobotContainer {
     } 
 
 
-          ///////////////////////////////////////////////////////
-         ///            NON-CONTROL FUNCTIONS                ///
+          //////////////////////////////////////////////////////
+         ///            NON-CONTROL FUNCTIONS               ///
         //////////////////////////////////////////////////////
 
     // If the A button is held, apply the precision modifier of 0.5x speed.
