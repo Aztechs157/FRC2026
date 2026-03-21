@@ -108,7 +108,7 @@ public class FlywheelSystem extends SubsystemBase {
     return Math.sqrt((g * distance * distance) / denominator);
   }
 
-  public static void setShotParams(double height, double distance) {
+  public void setShotParams(double height, double distance) {
     double lowerBound = HoodConstants.LOWER_SOFT_LIMIT.in(Radians);
     double upperBound = HoodConstants.UPPER_SOFT_LIMIT.in(Radians);
     double steps = 50;
