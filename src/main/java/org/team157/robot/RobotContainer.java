@@ -59,7 +59,8 @@ public class RobotContainer {
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
     public final FlywheelSystem flywheel = new FlywheelSystem();
-    public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
+    // TODO: consider whether other systems should be static, had to make this static for the dyanmic hood under trench.
+    public static final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
     private final SendableChooser<Command> autoChooser;
 

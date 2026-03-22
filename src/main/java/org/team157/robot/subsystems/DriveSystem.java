@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import org.team157.robot.Constants.FieldConstants;
+import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -370,8 +371,12 @@ public class DriveSystem extends TunerSwerveDrivetrain implements Subsystem {
     public Pose2d getPose() {
         return super.getStateCopy().Pose;
     }
-
+    /**
+     * Returns whether or not the turret is underneath the trench.
+     * 
+     * @return true if the turret (offset from drivebase center) is within a trench zone, false otherwise.
+     */
     public boolean isUnderTrench() {
-        return FieldConstants.positionDetails.isUnderTrench(getPose());
+        return FieldConstants.positionDetails.isUnderTrench(getPose().plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET));
     }
 }
