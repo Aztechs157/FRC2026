@@ -25,8 +25,6 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -57,7 +55,6 @@ import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.VisionConstants;
 import org.team157.robot.Robot;
 
-@Logged(strategy = Strategy.OPT_OUT)
 public class VisionSystem extends SubsystemBase {
 
   // Publishes the turret's target point to NT for field zoning testing.
