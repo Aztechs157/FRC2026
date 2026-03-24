@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.*;
 import java.util.Optional;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.fasterxml.jackson.databind.util.Named;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -24,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import org.team157.robot.Constants.ControllerConstants;
 import org.team157.robot.Constants.ModifierConstants;
@@ -61,22 +59,22 @@ public class RobotContainer {
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
     public final FlywheelSystem flywheel = new FlywheelSystem();
-    public final DriveSystem drivetrain = TunerConstants.createDrivetrain();    
+    public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
     private final SendableChooser<Command> autoChooser;
 
     public final Trigger intakeDeployTrigger = new Trigger(() -> intake.getDeployState());
 
     public static boolean manualOverride = false; // When true, allows manual control of the turret, hood, and flywheel, disabling any dynamic control.
-    
+
     public RobotContainer() {
-         // Adjusts drive speed based on if the robot is in rookie/demo mode.
+        // Adjusts drive speed based on if the robot is in rookie/demo mode.
         if (ModifierConstants.DEMO_MODE) {
             MaxSpeed = MaxSpeed * ModifierConstants.DEMO_DRIVE_MODIFIER;
             MaxAngularRate = MaxAngularRate * ModifierConstants.DEMO_DRIVE_MODIFIER;
         } else if (ModifierConstants.ROOKIE_MODE) {
             MaxSpeed = MaxSpeed * ModifierConstants.ROOKIE_DRIVE_MODIFIER;
-            
+
         }
 
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
@@ -91,33 +89,30 @@ public class RobotContainer {
         configureBindings();
 
         autoChooser = AutoBuilder.buildAutoChooser("New Auto");
-                SmartDashboard.putData("Auto Chooser", autoChooser);
-
+        SmartDashboard.putData("Auto Chooser", autoChooser);
 
     }
 
     private void configureBindings() {
-          ////////////////////////
-         /// DEFAULT COMMANDS ///
+        ////////////////////////
+        /// DEFAULT COMMANDS ///
         ////////////////////////
 
-        // Idle while the robot is disabled. This ensures the configured
-        // neutral mode is applied to the drive motors while disabled.
-        
+        // Idle while the robot is disabled. This ensures the configured neutral mode is applied to the drive motors while disabled.
+
         final var idle = new SwerveRequest.Idle();
         RobotModeTriggers.disabled().whileTrue(
-            drivetrain.applyRequest(() -> idle).ignoringDisable(true)
-        );
+                drivetrain.applyRequest(() -> idle).ignoringDisable(true));
         // Telemetry for the drivetrain.
-        drivetrain.registerTelemetry(logger::telemeterize);        
+        drivetrain.registerTelemetry(logger::telemeterize);
 
-        // Update the pose estimation and turret tracking angle while no other vision commands are running. 
+        // Update the pose estimation and turret tracking angle while no other vision commands are running.
         visionSystem.setDefaultCommand(visionSystem.setDefault(drivetrain, turret));
 
         // Disable turret movement when no other turret commands are running.
         turret.setDefaultCommand(turret.setDefault());
         flywheel.setDefaultCommand(flywheel.setDefault());
-        intake.setDefaultCommand(intake.setDefault()); 
+        intake.setDefaultCommand(intake.setDefault());
         hopper.setDefaultCommand(hopper.setDefault());
         uptake.setDefaultCommand(uptake.setDefault());
         hood.setDefaultCommand(hood.setDefault());
@@ -129,26 +124,27 @@ public class RobotContainer {
         // driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-          //////////////////////////////////////////////
-         ///            DRIVER COMMANDS             ///
         //////////////////////////////////////////////
-        
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
+        ///             DRIVER COMMANDS            ///
+        //////////////////////////////////////////////
+
+        // Note that X is defined as forward according to WPILib convention, and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() -> drive
-                .withVelocityX(MathUtil.applyDeadband(-driverController.getLeftY(),
-                        ControllerConstants.LEFT_Y_DEADBAND) * modifySpeed(MaxSpeed)) // Drive forward with
-                                                                                        // negative Y
-                // (forward)
-                .withVelocityY(MathUtil.applyDeadband(-driverController.getLeftX(),
-                        ControllerConstants.LEFT_X_DEADBAND) * modifySpeed(MaxSpeed)) // Drive left with
-                                                                                        // negative X (left)
-                .withRotationalRate(MathUtil.applyDeadband(-driverController.getRightX(),
-                        ControllerConstants.RIGHT_X_DEADBAND) * modifySpeed(MaxAngularRate)) // Drive counterclockwise with
-                                                                                // negative X (left)
-        ));
+                // Drivetrain will execute this command periodically
+                drivetrain.applyRequest(() -> drive
+                        .withVelocityX(MathUtil.applyDeadband(-driverController.getLeftY(),
+                                ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxSpeed)) // Drive forward with
+                                                                                                // negative Y
+                        // (forward)
+                        .withVelocityY(MathUtil.applyDeadband(-driverController.getLeftX(),
+                                ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxSpeed)) // Drive left with
+                                                                                                // negative X (left)
+                        .withRotationalRate(MathUtil.applyDeadband(-driverController.getRightX(),
+                                ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxAngularRate)) // Drive
+                                                                                                      // counterclockwise
+                                                                                                      // with
+                // negative X (left)
+                ));
 
         // Reset the field-centric heading on start and back button press.
         driverController.start().and(driverController.back()).onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
@@ -158,7 +154,6 @@ public class RobotContainer {
 
         // When the B button is held, the robot will brake in place, holding its position against external forces. 
         driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
-
 
 
 
@@ -191,22 +186,20 @@ public class RobotContainer {
         // Toggle manual override (on driver A for testing without controller)
         // driverController.a().onTrue(toggleManualOverride());
 
-
-          //////////////////////////////////////////////////
-         ///            OPERATOR COMMANDS               ///
         //////////////////////////////////////////////////
-        
+        ///             OPERATOR COMMANDS              ///
+        //////////////////////////////////////////////////
+
         // Toggle manual override with both sticks to prevent accidental activation during teleop.
-        operatorController.leftStick().and(operatorController.rightStick()).onTrue(toggleManualOverride()); // Toggle manual override with both sticks
-        
-        // Disables automatic turret tracking when manual override is enabled, 
+        operatorController.leftStick().and(operatorController.rightStick()).onTrue(toggleManualOverride());
+
+        // Disables automatic turret tracking when manual override is enabled,
         // allowing the operator to control the turret without interference from vision tracking.
-       turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());;  
+       turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
        turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
        turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());        
           ///////////////////////
          /// MANUAL FLYWHEEL ///
-        ///////////////////////
         // Only enable manual control of turret, hood and flywheel when manual override is enabled
         // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
         operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
@@ -240,8 +233,7 @@ public class RobotContainer {
         operatorController.a().and(operatorController.back()).toggleOnTrue(intake.deployIntake());
         operatorController.y().and(operatorController.back()).toggleOnTrue(intake.retractIntake());
 
-    } 
-
+    }
 
           //////////////////////////////////////////////////////
          ///            NON-CONTROL FUNCTIONS               ///
@@ -249,17 +241,18 @@ public class RobotContainer {
 
     // If the A button is held, apply the precision modifier of 0.5x speed.
     public double modifySpeed(final double speed) {
-        if (driverController.rightBumper().getAsBoolean()) { 
+        if (driverController.rightBumper().getAsBoolean()) {
             return speed * ModifierConstants.PRECISION_DRIVE_MODIFIER;
         } else {
             return speed;
         }
-    } 
-    // Old trigger-based precision mode that scales speed based on how much the right trigger is pressed. 
+    }
+    // Old trigger-based precision mode that scales speed based on how much the right trigger is pressed.
     // Replaced by button-based toggle due to lack of available triggers.
     // public double modifySpeed(final double speed) {
-    //     final var modifier = 1 - driverController.getRightTriggerAxis() * ModifierConstants.PRECISION_DRIVE_MODIFIER;
-    //     return speed * modifier;
+    // final var modifier = 1 - driverController.getRightTriggerAxis() *
+    // ModifierConstants.PRECISION_DRIVE_MODIFIER;
+    // return speed * modifier;
     // }
 
     public boolean isHubActive() {
@@ -280,7 +273,8 @@ public class RobotContainer {
         // We're teleop enabled, compute.
         double matchTime = DriverStation.getMatchTime();
         String gameData = DriverStation.getGameSpecificMessage();
-        // If we have no game data, we cannot compute, assume hub is active, as its likely early in teleop.
+        // If we have no game data, we cannot compute, assume hub is active, as its
+        // likely early in teleop.
         if (gameData.isEmpty()) {
             return true;
         }
@@ -289,7 +283,7 @@ public class RobotContainer {
             case 'R' -> redInactiveFirst = true;
             case 'B' -> redInactiveFirst = false;
             default -> {
-            // If we have invalid game data, assume hub is active.
+                // If we have invalid game data, assume hub is active.
                 return true;
             }
         }
@@ -325,28 +319,34 @@ public class RobotContainer {
         return autoChooser.getSelected();
     }
 
-    /** 
-     * Inverts the state of manual override, allowing the operator to toggle between manual and dynamic control of the turret, hood, and flywheel.
+    /**
+     * Inverts the state of manual override, allowing the operator to toggle between
+     * manual and dynamic control of the turret, hood, and flywheel.
+     * 
      * @return {@link InstantCommand} that toggles manual override when executed.
-     * */ 
+     */
     private Command toggleManualOverride() {
         return new InstantCommand(() -> {
             manualOverride = !manualOverride;
         });
     }
 
-    // A simple command that runs the intake, hopper, and uptake rollers in reverse at a low speed to clear any jams. 
+    // A simple command that runs the intake, hopper, and uptake rollers in reverse
+    // at a low speed to clear any jams.
     // TODO: remove from RobotContainer and into eventual Superstructure subsystem once it exists.
     private Command forceOuttake() {
-        return uptake.setRoller(-0.25).alongWith(hopper.setRoller(-0.25)).alongWith(intake.setRoller(-0.25));
+        return uptake.setRoller(-0.5).alongWith(hopper.setRoller(-0.5)).alongWith(intake.setRoller(-0.5));
     }
 
-    /** 
+    /**
      * Trigger used for tracking a target location with the turret
-     * @return {@link Trigger} that is true when the robot is in teleop or autonomous and manual override 
+     * 
+     * @return {@link Trigger} that is true when the robot is in teleop or autonomous and manual override
      * is not enabled, allowing the turret to track targets when those conditions are met.
      */
     private Trigger turretTrackingTrigger() {
-        return new Trigger(() -> (RobotModeTriggers.teleop().getAsBoolean() || RobotModeTriggers.autonomous().getAsBoolean()) && !manualOverride);
+        return new Trigger(
+                () -> (RobotModeTriggers.teleop().getAsBoolean() || RobotModeTriggers.autonomous().getAsBoolean())
+                        && !manualOverride);
     }
 }
