@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.team157.robot.subsystems;
+package org.team157.robot.subsystems.hood;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
@@ -16,6 +16,7 @@ import org.team157.robot.Constants;
 import org.team157.robot.Constants.HoodConstants;
 import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.TelemetryConstants;
+import org.team157.robot.subsystems.FlywheelSystem;
 import org.team157.utilities.PosUtils;
 
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;

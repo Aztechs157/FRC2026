@@ -25,16 +25,19 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import org.team157.robot.Constants.ControllerConstants;
+import org.team157.robot.Constants.HoodConstants;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.DriveSystem;
 import org.team157.robot.subsystems.FlywheelSystem;
 import org.team157.robot.subsystems.HopperSystem;
 import org.team157.robot.subsystems.IntakeSystem;
-import org.team157.robot.subsystems.HoodSystem;
 import org.team157.robot.subsystems.TurretSystem;
 import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
+import org.team157.robot.subsystems.hood.Hood;
+import org.team157.robot.subsystems.hood.HoodIOTalonFX;
+import org.team157.robot.subsystems.hood.HoodSystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -54,7 +57,9 @@ public class RobotContainer {
 
     public final TurretSystem turret;
     public final VisionSystem visionSystem;
-    public final HoodSystem hood = new HoodSystem();
+
+    // public final HoodSystem hood = new HoodSystem();
+    public final Hood hoodtwo = new Hood();
     public final IntakeSystem intake = new IntakeSystem();
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
@@ -80,6 +85,7 @@ public class RobotContainer {
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
         turret = new TurretSystem(visionSystem);
 
+        hoodtwo.setIO(new HoodIOTalonFX(hoodtwo));
         NamedCommands.registerCommand("DeployIntake", intake.deployIntake());
         NamedCommands.registerCommand("RunIntake", intake.runIntake());
         NamedCommands.registerCommand("RunHopper", hopper.setRoller(0.5));
@@ -115,7 +121,7 @@ public class RobotContainer {
         intake.setDefaultCommand(intake.setDefault());
         hopper.setDefaultCommand(hopper.setDefault());
         uptake.setDefaultCommand(uptake.setDefault());
-        hood.setDefaultCommand(hood.setDefault());
+        hoodtwo.setDefaultCommand(hoodtwo.setDefault());
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -158,7 +164,7 @@ public class RobotContainer {
 
         // Enables dynamic control of the flywheel and hood.
         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
-        driverController.a().toggleOnTrue(hood.setDynamicHoodAngle());
+        driverController.a().toggleOnTrue(hoodtwo.setDynamicHoodAngle());
 
         ////////////////////////////
         /// INTAKE UPTAKE HOPPER ///
@@ -195,7 +201,7 @@ public class RobotContainer {
         turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
         ;
         turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
-        turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());
+        turretTrackingTrigger().whileTrue(hoodtwo.setDynamicHoodAngle());
 
         ///////////////////////
         /// MANUAL FLYWHEEL ///
@@ -227,8 +233,8 @@ public class RobotContainer {
 
         // Set the hood to preset angles based on the bumpers and triggers of the
         // Operator controller.
-        operatorController.leftTrigger().toggleOnTrue(hood.setAngle(Degrees.of(45)));
-        operatorController.leftBumper().toggleOnTrue(hood.setAngle(Degrees.of(60)));
+        operatorController.leftTrigger().toggleOnTrue(hoodtwo.setAngle(Degrees.of(45)));
+        operatorController.leftBumper().toggleOnTrue(hoodtwo.setAngle(Degrees.of(60)));
 
         ///////////////////////
         /// INTAKE COMMANDS ///
