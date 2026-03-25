@@ -31,10 +31,11 @@ import org.team157.robot.subsystems.DriveSystem;
 import org.team157.robot.subsystems.FlywheelSystem;
 import org.team157.robot.subsystems.HopperSystem;
 import org.team157.robot.subsystems.IntakeSystem;
-import org.team157.robot.subsystems.HoodSystem;
 import org.team157.robot.subsystems.TurretSystem;
 import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
+import org.team157.robot.subsystems.hood.Hood;
+import org.team157.robot.subsystems.hood.HoodIOTalonFX;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -54,7 +55,9 @@ public class RobotContainer {
 
     public final TurretSystem turret;
     public final VisionSystem visionSystem;
-    public final HoodSystem hood = new HoodSystem();
+
+    // public final HoodSystem hood = new HoodSystem();
+    public final Hood hood = new Hood();
     public final IntakeSystem intake = new IntakeSystem();
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
@@ -79,7 +82,8 @@ public class RobotContainer {
 
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
         turret = new TurretSystem(visionSystem);
-
+        // Sets the IO implementation used in the Hood subsystem
+        hood.setIO(new HoodIOTalonFX(hood));
         NamedCommands.registerCommand("DeployIntake", intake.deployIntake());
         NamedCommands.registerCommand("RunIntake", intake.runIntake());
         NamedCommands.registerCommand("RunHopper", hopper.setRoller(0.5));
@@ -115,7 +119,7 @@ public class RobotContainer {
         intake.setDefaultCommand(intake.setDefault());
         hopper.setDefaultCommand(hopper.setDefault());
         uptake.setDefaultCommand(uptake.setDefault());
-        hood.setDefaultCommand(hood.setDefault());
+        hood.setDefaultCommand(hood.getDefault());
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -195,11 +199,15 @@ public class RobotContainer {
 
         // Disables automatic turret tracking when manual override is enabled,
         // allowing the operator to control the turret without interference from vision tracking.
-       turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
-       turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
-       turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());        
-          ///////////////////////
-         /// MANUAL FLYWHEEL ///
+        turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
+        ;
+        turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
+        turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());
+
+        ///////////////////////
+        /// MANUAL FLYWHEEL ///
+        ///////////////////////
+
         // Only enable manual control of turret, hood and flywheel when manual override is enabled
         // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
         operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
@@ -222,14 +230,18 @@ public class RobotContainer {
           ///////////////////
          /// MANUAL HOOD ///
         ///////////////////
-         // Set the hood to preset angles based on the bumpers and triggers of the Operator controller.
+
+        // Set the hood to preset angles based on the bumpers and triggers of the
+        // Operator controller.
         operatorController.leftTrigger().toggleOnTrue(hood.setAngle(Degrees.of(45)));
         operatorController.leftBumper().toggleOnTrue(hood.setAngle(Degrees.of(60)));
-       
-          ///////////////////////
-         /// INTAKE COMMANDS ///
-        /////////////////////// 
-         // Deploy and retract the intake with the A and Y buttons, but only when the back button is held to prevent accidental activation during teleop. 
+
+        ///////////////////////
+        /// INTAKE COMMANDS ///
+        ///////////////////////
+
+        // Deploy and retract the intake with the A and Y buttons, but only when the
+        // back button is held to prevent accidental activation during teleop.
         operatorController.a().and(operatorController.back()).toggleOnTrue(intake.deployIntake());
         operatorController.y().and(operatorController.back()).toggleOnTrue(intake.retractIntake());
 

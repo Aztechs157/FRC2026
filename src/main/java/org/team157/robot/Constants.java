@@ -194,12 +194,6 @@ public final class Constants {
     public static final Transform3d TURRET_CAMERA_PLACEMENT = new Transform3d(
             TURRET_CAMERA_TRANSLATION, TURRET_CAMERA_ROTATION);
 
-
-    public static final PIDController AIMING_PID = new PIDController(0.05, 0, 0.01);
-    // How close the robot can be (bumper to tag, in meters) before losing the
-    // ability to auto-align.
-    public static final double MIN_DISTANCE_TO_TAG = 0.8;
-
   }
 
 
