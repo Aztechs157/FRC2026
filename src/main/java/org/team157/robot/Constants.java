@@ -23,6 +23,7 @@ import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -191,8 +192,10 @@ public final class Constants {
     public static final Rotation3d TURRET_CAMERA_ROTATION = new Rotation3d(0, 0, 0);
     public static final Translation3d TURRET_CAMERA_TRANSLATION = new Translation3d(0.2602992, 0, 0.126);
     public static final Transform3d TURRET_CAMERA_PLACEMENT = new Transform3d(
-        TURRET_CAMERA_TRANSLATION, TURRET_CAMERA_ROTATION);
+            TURRET_CAMERA_TRANSLATION, TURRET_CAMERA_ROTATION);
+
   }
+
 
   public static class TelemetryConstants {
     public static final TelemetryVerbosity TELEMETRY_VERBOSITY = TelemetryVerbosity.LOW;
@@ -201,8 +204,12 @@ public final class Constants {
 
   public static class FieldConstants {
     public static final Distance FIELD_LENGTH = Meters.of(16.54175);
-    public static final Distance FIELD_WIDTH = Meters.of(8.0137);
-
+    public static final Distance FIELD_WIDTH = Meters.of(8.0137); 
+    /** Manual reset position in blue alliance HP corner */
+    public static final Pose2d MANUAL_RESET_POSE_BLUE = new Pose2d(0.441, 0.441, new Rotation2d());
+    /** Manual reset position in red alliance HP corner */
+    public static final Pose2d MANUAL_RESET_POSE_RED = new Pose2d(FieldConstants.FIELD_LENGTH.in(Meters) - 0.441, FieldConstants.FIELD_WIDTH.in(Meters) - 0.441, new Rotation2d(Degrees.of(180)));
+  
     public static final PositionDetails positionDetails = new PositionDetails();
 
   }
