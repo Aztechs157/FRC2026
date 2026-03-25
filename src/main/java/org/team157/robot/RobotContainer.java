@@ -30,13 +30,13 @@ import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.DriveSystem;
 import org.team157.robot.subsystems.FlywheelSystem;
 import org.team157.robot.subsystems.HopperSystem;
-import org.team157.robot.subsystems.IntakePivotSystem;
 import org.team157.robot.subsystems.IntakeRollerSystem;
 import org.team157.robot.subsystems.TurretSystem;
 import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
 import org.team157.robot.subsystems.hood.Hood;
 import org.team157.robot.subsystems.hood.HoodIOTalonFX;
+import org.team157.robot.subsystems.intakePivot.IntakePivotSystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -92,6 +92,8 @@ public class RobotContainer {
         NamedCommands.registerCommand("Wiggle", intakePivot.wiggleIntake());
 
         configureBindings();
+
+        hood.setIO(new HoodIOTalonFX(hood));
 
         autoChooser = AutoBuilder.buildAutoChooser("New Auto");
         SmartDashboard.putData("Auto Chooser", autoChooser);
