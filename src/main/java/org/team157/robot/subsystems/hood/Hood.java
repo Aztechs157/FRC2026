@@ -4,10 +4,13 @@
 
 package org.team157.robot.subsystems.hood;
 
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 import org.team157.robot.Constants.HoodConstants;
 import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.TelemetryConstants;
+import org.team157.robot.RobotContainer;
 import org.team157.robot.subsystems.FlywheelSystem;
 import org.team157.utilities.PosUtils;
 
@@ -44,6 +47,10 @@ public class Hood extends SubsystemBase {
         return io.setTargetAngle(angle);
     }
 
+    public Command setAngle(Supplier<Angle> angle) {
+        return io.setTargetAngle(angle);
+    }
+
 /**
      * Set the duty cycle output of the hood motor.
      * Primarily used for manual control
@@ -55,7 +62,7 @@ public class Hood extends SubsystemBase {
     }
 
     public Command setDynamicHoodAngle() {
-        return setAngle(FlywheelSystem.getDesiredHoodAngle());
+        return setAngle(FlywheelSystem::getDesiredHoodAngle);
     }
 
     /**

@@ -4,6 +4,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.AutoLog;
 
 
@@ -27,6 +29,9 @@ public interface HoodIO {
     default void updateInputs(HoodIOInputs inputs) {}
 
     default Command setTargetAngle(Angle angle) {
+        return Commands.none();
+    }
+    default Command setTargetAngle(Supplier<Angle> angle){
         return Commands.none();
     }
 

@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.Supplier;
+
 import org.team157.robot.Constants;
 import org.team157.robot.Constants.HoodConstants;
 import org.team157.robot.Constants.TelemetryConstants;
@@ -96,6 +98,11 @@ public class HoodIOTalonFX implements HoodIO {
 
     @Override  
     public Command setTargetAngle(Angle angle) {
+        return hood.setAngle(angle).finallyDo(() -> stop());
+    }
+    
+    @Override  
+    public Command setTargetAngle(Supplier<Angle> angle) {
         return hood.setAngle(angle).finallyDo(() -> stop());
     }
 
