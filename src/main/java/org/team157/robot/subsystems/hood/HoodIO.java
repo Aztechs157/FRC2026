@@ -19,7 +19,6 @@ public interface HoodIO {
         public double temperatureCelsius = 0.0;
         public double targetAngleDegrees = 0.0;
         public double angleDegrees = 0.0;
-        public double setpointAngleDegrees = 0.0;
         public double encoderPositionRotations = 0.0;
         public double scaledEncoderPosition = 0.0;
         public double angleFromEncoderDegrees = 0.0;
@@ -27,6 +26,8 @@ public interface HoodIO {
     }
 
     default void updateInputs(HoodIOInputs inputs) {}
+    
+    default void simIterate() {}
 
     default Command setTargetAngle(Angle angle) {
         return Commands.none();
@@ -35,11 +36,12 @@ public interface HoodIO {
         return Commands.none();
     }
 
-    Command stop();
+    default Command stop() {
+        return Commands.none();
+    }
 
     default Command set(double dutycycle) {
         return Commands.none();
     } 
 
-    default void simIterate() {}
 }

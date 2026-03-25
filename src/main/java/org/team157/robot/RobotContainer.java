@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import org.team157.robot.Constants.ControllerConstants;
-import org.team157.robot.Constants.HoodConstants;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.DriveSystem;
@@ -37,7 +36,6 @@ import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
 import org.team157.robot.subsystems.hood.Hood;
 import org.team157.robot.subsystems.hood.HoodIOTalonFX;
-import org.team157.robot.subsystems.hood.HoodSystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -84,7 +82,7 @@ public class RobotContainer {
 
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
         turret = new TurretSystem(visionSystem);
-
+        // Sets the IO implementation used in the Hood subsystem
         hoodtwo.setIO(new HoodIOTalonFX(hoodtwo));
         NamedCommands.registerCommand("DeployIntake", intake.deployIntake());
         NamedCommands.registerCommand("RunIntake", intake.runIntake());

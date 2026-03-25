@@ -89,7 +89,7 @@ public class HoodIOTalonFX implements HoodIO {
         inputs.appliedVolts = motor.getVoltage().in(Volts);
         inputs.temperatureCelsius = motor.getTemperature().in(Celsius);
         inputs.angleDegrees = hood.getAngle().in(Degrees);
-        inputs.setpointAngleDegrees = motor.getMechanismPositionSetpoint().map(a -> a.in(Degrees)).orElse(0.0);
+        inputs.targetAngleDegrees = motor.getMechanismPositionSetpoint().map(a -> a.in(Degrees)).orElse(0.0);
         inputs.encoderPositionRotations = encoder.get();
         inputs.angleFromEncoderDegrees = mapHoodEncoder(HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
         inputs.mechanismVelocityDegreesPerSecond = motor.getMechanismVelocity().in(DegreesPerSecond);
@@ -100,7 +100,7 @@ public class HoodIOTalonFX implements HoodIO {
     public Command setTargetAngle(Angle angle) {
         return hood.setAngle(angle).finallyDo(() -> stop());
     }
-    
+
     @Override  
     public Command setTargetAngle(Supplier<Angle> angle) {
         return hood.setAngle(angle).finallyDo(() -> stop());
