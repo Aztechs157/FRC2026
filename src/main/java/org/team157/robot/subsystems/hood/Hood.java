@@ -48,7 +48,7 @@ public class Hood extends SubsystemBase {
      * 
      * @return Command setting the duty cycle output of the hood's motor to 0
      */
-    public Command setDefault() {
+    public Command getDefault() {
         return io.stop();
     }
 

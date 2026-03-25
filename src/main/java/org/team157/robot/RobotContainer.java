@@ -119,7 +119,7 @@ public class RobotContainer {
         intake.setDefaultCommand(intake.setDefault());
         hopper.setDefaultCommand(hopper.setDefault());
         uptake.setDefaultCommand(uptake.setDefault());
-        hood.setDefaultCommand(hood.setDefault());
+        hood.setDefaultCommand(hood.getDefault());
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
