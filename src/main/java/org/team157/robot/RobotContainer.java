@@ -32,10 +32,11 @@ import org.team157.robot.subsystems.FlywheelSystem;
 import org.team157.robot.subsystems.HopperSystem;
 import org.team157.robot.subsystems.IntakePivotSystem;
 import org.team157.robot.subsystems.IntakeRollerSystem;
-import org.team157.robot.subsystems.HoodSystem;
 import org.team157.robot.subsystems.TurretSystem;
 import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
+import org.team157.robot.subsystems.hood.Hood;
+import org.team157.robot.subsystems.hood.HoodIOTalonFX;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -55,7 +56,9 @@ public class RobotContainer {
 
     public final TurretSystem turret;
     public final VisionSystem visionSystem;
-    public final HoodSystem hood = new HoodSystem();
+
+    // public final HoodSystem hood = new HoodSystem();
+    public final Hood hood = new Hood();
     public final IntakePivotSystem intakePivot = new IntakePivotSystem();
     public final IntakeRollerSystem intakeRoller = new IntakeRollerSystem();
     public final HopperSystem hopper = new HopperSystem();
@@ -118,7 +121,7 @@ public class RobotContainer {
         intakeRoller.setDefaultCommand(intakeRoller.setDefault());
         hopper.setDefaultCommand(hopper.setDefault());
         uptake.setDefaultCommand(uptake.setDefault());
-        hood.setDefaultCommand(hood.setDefault());
+        hood.setDefaultCommand(hood.getDefault());
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -151,24 +154,27 @@ public class RobotContainer {
 
         // Reset the field-centric heading on start and back button press.
         driverController.start().and(driverController.back()).onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-        // When the B button is held, the robot will brake in place,
-        //holding its position against external forces.
+        // Reset the robot pose to the alliance-specific manual reset pose when both start and back are pressed together on both controllers
+        operatorController.start().and(operatorController.back().and(driverController.start()
+              .and(driverController.back()))).onTrue(drivetrain.resetPose());
+
+        // When the B button is held, the robot will brake in place, holding its position against external forces. 
         driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
 
-        ///////////////////////////
-        ///     FlYWHEEL HOOD  ///
-        //////////////////////////
 
+
+          /////////////////////
+         /// FlYWHEEL HOOD ///
+        /////////////////////
         // Enables dynamic control of the flywheel and hood.
         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
         driverController.a().toggleOnTrue(hood.setDynamicHoodAngle());
 
+          ////////////////////////////
+         /// INTAKE UPTAKE HOPPER ///
         ////////////////////////////
-        /// INTAKE UPTAKE HOPPER ///
-        ////////////////////////////
-
-        // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's peference.
-        if (ModifierConstants.MAYA_MODE) {
+        // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's preference.
+        if(ModifierConstants.MAYA_MODE) {
             // Shooting on left trigger, intake on right trigger
             driverController.leftTrigger().whileTrue(uptake.setRoller(1));
             driverController.rightTrigger().whileTrue(intakeRoller.runIntake());
@@ -214,18 +220,17 @@ public class RobotContainer {
         operatorController.povDownLeft().toggleOnTrue(turret.setAngle(Degrees.of(175)));
         operatorController.povLeft().whileTrue(turret.setAngle(Degrees.of(220)));
         operatorController.povUpLeft().toggleOnTrue(turret.setAngle(Degrees.of(265)));
-
-        ////////////////////////
-        /// MANUAl FLYWHEEL ///
-        //////////////////////
-
-        // Set the flywheel to preset velocities based on the bumpers and triggers of the
-        // Operator controller.
+        
+          ///////////////////////
+         /// MANUAl FLYWHEEL ///
+        ///////////////////////
+        // Set the flywheel to preset velocities based on the bumpers and triggers of the Operator controller.
         operatorController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4800)));
         operatorController.rightBumper().toggleOnTrue(flywheel.setVelocity(RPM.of(2800)));
 
-        ////////////////////
-        /// MANUAL HOOD ///
+        
+          ///////////////////
+         /// MANUAL HOOD ///
         ///////////////////
 
         // Set the hood to preset angles based on the bumpers and triggers of the
@@ -244,9 +249,9 @@ public class RobotContainer {
 
     }
 
-    ///////////////////////////////////////////////////////
-    ///             NON-CONTROL FUNCTIONS              ///
-    /////////////////////////////////////////////////////
+          //////////////////////////////////////////////////////
+         ///            NON-CONTROL FUNCTIONS               ///
+        //////////////////////////////////////////////////////
 
     // If the A button is held, apply the precision modifier of 0.5x speed.
     public double modifySpeed(final double speed) {
