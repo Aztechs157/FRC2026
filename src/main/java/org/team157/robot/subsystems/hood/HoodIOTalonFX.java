@@ -1,5 +1,7 @@
 package org.team157.robot.subsystems.hood;
 
+import java.util.function.Supplier;
+
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Degrees;
@@ -8,22 +10,15 @@ import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.function.Supplier;
-
-import org.team157.robot.Constants;
-import org.team157.robot.Constants.HoodConstants;
-import org.team157.robot.Constants.TelemetryConstants;
-import org.team157.utilities.PosUtils;
-
-import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
-import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
+import com.ctre.phoenix6.hardware.TalonFX;
+
 import yams.mechanisms.config.PivotConfig;
 import yams.mechanisms.positional.Pivot;
 import yams.motorcontrollers.SmartMotorController;
@@ -32,6 +27,15 @@ import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
+import org.team157.robot.Constants;
+import org.team157.robot.Constants.HoodConstants;
+import org.team157.robot.Constants.TelemetryConstants;
+import org.team157.utilities.PosUtils;
+
+/**
+ * Represents an implementation of the Hood running 
+ * on TalonFX-based motors (e.g. a Kraken X44).
+ */
 public class HoodIOTalonFX implements HoodIO {
    
     private final Pivot hood;
@@ -76,6 +80,12 @@ public class HoodIOTalonFX implements HoodIO {
         this.motor = hood.getMotor();
     }
 
+    /** Helper function that maps the hood's current encoder value to a given range using PosUtils.
+     * 
+     * @param min The minimum value of the remapped range (equivalent to the hood's minimum encoder position)
+     * @param max The maximum value of the remapped range (equivalent to hood's maximum encoder position)
+     * @return The current value of the hood's encoder, mapped between 2 numbers based on the configured minimum and maximum encoder values.
+     */
     private double mapHoodEncoder(double min, double max){
         return PosUtils.mapRange(encoder.get(), HoodConstants.MIN_ENCODER_POSITION, 
                     HoodConstants.MAX_ENCODER_POSITION, min, max);
@@ -121,8 +131,4 @@ public class HoodIOTalonFX implements HoodIO {
         hood.simIterate();
     }
     
-    public Pivot getHood() {
-        return hood;
-    }
-
 }

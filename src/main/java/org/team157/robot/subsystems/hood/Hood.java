@@ -6,34 +6,48 @@ package org.team157.robot.subsystems.hood;
 
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
-import org.team157.robot.Constants.HoodConstants;
-import org.team157.robot.Constants.ModelConstants;
-import org.team157.robot.Constants.TelemetryConstants;
-import org.team157.robot.RobotContainer;
-import org.team157.robot.subsystems.FlywheelSystem;
-import org.team157.utilities.PosUtils;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
+import org.team157.robot.Constants.HoodConstants;
+import org.team157.robot.Constants.ModelConstants;
+import org.team157.robot.subsystems.FlywheelSystem;
+import org.team157.utilities.PosUtils;
 
+import org.littletonrobotics.junction.Logger;
+
+/** 
+ * Represents the Hood subsystem, which adjusts the angle 
+ * of the shot in order to reach a certain position. 
+ */
 public class Hood extends SubsystemBase {
+
+    // The IO interface for interacting with the hood's motor.
     private HoodIO io;
+
+    // Inputs from the motor, encoder, and mechanism, to be updated periodically and logged.
     private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
 
+    /** Creates a Hood. */
     public Hood() {
+
     }
 
+    /** Specifies the IO implementation to be used for the hood.
+     * 
+     * @param io An implementation of the Hood's IO layer, i.e. HoodIOTalonFX
+     */
     public void setIO(HoodIO io){
         this.io = io;
     }
 
+    /** Sets the default command of the hood, stopping motor output when no other commands are running.
+     * 
+     * @return Command setting the duty cycle output of the hood's motor to 0
+     */
     public Command setDefault() {
         return io.stop();
     }
@@ -47,11 +61,16 @@ public class Hood extends SubsystemBase {
         return io.setTargetAngle(angle);
     }
 
+    /**
+     * Set the target angle of the hood, with a Supplier angle.
+     * 
+     * @param angle Angle to go to.
+     */
     public Command setAngle(Supplier<Angle> angle) {
         return io.setTargetAngle(angle);
     }
 
-/**
+    /**
      * Set the duty cycle output of the hood motor.
      * Primarily used for manual control
      * 
@@ -61,6 +80,12 @@ public class Hood extends SubsystemBase {
         return io.set(dutycycle);
     }
 
+    /**
+     * Set the dynamic angle of the hood, for targeting the hub or a passing point.
+     * 
+     * @return A Command setting the angle of the Hood to the desired angle, 
+     *         determined by the FlywheelSystem's ballistics calculations.
+     */
     public Command setDynamicHoodAngle() {
         return setAngle(FlywheelSystem::getDesiredHoodAngle);
     }
@@ -76,27 +101,18 @@ public class Hood extends SubsystemBase {
         return PosUtils.mapRange(inputs.angleDegrees, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE,
                 HoodConstants.MAX_ANGLE, HoodConstants.MIN_ANGLE) - 40;
     }
-
+    
     @Override
     public void periodic() {
+        // This method will be called once per scheduler run
+        // Updates the inputs to be logged by AdvantageKit and writes them to the Logger
         io.updateInputs(inputs);
         Logger.processInputs("Hood", inputs);
-        // This method will be called once per scheduler run
-        // Send values to NT to display on Elastic.
-        if (TelemetryConstants.TELEMETRY_VERBOSITY == TelemetryVerbosity.HIGH) {
-            SmartDashboard.putNumber("Hood Pos", inputs.encoderPositionRotations);
-            SmartDashboard.putNumber("Scaled Hood Pos", inputs.scaledEncoderPosition);
-            SmartDashboard.putNumber("Hood Angle (Encoder)", inputs.angleFromEncoderDegrees);
-            SmartDashboard.putNumber("Hood Angle (YAMS)", inputs.angleDegrees);
-        }
-
-        
     }
 
     @Override
     public void simulationPeriodic() {
         // This method will be called once per scheduler run during simulation
-        // Updates the intake pivot simulation's values,
         io.simIterate();
     }
 
