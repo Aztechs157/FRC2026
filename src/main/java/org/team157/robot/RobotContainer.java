@@ -57,7 +57,7 @@ public class RobotContainer {
     public final VisionSystem visionSystem;
 
     // public final HoodSystem hood = new HoodSystem();
-    public final Hood hoodtwo = new Hood();
+    public final Hood hood = new Hood();
     public final IntakeSystem intake = new IntakeSystem();
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
@@ -83,7 +83,7 @@ public class RobotContainer {
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
         turret = new TurretSystem(visionSystem);
         // Sets the IO implementation used in the Hood subsystem
-        hoodtwo.setIO(new HoodIOTalonFX(hoodtwo));
+        hood.setIO(new HoodIOTalonFX(hood));
         NamedCommands.registerCommand("DeployIntake", intake.deployIntake());
         NamedCommands.registerCommand("RunIntake", intake.runIntake());
         NamedCommands.registerCommand("RunHopper", hopper.setRoller(0.5));
@@ -119,7 +119,7 @@ public class RobotContainer {
         intake.setDefaultCommand(intake.setDefault());
         hopper.setDefaultCommand(hopper.setDefault());
         uptake.setDefaultCommand(uptake.setDefault());
-        hoodtwo.setDefaultCommand(hoodtwo.setDefault());
+        hood.setDefaultCommand(hood.setDefault());
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -166,7 +166,7 @@ public class RobotContainer {
         /////////////////////
         // Enables dynamic control of the flywheel and hood.
         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
-        driverController.a().toggleOnTrue(hoodtwo.setDynamicHoodAngle());
+        driverController.a().toggleOnTrue(hood.setDynamicHoodAngle());
 
           ////////////////////////////
          /// INTAKE UPTAKE HOPPER ///
@@ -202,7 +202,7 @@ public class RobotContainer {
         turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
         ;
         turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
-        turretTrackingTrigger().whileTrue(hoodtwo.setDynamicHoodAngle());
+        turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());
 
         ///////////////////////
         /// MANUAL FLYWHEEL ///
@@ -233,8 +233,8 @@ public class RobotContainer {
 
         // Set the hood to preset angles based on the bumpers and triggers of the
         // Operator controller.
-        operatorController.leftTrigger().toggleOnTrue(hoodtwo.setAngle(Degrees.of(45)));
-        operatorController.leftBumper().toggleOnTrue(hoodtwo.setAngle(Degrees.of(60)));
+        operatorController.leftTrigger().toggleOnTrue(hood.setAngle(Degrees.of(45)));
+        operatorController.leftBumper().toggleOnTrue(hood.setAngle(Degrees.of(60)));
 
         ///////////////////////
         /// INTAKE COMMANDS ///
