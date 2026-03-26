@@ -34,9 +34,10 @@ import org.team157.robot.subsystems.IntakeRollerSystem;
 import org.team157.robot.subsystems.TurretSystem;
 import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
+import org.team157.robot.subsystems.Slapdown.Slapdown;
+import org.team157.robot.subsystems.Slapdown.SlapdownIOTalonFX;
 import org.team157.robot.subsystems.hood.Hood;
 import org.team157.robot.subsystems.hood.HoodIOTalonFX;
-import org.team157.robot.subsystems.intakePivot.IntakePivotSystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -59,7 +60,8 @@ public class RobotContainer {
 
     // public final HoodSystem hood = new HoodSystem();
     public final Hood hood = new Hood();
-    public final IntakePivotSystem intakePivot = new IntakePivotSystem();
+    public final Slapdown slapdown = new Slapdown();
+    // public final IntakePivotSystem intakePivot = new IntakePivotSystem();
     public final IntakeRollerSystem intakeRoller = new IntakeRollerSystem();
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
@@ -67,8 +69,6 @@ public class RobotContainer {
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
     private final SendableChooser<Command> autoChooser;
-
-    public final Trigger intakeDeployTrigger = new Trigger(() -> intakePivot.getDeployState());
 
     public static boolean manualOverride = false; // When true, allows manual control of the turret, hood, and flywheel, disabling any dynamic control.
 
@@ -82,18 +82,21 @@ public class RobotContainer {
 
         }
 
+        hood.setIO(new HoodIOTalonFX(hood));
+        slapdown.setIO(new SlapdownIOTalonFX(slapdown));
+        
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
         turret = new TurretSystem(visionSystem);
 
-        NamedCommands.registerCommand("DeployIntake", intakePivot.deployIntake());
+        NamedCommands.registerCommand("DeployIntake", slapdown.deployIntake());
         NamedCommands.registerCommand("RunIntake", intakeRoller.runIntake());
         NamedCommands.registerCommand("RunHopper", hopper.setRoller(0.5));
         NamedCommands.registerCommand("ShootBalls", uptake.setRoller(1));
-        NamedCommands.registerCommand("Wiggle", intakePivot.wiggleIntake());
+        NamedCommands.registerCommand("Wiggle", slapdown.wiggleIntake());
 
         configureBindings();
 
-        hood.setIO(new HoodIOTalonFX(hood));
+
 
         autoChooser = AutoBuilder.buildAutoChooser("New Auto");
         SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -119,7 +122,7 @@ public class RobotContainer {
         // Disable turret movement when no other turret commands are running.
         turret.setDefaultCommand(turret.setDefault());
         flywheel.setDefaultCommand(flywheel.setDefault());
-        intakePivot.setDefaultCommand(intakePivot.setDefault());
+        slapdown.setDefaultCommand(slapdown.getDefault());
         intakeRoller.setDefaultCommand(intakeRoller.setDefault());
         hopper.setDefaultCommand(hopper.setDefault());
         uptake.setDefaultCommand(uptake.setDefault());
@@ -190,7 +193,7 @@ public class RobotContainer {
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
         driverController.y().whileTrue(forceOuttake());
         // Wiggles the intake up and down to free up stuck balls
-        driverController.x().toggleOnTrue(intakePivot.wiggleIntake());
+        driverController.x().toggleOnTrue(slapdown.wiggleIntake());
         // Toggle manual override (on driver A for testing without controller)
         // driverController.a().onTrue(toggleManualOverride());
 
@@ -246,8 +249,8 @@ public class RobotContainer {
 
         // Deploy and retract the intake with the A and Y buttons, but only when the
         // back button is held to prevent accidental activation during teleop.
-        operatorController.a().and(operatorController.back()).toggleOnTrue(intakePivot.deployIntakeAndHold());
-        operatorController.y().and(operatorController.back()).toggleOnTrue(intakePivot.retractIntake());
+        operatorController.a().and(operatorController.back()).toggleOnTrue(slapdown.deployIntakeAndHold());
+        operatorController.y().and(operatorController.back()).toggleOnTrue(slapdown.retractIntake());
 
     }
 
