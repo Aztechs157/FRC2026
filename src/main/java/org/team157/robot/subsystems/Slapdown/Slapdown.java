@@ -1,4 +1,4 @@
-package org.team157.robot.subsystems.Slapdown;
+package org.team157.robot.subsystems.slapdown;
 
 import static edu.wpi.first.units.Units.Degrees;
 

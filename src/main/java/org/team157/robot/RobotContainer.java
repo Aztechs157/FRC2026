@@ -34,10 +34,10 @@ import org.team157.robot.subsystems.IntakeRollerSystem;
 import org.team157.robot.subsystems.TurretSystem;
 import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
-import org.team157.robot.subsystems.Slapdown.Slapdown;
-import org.team157.robot.subsystems.Slapdown.SlapdownIOTalonFX;
 import org.team157.robot.subsystems.hood.Hood;
 import org.team157.robot.subsystems.hood.HoodIOTalonFX;
+import org.team157.robot.subsystems.slapdown.Slapdown;
+import org.team157.robot.subsystems.slapdown.SlapdownIOTalonFX;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
