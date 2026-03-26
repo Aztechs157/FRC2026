@@ -30,12 +30,12 @@ import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.DriveSystem;
 import org.team157.robot.subsystems.FlywheelSystem;
 import org.team157.robot.subsystems.HopperSystem;
-import org.team157.robot.subsystems.IntakeRollerSystem;
 import org.team157.robot.subsystems.TurretSystem;
 import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
 import org.team157.robot.subsystems.hood.Hood;
 import org.team157.robot.subsystems.hood.HoodIOTalonFX;
+import org.team157.robot.subsystems.intake.IntakeRollerSystem;
 import org.team157.robot.subsystems.slapdown.Slapdown;
 import org.team157.robot.subsystems.slapdown.SlapdownIOTalonFX;
 

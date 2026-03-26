@@ -13,7 +13,10 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
+/** 
+ * Represents the Slapdown subsystem, pivots the intake 
+ * up and down to collect/agitate balls and expand hopper capacity. 
+ */
 public class Slapdown extends SubsystemBase {
     
     // The IO interface for interacting with the hood's motor.
