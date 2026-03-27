@@ -51,28 +51,21 @@ public final class Constants {
   public static class VisionConstants {
     public static final String FRONTLEFT_CAMERA_NICKNAME = "frontLeftCam";
     public static final Rotation3d FRONTLEFT_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(65));
-    public static final Translation3d FRONTLEFT_CAMERA_TRANSLATION = new Translation3d(-0.128, 0.329, 0.394);
+    public static final Translation3d FRONTLEFT_CAMERA_TRANSLATION = new Translation3d(-0.127, 0.3302, 0.3556);
     public static final Transform3d FRONTLEFT_CAMERA_PLACEMENT = new Transform3d(
         FRONTLEFT_CAMERA_TRANSLATION, FRONTLEFT_CAMERA_ROTATION);
 
     public static final String FRONTRIGHT_CAMERA_NICKNAME = "frontRightCam";
     public static final Rotation3d FRONTRIGHT_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(-65));
-    public static final Translation3d FRONTRIGHT_CAMERA_TRANSLATION = new Translation3d(-0.128, -0.329, 0.394);
+    public static final Translation3d FRONTRIGHT_CAMERA_TRANSLATION = new Translation3d(-0.127, -0.3302, 0.3556);
     public static final Transform3d FRONTRIGHT_CAMERA_PLACEMENT = new Transform3d(
         FRONTRIGHT_CAMERA_TRANSLATION, FRONTRIGHT_CAMERA_ROTATION);
 
     public static final String BACK_CAMERA_NICKNAME = "backCam";
     public static final Rotation3d BACK_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(180));
-    public static final Translation3d BACK_CAMERA_TRANSLATION = new Translation3d(-0.322, 0, 0.381);
+    public static final Translation3d BACK_CAMERA_TRANSLATION = new Translation3d(-0.32326, 0, 0.3556);
     public static final Transform3d BACK_CAMERA_PLACEMENT = new Transform3d(
         BACK_CAMERA_TRANSLATION, BACK_CAMERA_ROTATION);
-
-    public static final String TURRET_CAMERA_NICKNAME = "turretCam";
-    public static final Rotation3d TURRET_CAMERA_ROTATION = new Rotation3d(0, 0, 0);
-    public static final Translation3d TURRET_CAMERA_TRANSLATION = new Translation3d(0.2602992, 0, 0.126);
-    public static final Transform3d TURRET_CAMERA_PLACEMENT = new Transform3d(
-            TURRET_CAMERA_TRANSLATION, TURRET_CAMERA_ROTATION);
-
   }
 
 
@@ -96,11 +89,11 @@ public final class Constants {
   public static class ModelConstants {
     // 3D offsets from the robot's origin (center of rotation) to various key points
     // on the robot, used for mechanism visualization on the AdvantageScope model.
-    public static final Translation3d ORIGIN_TO_TURRET_BASE_OFFSET = new Translation3d(-0.171, 0, 0.460);
+    public static final Translation3d ORIGIN_TO_TURRET_BASE_OFFSET = new Translation3d(-0.12192, 0.11557, 0.396535);
     public static final Translation3d ORIGIN_TO_HOOD_PIVOT_POINT_OFFSET = new Translation3d(-0.0465, 0, 0.530);
     public static final Translation3d ORIGIN_TO_INTAKE_PIVOT_POINT_OFFSET = new Translation3d(0.146050, 0, 0.197803);
     // 2D offset from the robot's origin to the turret base, used in position-based
     // dynamic shooting calculations.
-    public static final Transform2d XY_ORIGIN_TO_TURRET_BASE_OFFSET = new Transform2d(-0.171, 0.0, new Rotation2d());
+    public static final Transform2d XY_ORIGIN_TO_TURRET_BASE_OFFSET = new Transform2d(-0.12192, 0.11557, new Rotation2d());
   }
 }
