@@ -19,8 +19,8 @@ import yams.motorcontrollers.SmartMotorController;
 
 import org.team157.robot.Constants;
 import org.team157.robot.Constants.FieldConstants;
-import org.team157.robot.Constants.HoodConstants;
 import org.team157.robot.Constants.TelemetryConstants;
+import org.team157.robot.subsystems.hood.HoodConstants;
 import org.team157.robot.subsystems.vision.VisionSystem;
 
 import edu.wpi.first.math.Pair;

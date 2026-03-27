@@ -21,7 +21,7 @@ import edu.wpi.first.units.measure.Time;
 
 
 public final class TurretConstants {
-    public static final int MOTOR_ID = 19;
+    public static final int MOTOR_ID = 20;
     public static final int ENCODER_ID = 0;
     public static final double MIN_ENCODER_POSITION = 0.99, MAX_ENCODER_POSITION = 0.014;
     public static final double MIN_ANGLE = -179, MAX_ANGLE = 179;

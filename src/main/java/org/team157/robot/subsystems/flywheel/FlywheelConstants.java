@@ -22,7 +22,7 @@ import edu.wpi.first.units.measure.Time;
 
 public final class FlywheelConstants {
     // IDs of both motors powering the flywheel.
-    public static final int MOTOR_ID = 21, FOLLOWER_MOTOR_ID = 22;
+    public static final int MOTOR_ID = 22, FOLLOWER_MOTOR_ID = 23;
     // Closed-loop control values for the flywheel.
     public static final double KP = 2, KI = 0, KD = 0;
     public static final double KS = 0.0, KV = 0.0, KA = 0.0;
