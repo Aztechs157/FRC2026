@@ -27,18 +27,18 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.team157.robot.Constants.ControllerConstants;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.generated.TunerConstants;
-import org.team157.robot.subsystems.DriveSystem;
-import org.team157.robot.subsystems.FlywheelSystem;
-import org.team157.robot.subsystems.HopperSystem;
-import org.team157.robot.subsystems.TurretSystem;
-import org.team157.robot.subsystems.UptakeSystem;
-import org.team157.robot.subsystems.VisionSystem;
+import org.team157.robot.subsystems.hopper.HopperSystem;
+import org.team157.robot.subsystems.drive.DriveSystem;
+import org.team157.robot.subsystems.flywheel.FlywheelSystem;
 import org.team157.robot.subsystems.hood.Hood;
 import org.team157.robot.subsystems.hood.HoodIOTalonFX;
 import org.team157.robot.subsystems.intake.Intake;
 import org.team157.robot.subsystems.intake.IntakeIOTalonFX;
 import org.team157.robot.subsystems.slapdown.Slapdown;
 import org.team157.robot.subsystems.slapdown.SlapdownIOTalonFX;
+import org.team157.robot.subsystems.turret.TurretSystem;
+import org.team157.robot.subsystems.uptake.UptakeSystem;
+import org.team157.robot.subsystems.vision.VisionSystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed

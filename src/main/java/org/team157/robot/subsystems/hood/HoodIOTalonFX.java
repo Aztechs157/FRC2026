@@ -28,7 +28,6 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 import org.team157.robot.Constants;
-import org.team157.robot.Constants.HoodConstants;
 import org.team157.robot.Constants.TelemetryConstants;
 import org.team157.utilities.PosUtils;
 
