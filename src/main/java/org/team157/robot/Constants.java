@@ -22,7 +22,6 @@ import com.ctre.phoenix6.CANBus;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -75,7 +74,7 @@ public final class Constants {
     public static final MechanismGearing PIVOT_GEARING = new MechanismGearing(GearBox.fromStages("23:1", "50:12"));
     /** Closed loop control values for the pivot */
     public static final double KP = 157, KI = 0, KD = 0;
-    public static final double SIM_KP = 157, SIM_KI = 0, SIM_KD = 0;
+    public static final double SIM_KP = 20, SIM_KI = 0, SIM_KD = 0;
     /** Angular velocity for the pivot motor */
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
     /** Angular acceleration for the pivot motor */
