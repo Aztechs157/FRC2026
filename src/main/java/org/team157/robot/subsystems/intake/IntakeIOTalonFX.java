@@ -12,7 +12,6 @@ import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.team157.robot.Constants;
-import org.team157.robot.Constants.IntakeConstants;
 import org.team157.robot.Constants.TelemetryConstants;
 
 import com.ctre.phoenix6.hardware.TalonFX;

@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilograms;
 
 import org.team157.robot.Constants;
-import org.team157.robot.Constants.HopperConstants;
 import org.team157.robot.Constants.TelemetryConstants;
 
 import com.ctre.phoenix6.hardware.TalonFX;

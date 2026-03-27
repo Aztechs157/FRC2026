@@ -3,7 +3,6 @@ package org.team157.robot.subsystems.slapdown;
 import static edu.wpi.first.units.Units.Degrees;
 
 import org.littletonrobotics.junction.Logger;
-import org.team157.robot.Constants.IntakeConstants;
 import org.team157.robot.Constants.ModelConstants;
 import org.team157.utilities.PosUtils;
 
@@ -122,7 +121,7 @@ public class Slapdown extends SubsystemBase {
     }
 
     public double getHopperWallsPosition() {
-        return PosUtils.mapRange(inputs.angleFromEncoderDegrees, IntakeConstants.MIN_ANGLE, IntakeConstants.MAX_ANGLE, 0.3048, 0);
+        return PosUtils.mapRange(inputs.angleFromEncoderDegrees, SlapdownConstants.MIN_ANGLE, SlapdownConstants.MAX_ANGLE, 0.3048, 0);
     }
 
     public Pose3d getHopperWallsPose() {
