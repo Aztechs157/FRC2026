@@ -27,11 +27,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.team157.robot.Constants.ControllerConstants;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.generated.TunerConstants;
-import org.team157.robot.subsystems.hopper.HopperSystem;
 import org.team157.robot.subsystems.drive.DriveSystem;
 import org.team157.robot.subsystems.flywheel.FlywheelSystem;
 import org.team157.robot.subsystems.hood.Hood;
 import org.team157.robot.subsystems.hood.HoodIOTalonFX;
+import org.team157.robot.subsystems.hopper.Hopper;
+import org.team157.robot.subsystems.hopper.HopperIOTalonFX;
 import org.team157.robot.subsystems.intake.Intake;
 import org.team157.robot.subsystems.intake.IntakeIOTalonFX;
 import org.team157.robot.subsystems.slapdown.Slapdown;
@@ -65,7 +66,8 @@ public class RobotContainer {
     // public final IntakePivotSystem intakePivot = new IntakePivotSystem();
     // public final IntakeRollerSystem intakeRoller = new IntakeRollerSystem();
     public final Intake intake = new Intake();
-    public final HopperSystem hopper = new HopperSystem();
+    // public final HopperSystem hopper = new HopperSystem();
+    public final Hopper hopper = new Hopper();
     public final UptakeSystem uptake = new UptakeSystem();
     public final FlywheelSystem flywheel = new FlywheelSystem();
     public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
@@ -87,13 +89,13 @@ public class RobotContainer {
         intake.setIO(new IntakeIOTalonFX(intake));
         hood.setIO(new HoodIOTalonFX(hood));
         slapdown.setIO(new SlapdownIOTalonFX(slapdown));
-        
+        hopper.setIO(new HopperIOTalonFX(hopper));
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
         turret = new TurretSystem(visionSystem);
 
         NamedCommands.registerCommand("DeployIntake", slapdown.deployIntake());
         NamedCommands.registerCommand("RunIntake", intake.runIntake());
-        NamedCommands.registerCommand("RunHopper", hopper.setRoller(0.5));
+        NamedCommands.registerCommand("RunHopper", hopper.set(0.5));
         NamedCommands.registerCommand("ShootBalls", uptake.setRoller(1));
         NamedCommands.registerCommand("Wiggle", slapdown.wiggleIntake());
 
@@ -127,7 +129,7 @@ public class RobotContainer {
         flywheel.setDefaultCommand(flywheel.setDefault());
         slapdown.setDefaultCommand(slapdown.getDefault());
         intake.setDefaultCommand(intake.getDefault());
-        hopper.setDefaultCommand(hopper.setDefault());
+        hopper.setDefaultCommand(hopper.getDefault());
         uptake.setDefaultCommand(uptake.setDefault());
         hood.setDefaultCommand(hood.getDefault());
 
@@ -186,12 +188,12 @@ public class RobotContainer {
             // Shooting on left trigger, intake on right trigger
             driverController.leftTrigger().whileTrue(uptake.setRoller(1));
             driverController.rightTrigger().whileTrue(intake.runIntake());
-            driverController.leftTrigger().whileTrue(hopper.setRoller(0.5));
+            driverController.leftTrigger().whileTrue(hopper.set(0.5));
         } else {
             // Shooting on right trigger, intake on left trigger
             driverController.rightTrigger().whileTrue(uptake.setRoller(1));
             driverController.leftTrigger().whileTrue(intake.runIntake());
-            driverController.rightTrigger().whileTrue(hopper.setRoller(0.5));
+            driverController.rightTrigger().whileTrue(hopper.set(0.5));
         }
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
         driverController.y().whileTrue(forceOuttake());
@@ -357,7 +359,7 @@ public class RobotContainer {
     // at a low speed to clear any jams.
     // TODO: remove from RobotContainer and into eventual Superstructure subsystem once it exists.
     private Command forceOuttake() {
-        return uptake.setRoller(-0.25).alongWith(hopper.setRoller(-0.25)).alongWith(intake.set(-0.25));
+        return uptake.setRoller(-0.25).alongWith(hopper.set(-0.25)).alongWith(intake.set(-0.25));
     }
 
     /**
