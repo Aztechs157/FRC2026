@@ -97,37 +97,8 @@ public final class Constants {
     public static final int ROLLER_MOTOR_ID = 14, FOLLOWER_MOTOR_ID = 15;
   }
 
-  public static class HopperConstants {
-    public static final int MOTOR_ID = 17;
-    public static final Current CURRENT_LIMIT = Amps.of(40);
-    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("2:1"));
 
-  }
 
-  public static class UptakeConstants {
-    public static final int MOTOR_ID = 18;
-    public static final Current CURRENT_LIMIT = Amps.of(40);
-    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("9:1"));
-
-  }
-
-  public static class TurretConstants {
-    public static final int MOTOR_ID = 19;
-    public static final int ENCODER_ID = 0;
-    public static final double MIN_ENCODER_POSITION = 0.99, MAX_ENCODER_POSITION = 0.014;
-    public static final double MIN_ANGLE = -179, MAX_ANGLE = 179;
-    public static final double KP = 157, KI = 0, KD = 0;
-    public static final double SIM_KP = 5, SIM_KI = 0, SIM_KD = 0;
-    public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
-    public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(2880);
-    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("28:1"));
-    public static final Current CURRENT_LIMIT = Amps.of(40);
-    public static final Time RAMP_RATE = Seconds.of(0.00157);
-    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(-179), UPPER_SOFT_LIMIT = Degrees.of(179);
-    public static final Angle LOWER_HARD_LIMIT = Degrees.of(-179), UPPER_HARD_LIMIT = Degrees.of(179);
-    // Angle offset to account for misalignment between turret zero position and robot forward, in degrees.
-    public static final double TURRET_ANGLE_OFFSET = 130;
-  }
 
   public static class HoodConstants {
 
@@ -148,35 +119,6 @@ public final class Constants {
 
   }
 
-  public static class FlywheelConstants {
-    // IDs of both motors powering the flywheel.
-    public static final int MOTOR_ID = 21, FOLLOWER_MOTOR_ID = 22;
-    // Closed-loop control values for the flywheel.
-    public static final double KP = 2, KI = 0, KD = 0;
-    public static final double KS = 0.0, KV = 0.0, KA = 0.0;
-    public static final double SIM_KP = 1.57, SIM_KI = 0, SIM_KD = 0.157;
-    public static final double SIM_KS = 0.0, SIM_KV = 0.37, SIM_KA = 0.27; // Determined via Reca.lc, tune and/or run
-                                                                           // SysID to verify these values.
-    public static final AngularVelocity ANGULAR_VELOCITY = RPM.of(5800);
-    public static final AngularAcceleration ANGULAR_ACCELERATION = RotationsPerSecondPerSecond.of(11600);
-    // Gear ratio between the motor and the flywheel.
-    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("17:17"));
-    // Diameter of the flywheel, in meters.
-    public static final Distance FLYWHEEL_DIAMETER = Inches.of(4);
-    // Mass of the flywheel (including shooter wheels), in pounds.
-    public static final Mass FLYWHEEL_MASS = Pounds.of(2);
-    // Z distance from the center of the flywheel to the ground, in meters.
-    public static final Distance HEIGHT = Meters.of(0.523);
-
-    public static final Time RAMP_RATE = Seconds.of(0.00157);
-    // Flywheel RPM limits for safety, in... RPM.
-    public static final AngularVelocity FLYWHEEL_RPM_LIMIT_UPPER = RPM.of(5800),
-        FLYWHEEL_RPM_LIMIT_LOWER = RPM.of(-5800);
-    // RPM multiplier to account for external factors like air resistance and wheel slip. This is determined experimentally.
-    public static final double SPEED_FACTOR = 1 / 0.385;
-    public static final Current CURRENT_LIMIT = Amps.of(40);
-
-  }
 
   public static class VisionConstants {
     public static final String FRONTLEFT_CAMERA_NICKNAME = "frontLeftCam";

@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.team157.robot.Constants.HoodConstants;
 import org.team157.robot.Constants.ModelConstants;
-import org.team157.robot.subsystems.FlywheelSystem;
+import org.team157.robot.subsystems.flywheel.FlywheelSystem;
 import org.team157.utilities.PosUtils;
 
 import org.littletonrobotics.junction.Logger;
