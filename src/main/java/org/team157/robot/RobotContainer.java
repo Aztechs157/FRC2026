@@ -35,7 +35,8 @@ import org.team157.robot.subsystems.UptakeSystem;
 import org.team157.robot.subsystems.VisionSystem;
 import org.team157.robot.subsystems.hood.Hood;
 import org.team157.robot.subsystems.hood.HoodIOTalonFX;
-import org.team157.robot.subsystems.intake.IntakeRollerSystem;
+import org.team157.robot.subsystems.intake.Intake;
+import org.team157.robot.subsystems.intake.IntakeIOTalonFX;
 import org.team157.robot.subsystems.slapdown.Slapdown;
 import org.team157.robot.subsystems.slapdown.SlapdownIOTalonFX;
 
@@ -62,7 +63,8 @@ public class RobotContainer {
     public final Hood hood = new Hood();
     public final Slapdown slapdown = new Slapdown();
     // public final IntakePivotSystem intakePivot = new IntakePivotSystem();
-    public final IntakeRollerSystem intakeRoller = new IntakeRollerSystem();
+    // public final IntakeRollerSystem intakeRoller = new IntakeRollerSystem();
+    public final Intake intake = new Intake();
     public final HopperSystem hopper = new HopperSystem();
     public final UptakeSystem uptake = new UptakeSystem();
     public final FlywheelSystem flywheel = new FlywheelSystem();
@@ -82,6 +84,7 @@ public class RobotContainer {
 
         }
 
+        intake.setIO(new IntakeIOTalonFX(intake));
         hood.setIO(new HoodIOTalonFX(hood));
         slapdown.setIO(new SlapdownIOTalonFX(slapdown));
         
@@ -89,7 +92,7 @@ public class RobotContainer {
         turret = new TurretSystem(visionSystem);
 
         NamedCommands.registerCommand("DeployIntake", slapdown.deployIntake());
-        NamedCommands.registerCommand("RunIntake", intakeRoller.runIntake());
+        NamedCommands.registerCommand("RunIntake", intake.runIntake());
         NamedCommands.registerCommand("RunHopper", hopper.setRoller(0.5));
         NamedCommands.registerCommand("ShootBalls", uptake.setRoller(1));
         NamedCommands.registerCommand("Wiggle", slapdown.wiggleIntake());
@@ -123,7 +126,7 @@ public class RobotContainer {
         turret.setDefaultCommand(turret.setDefault());
         flywheel.setDefaultCommand(flywheel.setDefault());
         slapdown.setDefaultCommand(slapdown.getDefault());
-        intakeRoller.setDefaultCommand(intakeRoller.setDefault());
+        intake.setDefaultCommand(intake.getDefault());
         hopper.setDefaultCommand(hopper.setDefault());
         uptake.setDefaultCommand(uptake.setDefault());
         hood.setDefaultCommand(hood.getDefault());
@@ -182,12 +185,12 @@ public class RobotContainer {
         if(ModifierConstants.MAYA_MODE) {
             // Shooting on left trigger, intake on right trigger
             driverController.leftTrigger().whileTrue(uptake.setRoller(1));
-            driverController.rightTrigger().whileTrue(intakeRoller.runIntake());
+            driverController.rightTrigger().whileTrue(intake.runIntake());
             driverController.leftTrigger().whileTrue(hopper.setRoller(0.5));
         } else {
             // Shooting on right trigger, intake on left trigger
             driverController.rightTrigger().whileTrue(uptake.setRoller(1));
-            driverController.leftTrigger().whileTrue(intakeRoller.runIntake());
+            driverController.leftTrigger().whileTrue(intake.runIntake());
             driverController.rightTrigger().whileTrue(hopper.setRoller(0.5));
         }
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
@@ -354,7 +357,7 @@ public class RobotContainer {
     // at a low speed to clear any jams.
     // TODO: remove from RobotContainer and into eventual Superstructure subsystem once it exists.
     private Command forceOuttake() {
-        return uptake.setRoller(-0.25).alongWith(hopper.setRoller(-0.25)).alongWith(intakeRoller.setRoller(-0.25));
+        return uptake.setRoller(-0.25).alongWith(hopper.setRoller(-0.25)).alongWith(intake.set(-0.25));
     }
 
     /**
