@@ -1,4 +1,4 @@
-package org.team157.robot.subsystems;
+package org.team157.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -28,6 +28,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
+import org.team157.robot.Constants.FieldConstants;
+import org.team157.robot.Constants.VisionConstants;
 import org.team157.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -368,5 +370,25 @@ public class DriveSystem extends TunerSwerveDrivetrain implements Subsystem {
 
     public Pose2d getPose() {
         return super.getStateCopy().Pose;
+    }
+    /**
+     *  Returns the pose to which the drivetrain should be reset, based on the current alliance.
+     * @return A Pose2d of the current alliance's Human Player Station corner.
+     */
+    public Pose2d getResetPose() {
+        // Gets the current alliance from the DriverStation. 
+        
+        Optional<Alliance> alliance = DriverStation.getAlliance();
+        // If the alliance is Red, return the Red reset pose. 
+        // Otherwise, return the Blue reset pose.
+        if(alliance.isPresent() && alliance.get() == Alliance.Red) {
+            return FieldConstants.MANUAL_RESET_POSE_RED;
+        } else {
+            return FieldConstants.MANUAL_RESET_POSE_BLUE;
+        }
+    }
+    /** Resets the pose of the drivetrain to the reset pose. */
+    public Command resetPose() {
+        return runOnce(() -> resetPose(getResetPose()));
     }
 }

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.team157.robot.subsystems;
+package org.team157.robot.subsystems.vision;
 
 import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Milliseconds;
@@ -26,8 +26,6 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -57,10 +55,11 @@ import yams.mechanisms.swerve.SwerveDrive;
 import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.VisionConstants;
-import org.team157.robot.parsing.PositionDetails;
+import org.team157.robot.subsystems.drive.DriveSystem;
+import org.team157.robot.subsystems.turret.TurretSystem;
+import org.team157.robot.subsystems.flywheel.FlywheelSystem;
 import org.team157.robot.Robot;
 
-@Logged(strategy = Strategy.OPT_OUT)
 public class VisionSystem extends SubsystemBase {
 
   // Publishes the turret's target point to NT for field zoning testing.
@@ -300,6 +299,13 @@ public class VisionSystem extends SubsystemBase {
     }
     return Optional.empty();
   }
+    public Command disableCams() {
+      return runOnce(() -> {
+        for (Cameras cam : Cameras.values()) {
+          cam.useForPositioning = false;
+        }
+      });
+    }
 
   /**
    * Get distance of the robot from the AprilTag pose.
@@ -362,23 +368,6 @@ public class VisionSystem extends SubsystemBase {
     }
 
     field2d.getObject("tracked targets").setPoses(poses);
-  }
-
-  /**
-   * Update the pose estimation inside of {@link SwerveDrive} with all of the
-   * given poses.
-   *
-   * @param swerveDrive {@link SwerveDrive} instance.
-   */
-  public double getHubTagYawFromTurretCam() {
-    Cameras.TURRET_CAM.updateUnreadResults();
-    PhotonTrackedTarget target = getTargetFromId(26, Cameras.TURRET_CAM);
-    if (target == null) {
-      // arbitrary number indicating no target
-      return 157357;
-    }
-
-    return target.yaw;
   }
 
   /**
@@ -481,15 +470,7 @@ public class VisionSystem extends SubsystemBase {
     BACK_CAM(VisionConstants.BACK_CAMERA_NICKNAME,
         VisionConstants.BACK_CAMERA_ROTATION,
         VisionConstants.BACK_CAMERA_TRANSLATION,
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-    /**
-     * Turret Camera
-     */
-    TURRET_CAM(VisionConstants.TURRET_CAMERA_NICKNAME,
-        VisionConstants.TURRET_CAMERA_ROTATION,
-        VisionConstants.TURRET_CAMERA_TRANSLATION,
         VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
-
     /**
      * flag to ignore the turret cam for positioning
      */
@@ -571,10 +552,6 @@ public class VisionSystem extends SubsystemBase {
           PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
           robotToCamTransform);
       poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-      //TODO: evaluate whether we need turret cam at all, remove this code and all notions of turret cam if we dont want to use it for global positioning
-      if (name.equals(VisionConstants.TURRET_CAMERA_NICKNAME)) {
-        this.useForPositioning = false;
-      }
 
       this.singleTagStdDevs = singleTagStdDevs;
       this.multiTagStdDevs = multiTagStdDevsMatrix;
