@@ -19,14 +19,14 @@ public class SlapdownConstants {
     /** Gearing for the pivot motor */
     public static final MechanismGearing PIVOT_GEARING = new MechanismGearing(GearBox.fromStages("23:1", "50:12"));
     /** Closed loop control values for the pivot */
-    public static final double KP = 157, KI = 0, KD = 0;
+    public static final double KP = 67, KI = 0, KD = 0;
     public static final double SIM_KP = 20, SIM_KI = 0, SIM_KD = 0;
     /** Angular velocity for the pivot motor */
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
     /** Angular acceleration for the pivot motor */
     public static final AngularAcceleration ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(540);
     /** Minimum and maximum positions for the pivot encoder */
-    public static final double MIN_ENCODER_POSITION = 0.01, MAX_ENCODER_POSITION = 0.91;
+    public static final double MIN_ENCODER_POSITION = 0.0, MAX_ENCODER_POSITION = 0.85;
     /** Minimum and maximum angles for the pivot */
     public static final double MIN_ANGLE = 0, MAX_ANGLE = 80;
     /** Soft limits for the pivot angle */

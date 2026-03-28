@@ -211,10 +211,9 @@ public class RobotContainer {
 
         // Disables automatic turret tracking when manual override is enabled,
         // allowing the operator to control the turret without interference from vision tracking.
-        turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
-        ;
-        turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
-        turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());
+        // turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
+        // turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
+        // turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());
 
         ///////////////////////
         /// MANUAL FLYWHEEL ///
@@ -254,7 +253,7 @@ public class RobotContainer {
 
         // Deploy and retract the intake with the A and Y buttons, but only when the
         // back button is held to prevent accidental activation during teleop.
-        operatorController.a().and(operatorController.back()).toggleOnTrue(slapdown.deployIntakeAndHold());
+        operatorController.a().and(operatorController.back()).toggleOnTrue(slapdown.deployIntake());
         operatorController.y().and(operatorController.back()).toggleOnTrue(slapdown.retractIntake());
 
     }
