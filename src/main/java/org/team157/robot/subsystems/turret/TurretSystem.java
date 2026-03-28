@@ -144,16 +144,6 @@ public class TurretSystem extends SubsystemBase {
     return turret.sysId(Volts.of(7), Volts.of(2).per(Second), Seconds.of(4));
   }
 
-  /**
-   * Track the hub tag using the turret's camera.
-   * 
-   * @return Command either setting the turret angle to face the tag, or setting
-   *         the turret power to 0 if the tag isn't present.
-   */
-  public Command trackHubTag() {
-    return turret.setAngle(this::getAngleToHubFaceTag);
-  }
-
   public Command trackTagGlobalRelative() {
     return turret.setAngle(this::getTrackingAngle);
   }
@@ -223,27 +213,6 @@ public class TurretSystem extends SubsystemBase {
    */
   public double getVelocity() {
     return smartMotor.getMechanismVelocity().in(DegreesPerSecond);
-  }
-
-  /**
-   * Calculate the angle the turret needs to turn to face the target tag.
-   * 
-   * @return The angle the turret needs to rotate to to face the target tag.
-   */
-  public Angle getAngleToHubFaceTag() {
-    // The current angular offset of the tag, relative to the turret camera.
-    double tagYaw = visionSystem.getHubTagYawFromTurretCam();
-    SmartDashboard.putNumber("Target Yaw", tagYaw);
-    // if the target tag is seen, at an arbitrary number indicating no target,
-    if (tagYaw != 157357) {
-      // Subtract the camera-to-tag angle from the turret angle
-      // to find our new setpoint angle to face the tag.
-      double finalAngle = getScaledPosAngleYAMS() - tagYaw;
-      return Degrees.of(finalAngle);
-    } else {
-      // If no tag seen, don't move turret.
-      return Degrees.of(getScaledPosAngleYAMS());
-    }
   }
 
   /**
