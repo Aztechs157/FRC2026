@@ -188,12 +188,12 @@ public class RobotContainer {
             // Shooting on left trigger, intake on right trigger
             driverController.leftTrigger().whileTrue(uptake.setRoller(1));
             driverController.rightTrigger().whileTrue(intake.runIntake());
-            driverController.leftTrigger().whileTrue(hopper.set(0.5));
+            driverController.leftTrigger().whileTrue(hopper.set(1));
         } else {
             // Shooting on right trigger, intake on left trigger
             driverController.rightTrigger().whileTrue(uptake.setRoller(1));
             driverController.leftTrigger().whileTrue(intake.runIntake());
-            driverController.rightTrigger().whileTrue(hopper.set(0.5));
+            driverController.rightTrigger().whileTrue(hopper.set(1));
         }
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
         driverController.y().whileTrue(forceOuttake());
@@ -358,7 +358,7 @@ public class RobotContainer {
     // at a low speed to clear any jams.
     // TODO: remove from RobotContainer and into eventual Superstructure subsystem once it exists.
     private Command forceOuttake() {
-        return uptake.setRoller(-0.25).alongWith(hopper.set(-0.25)).alongWith(intake.set(-0.25));
+        return uptake.setRoller(-0.5).alongWith(hopper.set(-0.5)).alongWith(intake.set(-0.5));
     }
 
     /**
