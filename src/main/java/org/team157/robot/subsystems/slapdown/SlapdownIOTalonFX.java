@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
+import edu.wpi.first.math.controller.ArmFeedforward;
 
 import java.util.function.Supplier;
 
@@ -20,7 +21,9 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import yams.mechanisms.config.ArmConfig;
 import yams.mechanisms.config.PivotConfig;
+import yams.mechanisms.positional.Arm;
 import yams.mechanisms.positional.Pivot;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
@@ -29,7 +32,7 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class SlapdownIOTalonFX implements SlapdownIO {
-    private final Pivot slapdown;
+    private final Arm slapdown;
     private final SmartMotorController motor;
     private final DutyCycleEncoder encoder;
 
@@ -42,6 +45,7 @@ public class SlapdownIOTalonFX implements SlapdownIO {
             .withClosedLoopController(SlapdownConstants.KP, SlapdownConstants.KI, SlapdownConstants.KD,
                 SlapdownConstants.ANGULAR_VELOCITY, SlapdownConstants.ANGULAR_ACCELERATION)
             .withSimClosedLoopController(SlapdownConstants.SIM_KP, SlapdownConstants.SIM_KI, SlapdownConstants.SIM_KD, SlapdownConstants.ANGULAR_VELOCITY, SlapdownConstants.ANGULAR_ACCELERATION)
+            .withFeedforward(new ArmFeedforward(0, 0, 0))
             .withIdleMode(MotorMode.BRAKE)
             .withMotorInverted(true)
             .withGearing(SlapdownConstants.PIVOT_GEARING)
@@ -53,15 +57,16 @@ public class SlapdownIOTalonFX implements SlapdownIO {
         SmartMotorController smartIntakePivotMotor = new TalonFXWrapper(talonfx, DCMotor.getKrakenX44(1), slapdownMotorConfig);
 
         // Configure the physical characteristics of the pivot.
-        PivotConfig slapdownConfig = new PivotConfig(smartIntakePivotMotor)
+        ArmConfig slapdownConfig = new ArmConfig(smartIntakePivotMotor)
             .withStartingPosition(Degrees.of(mapEncoder(SlapdownConstants.MIN_ANGLE, SlapdownConstants.MAX_ANGLE)))
             .withHardLimit(SlapdownConstants.LOWER_HARD_LIMIT, SlapdownConstants.UPPER_HARD_LIMIT)
             .withSoftLimits(SlapdownConstants.LOWER_SOFT_LIMIT, SlapdownConstants.UPPER_SOFT_LIMIT)
             .withTelemetry("Intake Pivot", TelemetryConstants.TELEMETRY_VERBOSITY)
-            .withMOI(Meters.of(0.75), Kilograms.of(1));
+            .withLength(Meters.of(0.75))
+            .withMass(Kilograms.of(1));
 
         // Create the pivot system with the above configuration.
-        this.slapdown = new Pivot(slapdownConfig);
+        this.slapdown = new Arm(slapdownConfig);
         this.motor = slapdown.getMotor();
     }
     /** Helper function that maps the pivot's current encoder value to a given range using PosUtils.
