@@ -61,7 +61,7 @@ public class TurretSystem extends SubsystemBase {
       .withClosedLoopController(TurretConstants.KP, TurretConstants.KI, TurretConstants.KD,
           TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)
       .withSimClosedLoopController(TurretConstants.SIM_KP, TurretConstants.SIM_KI, TurretConstants.SIM_KD,
-          TurretConstants.ANGULAR_VELOCITY, TurretConstants.ANGULAR_ACCELERATION)
+          TurretConstants.SIM_ANGULAR_VELOCITY, TurretConstants.SIM_ANGULAR_ACCELERATION)
       .withIdleMode(MotorMode.BRAKE)
       .withMotorInverted(true)
       .withGearing(TurretConstants.GEARING)
