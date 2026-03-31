@@ -4,16 +4,23 @@
 
 package org.team157.robot;
 
+import java.util.Optional;
+
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
 import com.ctre.phoenix6.HootAutoReplay;
 
 import edu.wpi.first.math.geometry.Pose3d;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
-
-import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,21 +33,30 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * If you change the name of this class or the package after 
  * creating this project, you must also update the Main.java file in the project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
+  public static enum Mode {
+    /** Running on a real robot. */
+    REAL,
 
+    /** Running a physics simulator. */
+    SIM,
+
+    /** Replaying from a log file. */
+    REPLAY
+  }
+
+  // Change to Mode.REPLAY to enable REPLAY.
+  public static final Mode simMode     = Mode.SIM;
+  public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+
+
+  private String autoName, newAutoName;
+  private Optional<Alliance> alliance, newAlliance;
   private Command m_autonomousCommand;
 
   public static Pose3d[] zeroArray = new Pose3d[4];
   public static Pose3d[] finalArray = new Pose3d[4];
   public static Pose3d[] cameras = new Pose3d[3];
-  // creates a publisher to send zeroed Pose3d values to NT for model calibration.
-  public static StructArrayPublisher<Pose3d> zeroedPoses = NetworkTableInstance.getDefault()
-      .getStructArrayTopic("ZeroedComponentPoses", Pose3d.struct).publish();
-  public static StructArrayPublisher<Pose3d> finalPoses = NetworkTableInstance.getDefault()
-      .getStructArrayTopic("FinalComponentPoses", Pose3d.struct).publish();
-
-  public static StructArrayPublisher<Pose3d> cameraPoses = NetworkTableInstance.getDefault()
-      .getStructArrayTopic("CameraPoses", Pose3d.struct).publish();
 
   public static final Field2d m_field = new Field2d();
 
@@ -56,6 +72,29 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   public Robot() {
+    switch (currentMode) {
+      case REAL:
+        // Running on a real robot, log to a USB stick ("/U/logs")
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      case SIM:
+        // Running a physics simulator, log to NT
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      case REPLAY:
+        // Replaying a log, set up replay source
+        setUseTiming(false); // Run as fast as possible
+        String logPath = LogFileUtil.findReplayLog();
+        Logger.setReplaySource(new WPILOGReader(logPath));
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        break;
+    }
+    // Start AdvantageKit logger
+    Logger.start();
+
     // Instantiate our RobotContainer. This will perform 
     //all our button bindings, and put our
     // autonomous chooser on the dashboard.
@@ -100,19 +139,20 @@ public class Robot extends TimedRobot {
     // zeroedPoses.set(zeroArray);
 
     // Gets mechanism poses to be used for the AdvantageScope model.
-    finalArray = new Pose3d[] {
-        // turret base
-        m_robotContainer.turret.getBasePose(),
-        // turret hood
-        m_robotContainer.turret.getHoodPivotPose(new Transform3d(0, 0, 0,
-            new Rotation3d(0, Math.toRadians(m_robotContainer.hood.getScaledPosAngleSim()), 0))),
-        // intake pivot
-        m_robotContainer.intake.getIntakePivotPose(),
-        // hopper walls
-        m_robotContainer.intake.getHopperWallsPose()
-    };
+
+    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {
+      // turret base 
+      m_robotContainer.turret.getBasePose(), 
+      // turret hood
+      m_robotContainer.turret.getHoodPivotPose(new Transform3d(0,0,0, 
+        new Rotation3d(0, Math.toRadians(m_robotContainer.hood.getScaledPosAngleSim()), 0))),
+      // intake pivot
+      m_robotContainer.slapdown.getIntakePivotPose(), 
+      // hopper walls
+      m_robotContainer.slapdown.getHopperWallsPose()} 
+    );
     // Send mechanism poses to NT.
-    finalPoses.set(finalArray);
+    // finalPoses.set(finalArray);
 
     // // used for model camera position calibration
     // cameras = new Pose3d[] {
