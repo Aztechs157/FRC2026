@@ -211,9 +211,9 @@ public class RobotContainer {
 
         // Disables automatic turret tracking when manual override is enabled,
         // allowing the operator to control the turret without interference from vision tracking.
-        // turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
-        // turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
-        // turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());
+        turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
+        turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
+        turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());
 
         ///////////////////////
         /// MANUAL FLYWHEEL ///
@@ -221,14 +221,14 @@ public class RobotContainer {
 
         // Only enable manual control of turret, hood and flywheel when manual override is enabled
         // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
-        operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(-50)));
-        operatorController.povUpRight().toggleOnTrue(turret.setAngle(Degrees.of(-5)));
-        operatorController.povRight().whileTrue(turret.setAngle(Degrees.of(40)));
-        operatorController.povDownRight().toggleOnTrue(turret.setAngle(Degrees.of(85)));
-        operatorController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(130)));
-        operatorController.povDownLeft().toggleOnTrue(turret.setAngle(Degrees.of(175)));
-        operatorController.povLeft().whileTrue(turret.setAngle(Degrees.of(220)));
-        operatorController.povUpLeft().toggleOnTrue(turret.setAngle(Degrees.of(265)));
+        operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(168.5)));
+        // operatorController.povUpRight().toggleOnTrue(turret.setAngle(Degrees.of(-5)));
+        operatorController.povRight().whileTrue(turret.setAngle(Degrees.of(78.5)));
+        // operatorController.povDownRight().toggleOnTrue(turret.setAngle(Degrees.of(85)));
+        operatorController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(-12.5)));
+        // operatorController.povDownLeft().toggleOnTrue(turret.setAngle(Degrees.of(175)));
+        operatorController.povLeft().whileTrue(turret.setAngle(Degrees.of(-102.5)));
+        // operatorController.povUpLeft().toggleOnTrue(turret.setAngle(Degrees.of(265)));
         
           ///////////////////////
          /// MANUAl FLYWHEEL ///
