@@ -172,6 +172,7 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putNumber("Match Time", Timer.getMatchTime());
     // Gets hub activity status to display on the dashboard.
     SmartDashboard.putBoolean("Hub Active?", m_robotContainer.isHubActive());
+    SmartDashboard.putBoolean("Under Trench?", m_robotContainer.drivetrain.isUnderTrench());
 
   }
 

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.team157.robot.Constants.ModelConstants;
+import org.team157.robot.subsystems.drive.DriveSystem;
 import org.team157.robot.subsystems.flywheel.FlywheelSystem;
 import org.team157.utilities.PosUtils;
 
@@ -47,8 +48,8 @@ public class Hood extends SubsystemBase {
      * 
      * @return Command setting the duty cycle output of the hood's motor to 0
      */
-    public Command getDefault() {
-        return io.stop();
+    public Command getDefault(DriveSystem drivetrain) {
+        return io.setTargetAngle(HoodConstants.UPPER_SOFT_LIMIT);
     }
 
     /**

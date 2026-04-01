@@ -20,6 +20,7 @@ import yams.motorcontrollers.SmartMotorController;
 import org.team157.robot.Constants;
 import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.TelemetryConstants;
+import org.team157.robot.RobotContainer;
 import org.team157.robot.subsystems.hood.HoodConstants;
 import org.team157.robot.subsystems.vision.VisionSystem;
 
@@ -108,8 +109,16 @@ public class FlywheelSystem extends SubsystemBase {
     return Math.sqrt((g * distance * distance) / denominator);
   }
 
+  double getLowerBound(boolean isUnderTrench){
+    if(isUnderTrench){
+      return HoodConstants.UPPER_SOFT_LIMIT.in(Radians);
+    } else {
+      return HoodConstants.LOWER_SOFT_LIMIT.in(Radians);
+    }
+  }
+
   public void setShotParams(double height, double distance) {
-    double lowerBound = HoodConstants.LOWER_SOFT_LIMIT.in(Radians);
+    double lowerBound = getLowerBound(RobotContainer.drivetrain.isUnderTrench());
     double upperBound = HoodConstants.UPPER_SOFT_LIMIT.in(Radians);
     double steps = 50;
     double stepSize = (upperBound - lowerBound) / steps;
@@ -141,7 +150,7 @@ public class FlywheelSystem extends SubsystemBase {
     // Relationship: ballVelocity = (flywheelRPM / 60) * π * flywheel_radius
     // Therefore: flywheelRPM = (ballVelocity * 60) / (π * flywheel_diameter)
     // desiredRPM is divided by 0.4 to account for 
-    //external factors like air resistace and wheel slip.
+    // external factors like air resistace and wheel slip.
     double flywheelDiameterMeters = (FlywheelConstants.FLYWHEEL_DIAMETER).in(Meters);
     double desiredRPM = ((ballVelocity) * 60) / (Math.PI * flywheelDiameterMeters) * FlywheelConstants.SPEED_FACTOR;
     return RPM.of(Math.max(2800, desiredRPM));
@@ -197,9 +206,11 @@ public class FlywheelSystem extends SubsystemBase {
       SmartDashboard.putNumber("Target Height", FieldConstants.positionDetails.getTargetHeight());
       SmartDashboard.putNumber("Ball Velocity (m/s)", ballVelocity);
       SmartDashboard.putBoolean("Ball Velocity is NaN", Double.isNaN(ballVelocity));
-      SmartDashboard.putNumber("Flywheel RPM", getVelocity().in(RPM));
       SmartDashboard.putNumber("Desired Flywheel Velocity", getDesiredFlywheelVelocity().in(RPM));
     }
+
+    SmartDashboard.putNumber("Flywheel RPM", getVelocity().in(RPM));
+
     flywheel.updateTelemetry();
   }
 

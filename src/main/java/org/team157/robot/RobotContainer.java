@@ -70,7 +70,8 @@ public class RobotContainer {
     public final Hopper hopper = new Hopper();
     public final UptakeSystem uptake = new UptakeSystem();
     public final FlywheelSystem flywheel = new FlywheelSystem();
-    public final DriveSystem drivetrain = TunerConstants.createDrivetrain();
+    // TODO: consider whether other systems should be static, had to make this static for the dyanmic hood under trench.
+    public static final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
     private final SendableChooser<Command> autoChooser;
 
@@ -131,7 +132,7 @@ public class RobotContainer {
         intake.setDefaultCommand(intake.getDefault());
         hopper.setDefaultCommand(hopper.getDefault());
         uptake.setDefaultCommand(uptake.setDefault());
-        hood.setDefaultCommand(hood.getDefault());
+        hood.setDefaultCommand(hood.getDefault(drivetrain));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.

@@ -70,7 +70,7 @@ public final class Constants {
 
 
   public static class TelemetryConstants {
-    public static final TelemetryVerbosity TELEMETRY_VERBOSITY = TelemetryVerbosity.HIGH;
+    public static final TelemetryVerbosity TELEMETRY_VERBOSITY = TelemetryVerbosity.LOW;
 
   }
 
