@@ -54,7 +54,7 @@ public class Turret extends SubsystemBase {
      *
      * @return Command setting the duty cycle output of the turret's motor to 0
      */
-    public Command setDefault() {
+    public Command getDefault() {
         return io.set(0);
     }
 

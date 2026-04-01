@@ -127,7 +127,7 @@ public class RobotContainer {
         visionSystem.setDefaultCommand(visionSystem.setDefault(drivetrain, turret));
 
         // Disable turret movement when no other turret commands are running.
-        turret.setDefaultCommand(turret.setDefault());
+        turret.setDefaultCommand(turret.getDefault());
         flywheel.setDefaultCommand(flywheel.setDefault());
         slapdown.setDefaultCommand(slapdown.getDefault());
         intake.setDefaultCommand(intake.getDefault());
