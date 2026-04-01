@@ -34,7 +34,6 @@ public class HopperIOTalonFX implements HopperIO {
         SmartMotorControllerConfig hopperRollerMotorConfig = new SmartMotorControllerConfig(subsystem)
             .withControlMode(ControlMode.OPEN_LOOP)
             .withTelemetry("HopperRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
-            .withGearing(1)
             .withMotorInverted(true)
             .withIdleMode(MotorMode.COAST)
             .withStatorCurrentLimit((HopperConstants.CURRENT_LIMIT))
@@ -50,7 +49,6 @@ public class HopperIOTalonFX implements HopperIO {
 
         this.hopper = new FlyWheel(hopperRollerConfig);
         this.motor = hopper.getMotor();
-
     }
         
     @Override
@@ -70,15 +68,13 @@ public class HopperIOTalonFX implements HopperIO {
     }
 
     @Override
-    public Command set(double dutycycle) {
-        return hopper.set(dutycycle);
+    public Command set(double dutyCycle) {
+        return hopper.set(dutyCycle);
     }
 
     @Override
     public void simIterate() {
         hopper.simIterate();
     }
-
-
 
 }

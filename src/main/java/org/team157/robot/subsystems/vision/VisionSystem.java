@@ -54,7 +54,7 @@ import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.VisionConstants;
 import org.team157.robot.subsystems.drive.DriveSystem;
-import org.team157.robot.subsystems.turret.TurretSystem;
+import org.team157.robot.subsystems.turret.Turret;
 import org.team157.robot.Robot;
 
 public class VisionSystem extends SubsystemBase {
@@ -120,7 +120,7 @@ public class VisionSystem extends SubsystemBase {
     setDefaultCommand(getDefaultCommand());
   }
 
-  public Command setDefault(DriveSystem drivetrain, TurretSystem turret) {
+  public Command setDefault(DriveSystem drivetrain, Turret turret) {
     return run(() -> {
       updatePoseEstimation(drivetrain);
       turret.updateRelativeAngleToTarget(FieldConstants.positionDetails.getTargetPose2d(drivetrain.getPose(), isBlueAlliance),

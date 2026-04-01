@@ -5,11 +5,15 @@ import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
+/**
+ * Defines the input data to be logged by AdvantageKit, along with methods and
+ * {@link Command}s which an implementation of this IO interface must have.
+ */
 public interface HopperIO {
 
     /** 
      * Represents the set of inputs which are to be logged by AdvantageKit 
-     * and updated by an implementation of the {@link HoodIO} interface. 
+     * and updated by an implementation of the {@link HopperIO} interface. 
      */
     @AutoLog
     public static class HopperIOInputs {

@@ -37,8 +37,10 @@ import org.team157.robot.subsystems.intake.Intake;
 import org.team157.robot.subsystems.intake.IntakeIOTalonFX;
 import org.team157.robot.subsystems.slapdown.Slapdown;
 import org.team157.robot.subsystems.slapdown.SlapdownIOTalonFX;
-import org.team157.robot.subsystems.turret.TurretSystem;
-import org.team157.robot.subsystems.uptake.UptakeSystem;
+import org.team157.robot.subsystems.uptake.Uptake;
+import org.team157.robot.subsystems.uptake.UptakeIOTalonFX;
+import org.team157.robot.subsystems.turret.Turret;
+import org.team157.robot.subsystems.turret.TurretIOTalonFX;
 import org.team157.robot.subsystems.vision.VisionSystem;
 
 public class RobotContainer {
@@ -57,21 +59,18 @@ public class RobotContainer {
     private final CommandXboxController driverController = new CommandXboxController(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
 
-    public final TurretSystem turret;
+    public final Turret turret = new Turret();
     public final VisionSystem visionSystem;
-
-    // public final HoodSystem hood = new HoodSystem();
-    public final Hood hood = new Hood();
-    public final Slapdown slapdown = new Slapdown();
-    // public final IntakePivotSystem intakePivot = new IntakePivotSystem();
-    // public final IntakeRollerSystem intakeRoller = new IntakeRollerSystem();
-    public final Intake intake = new Intake();
-    // public final HopperSystem hopper = new HopperSystem();
-    public final Hopper hopper = new Hopper();
-    public final UptakeSystem uptake = new UptakeSystem();
     public final FlywheelSystem flywheel = new FlywheelSystem();
     // TODO: consider whether other systems should be static, had to make this static for the dyanmic hood under trench.
     public static final DriveSystem drivetrain = TunerConstants.createDrivetrain();
+
+    public final Hood hood = new Hood();
+    public final Intake intake = new Intake();
+    public final Hopper hopper = new Hopper();
+    public final Uptake uptake = new Uptake();
+    public final Slapdown slapdown = new Slapdown();
+
 
     private final SendableChooser<Command> autoChooser;
 
@@ -91,13 +90,15 @@ public class RobotContainer {
         hood.setIO(new HoodIOTalonFX(hood));
         slapdown.setIO(new SlapdownIOTalonFX(slapdown));
         hopper.setIO(new HopperIOTalonFX(hopper));
+        uptake.setIO(new UptakeIOTalonFX(uptake));
+
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
-        turret = new TurretSystem(visionSystem);
+        turret.setIO(new TurretIOTalonFX(turret), visionSystem);
 
         NamedCommands.registerCommand("DeployIntake", slapdown.deployIntake());
         NamedCommands.registerCommand("RunIntake", intake.runIntake());
         NamedCommands.registerCommand("RunHopper", hopper.set(0.5));
-        NamedCommands.registerCommand("ShootBalls", uptake.setRoller(1));
+        NamedCommands.registerCommand("ShootBalls", uptake.set(1));
         NamedCommands.registerCommand("Wiggle", slapdown.wiggleIntake());
 
         configureBindings();
@@ -126,7 +127,7 @@ public class RobotContainer {
         visionSystem.setDefaultCommand(visionSystem.setDefault(drivetrain, turret));
 
         // Disable turret movement when no other turret commands are running.
-        turret.setDefaultCommand(turret.setDefault());
+        turret.setDefaultCommand(turret.getDefault());
         flywheel.setDefaultCommand(flywheel.setDefault());
         slapdown.setDefaultCommand(slapdown.getDefault());
         intake.setDefaultCommand(intake.getDefault());
@@ -187,12 +188,12 @@ public class RobotContainer {
         // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's preference.
         if(ModifierConstants.MAYA_MODE) {
             // Shooting on left trigger, intake on right trigger
-            driverController.leftTrigger().whileTrue(uptake.setRoller(1));
+            driverController.leftTrigger().whileTrue(uptake.set(1));
             driverController.rightTrigger().whileTrue(intake.runIntake());
             driverController.leftTrigger().whileTrue(hopper.set(1));
         } else {
             // Shooting on right trigger, intake on left trigger
-            driverController.rightTrigger().whileTrue(uptake.setRoller(1));
+            driverController.rightTrigger().whileTrue(uptake.set(1));
             driverController.leftTrigger().whileTrue(intake.runIntake());
             driverController.rightTrigger().whileTrue(hopper.set(1));
         }
@@ -359,7 +360,7 @@ public class RobotContainer {
     // at a low speed to clear any jams.
     // TODO: remove from RobotContainer and into eventual Superstructure subsystem once it exists.
     private Command forceOuttake() {
-        return uptake.setRoller(-0.5).alongWith(hopper.set(-0.5)).alongWith(intake.set(-0.5));
+        return uptake.set(-0.5).alongWith(hopper.set(-0.5)).alongWith(intake.set(-0.5));
     }
 
     /**
