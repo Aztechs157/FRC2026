@@ -39,7 +39,8 @@ import org.team157.robot.subsystems.slapdown.Slapdown;
 import org.team157.robot.subsystems.slapdown.SlapdownIOTalonFX;
 import org.team157.robot.subsystems.uptake.Uptake;
 import org.team157.robot.subsystems.uptake.UptakeIOTalonFX;
-import org.team157.robot.subsystems.turret.TurretSystem;
+import org.team157.robot.subsystems.turret.Turret;
+import org.team157.robot.subsystems.turret.TurretIOTalonFX;
 import org.team157.robot.subsystems.vision.VisionSystem;
 
 public class RobotContainer {
@@ -58,7 +59,7 @@ public class RobotContainer {
     private final CommandXboxController driverController = new CommandXboxController(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
 
-    public final TurretSystem turret;
+    public final Turret turret = new Turret();
     public final VisionSystem visionSystem;
     public final FlywheelSystem flywheel = new FlywheelSystem();
     // TODO: consider whether other systems should be static, had to make this static for the dyanmic hood under trench.
@@ -92,7 +93,7 @@ public class RobotContainer {
         uptake.setIO(new UptakeIOTalonFX(uptake));
 
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
-        turret = new TurretSystem(visionSystem);
+        turret.setIO(new TurretIOTalonFX(turret), visionSystem);
 
         NamedCommands.registerCommand("DeployIntake", slapdown.deployIntake());
         NamedCommands.registerCommand("RunIntake", intake.runIntake());
@@ -126,7 +127,7 @@ public class RobotContainer {
         visionSystem.setDefaultCommand(visionSystem.setDefault(drivetrain, turret));
 
         // Disable turret movement when no other turret commands are running.
-        turret.setDefaultCommand(turret.setDefault());
+        turret.setDefaultCommand(turret.getDefault());
         flywheel.setDefaultCommand(flywheel.setDefault());
         slapdown.setDefaultCommand(slapdown.getDefault());
         intake.setDefaultCommand(intake.getDefault());
