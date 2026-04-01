@@ -37,7 +37,6 @@ public class UptakeIOTalonFX implements UptakeIO {
         SmartMotorControllerConfig uptakeRollerMotorConfig = new SmartMotorControllerConfig(subsystem)
             .withControlMode(ControlMode.OPEN_LOOP)
             .withTelemetry("UptakeRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
-            .withGearing(1)
             .withMotorInverted(true)
             .withIdleMode(MotorMode.COAST)
             .withStatorCurrentLimit(UptakeConstants.CURRENT_LIMIT)
@@ -63,7 +62,7 @@ public class UptakeIOTalonFX implements UptakeIO {
         inputs.appliedVolts = motor.getVoltage().in(Volts);
         inputs.temperatureCelsius = motor.getTemperature().in(Celsius);
         inputs.mechanismVelocityDegreesPerSecond = motor.getMechanismVelocity().in(DegreesPerSecond);
-        inputs.uptakeRunning = !uptake.gte(DegreesPerSecond.of(5)).getAsBoolean();
+        inputs.uptakeRunning = uptake.gte(DegreesPerSecond.of(5)).getAsBoolean();
     }
 
     @Override

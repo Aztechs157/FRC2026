@@ -60,19 +60,16 @@ public class RobotContainer {
 
     public final TurretSystem turret;
     public final VisionSystem visionSystem;
-
-    // public final HoodSystem hood = new HoodSystem();
-    public final Hood hood = new Hood();
-    public final Slapdown slapdown = new Slapdown();
-    // public final IntakePivotSystem intakePivot = new IntakePivotSystem();
-    // public final IntakeRollerSystem intakeRoller = new IntakeRollerSystem();
-    public final Intake intake = new Intake();
-    // public final HopperSystem hopper = new HopperSystem();
-    public final Hopper hopper = new Hopper();
-    public final Uptake uptake = new Uptake();
     public final FlywheelSystem flywheel = new FlywheelSystem();
     // TODO: consider whether other systems should be static, had to make this static for the dyanmic hood under trench.
     public static final DriveSystem drivetrain = TunerConstants.createDrivetrain();
+
+    public final Hood hood = new Hood();
+    public final Intake intake = new Intake();
+    public final Hopper hopper = new Hopper();
+    public final Uptake uptake = new Uptake();
+    public final Slapdown slapdown = new Slapdown();
+
 
     private final SendableChooser<Command> autoChooser;
 

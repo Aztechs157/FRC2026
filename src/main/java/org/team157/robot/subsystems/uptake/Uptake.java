@@ -42,11 +42,11 @@ public class Uptake extends SubsystemBase {
     /**
      * Set the duty cycle of the uptake roller motors.
      *
-     * @param dutycycle The power to be applied to the motors, between -1 and 1.
+     * @param dutyCycle The power to be applied to the motors, between -1 and 1.
      * @return {@link Command} setting the duty cycle of the uptake roller motors.
      */
-    public Command set(double dutycycle) {
-        return io.set(dutycycle);
+    public Command set(double dutyCycle) {
+        return io.set(dutyCycle);
     }
 
     @Override
