@@ -57,6 +57,30 @@
             "yMin": 4.040981,
             "xMax": 16.535400,
             "yMax": 7.98703
+        },
+        "blueTrenchLow": {
+            "xMin": 3.0259,
+            "yMin": 0,
+            "xMax": 6.2197,
+            "yMax": 1.285081
+        },
+        "blueTrenchHigh": {
+            "xMin": 3.0259,
+            "yMin": 6.796881,
+            "xMax": 6.2197,
+            "yMax": 8.096644
+        },
+        "redTrenchLow": {
+            "xMin": 10.315700,
+            "yMin": 0,
+            "xMax": 13.504738,
+            "yMax": 1.285081
+        },
+        "redTrenchHigh": {
+            "xMin": 10.315700,
+            "yMin": 6.796881,
+            "xMax": 13.504738,
+            "yMax": 8.096644
         }
     }
 }

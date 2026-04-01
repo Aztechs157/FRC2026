@@ -29,7 +29,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import org.team157.robot.Constants.FieldConstants;
-import org.team157.robot.Constants.VisionConstants;
+import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -371,8 +371,18 @@ public class DriveSystem extends TunerSwerveDrivetrain implements Subsystem {
     public Pose2d getPose() {
         return super.getStateCopy().Pose;
     }
+
     /**
-     *  Returns the pose to which the drivetrain should be reset, based on the current alliance.
+     * Returns whether or not the turret is underneath the trench.
+     * 
+     * @return true if the turret (offset from drivebase center) is within a trench zone, false otherwise.
+     */
+    public boolean isUnderTrench() {
+        return FieldConstants.positionDetails.isUnderTrench(getPose().plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET));
+    }
+
+    /**
+     * Returns the pose to which the drivetrain should be reset, based on the current alliance.
      * @return A Pose2d of the current alliance's Human Player Station corner.
      */
     public Pose2d getResetPose() {
@@ -387,6 +397,7 @@ public class DriveSystem extends TunerSwerveDrivetrain implements Subsystem {
             return FieldConstants.MANUAL_RESET_POSE_BLUE;
         }
     }
+
     /** Resets the pose of the drivetrain to the reset pose. */
     public Command resetPose() {
         return runOnce(() -> resetPose(getResetPose()));
