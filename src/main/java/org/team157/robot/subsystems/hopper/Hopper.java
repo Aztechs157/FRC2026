@@ -5,27 +5,34 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/**
+ * Represents the Hopper subsystem, which feeds balls 
+ * from the intake into the uptake for shooting.
+ */
 public class Hopper extends SubsystemBase {
-    private HopperIO io;
+  
+  // The IO interface for interacting with the hopper's motor.
+  private HopperIO io;
 
-    private final HopperIOInputsAutoLogged inputs = new HopperIOInputsAutoLogged();
+  // Inputs from the motor and mechanism, to be updated periodically and logged.
+  private final HopperIOInputsAutoLogged inputs = new HopperIOInputsAutoLogged();
   
     /** Creates a new Hopper. */
     public Hopper() {}
-/**
-   * Specifies the IO implementation to be used for the hood.
+  /**
+   * Specifies the IO implementation to be used for the hopper.
    * 
-   * @param io An implementation of the Hood's IO layer, i.e. HoodIOTalonFX
+   * @param io An implementation of the Hopper's IO layer, i.e. HopperIOTalonFX
    */
   public void setIO(HopperIO io) {
     this.io = io;
   }
 
   /**
-   * Sets the default command of the hopper, stopping motor output when no other
-   * commands are running.
+   * Sets the default command of the hopper, stopping 
+   * motor output when no other commands are running.
    * 
-   * @return Command setting the duty cycle output of the hood's motor to 0
+   * @return Command setting the duty cycle of the hopper's motor to 0
    */
   public Command getDefault() {
     return io.stop();
@@ -54,6 +61,5 @@ public class Hopper extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
     io.simIterate();
   }
-
 
 }

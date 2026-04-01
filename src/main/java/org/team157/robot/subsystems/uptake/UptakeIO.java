@@ -28,23 +28,23 @@ public interface UptakeIO {
     /**
      * Updates the inputs to be logged by AdvantageKit.
      *
-     * @param inputs The set of inputs to be logged, including information on the motor and mechanism.
+     * @param inputs The set of inputs to be logged, including information on the motors and mechanism.
      */
     default void updateInputs(UptakeIOInputs inputs) {}
 
-    /** Updates the values for the simulated version of the uptake roller mechanism. */
+    /** Updates the values for the simulated version of the uptake mechanism. */
     default void simIterate() {}
 
     /**
-     * Stops the uptake roller.
-     * @return a {@link Command} setting the motor's output power to 0.
+     * Stops the uptake rollers.
+     * @return a {@link Command} setting the motors' output power to 0.
      */
     default Command stop() {
         return Commands.none();
     }
 
     /**
-     * Directly sets the output duty cycle of the uptake roller motor.
+     * Directly sets the output duty cycle of the uptake rollers' motors.
      *
      * @param dutyCycle The duty cycle to apply to the motor, between -1 and 1.
      * @return a {@link Command} setting the motor's duty cycle to the specified value.

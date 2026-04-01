@@ -30,8 +30,8 @@ public class Uptake extends SubsystemBase {
     }
 
     /**
-     * Sets the default command of the uptake, stopping motor output when no other
-     * commands are running.
+     * Sets the default command of the uptake, stopping 
+     * motor output when no other commands are running.
      *
      * @return Command setting the duty cycle output of the uptake's motor to 0
      */
@@ -40,27 +40,26 @@ public class Uptake extends SubsystemBase {
     }
 
     /**
-     * Set the duty cycle output of the uptake roller motor.
+     * Set the duty cycle of the uptake roller motors.
      *
-     * @param dutyCycle The power to be applied to the motor, between -1 and 1.
-     * @return {@link Command} setting the duty cycle of the uptake roller.
+     * @param dutycycle The power to be applied to the motors, between -1 and 1.
+     * @return {@link Command} setting the duty cycle of the uptake roller motors.
      */
-    public Command setRoller(double dutyCycle) {
-        return io.set(dutyCycle);
-    }
-
-    /**
-     * Gets the current velocity of the uptake roller mechanism.
-     *
-     * @return The velocity of the uptake roller in RPM.
-     */
-    public double getRollerVelocity() {
-        return inputs.mechanismVelocityDegreesPerSecond;
+    public Command set(double dutycycle) {
+        return io.set(dutycycle);
     }
 
     @Override
     public void periodic() {
+        // This method will be called once per scheduler run
+        // Updates the inputs to be logged by AdvantageKit and writes them to the Logger
         io.updateInputs(inputs);
         Logger.processInputs("Uptake", inputs);
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        // This method will be called once per scheduler run during simulation
+        io.simIterate();
     }
 }

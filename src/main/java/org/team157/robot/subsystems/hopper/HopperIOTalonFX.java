@@ -50,7 +50,6 @@ public class HopperIOTalonFX implements HopperIO {
 
         this.hopper = new FlyWheel(hopperRollerConfig);
         this.motor = hopper.getMotor();
-
     }
         
     @Override
@@ -78,7 +77,5 @@ public class HopperIOTalonFX implements HopperIO {
     public void simIterate() {
         hopper.simIterate();
     }
-
-
 
 }

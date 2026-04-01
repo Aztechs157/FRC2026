@@ -100,7 +100,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("DeployIntake", slapdown.deployIntake());
         NamedCommands.registerCommand("RunIntake", intake.runIntake());
         NamedCommands.registerCommand("RunHopper", hopper.set(0.5));
-        NamedCommands.registerCommand("ShootBalls", uptake.setRoller(1));
+        NamedCommands.registerCommand("ShootBalls", uptake.set(1));
         NamedCommands.registerCommand("Wiggle", slapdown.wiggleIntake());
 
         configureBindings();
@@ -190,12 +190,12 @@ public class RobotContainer {
         // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's preference.
         if(ModifierConstants.MAYA_MODE) {
             // Shooting on left trigger, intake on right trigger
-            driverController.leftTrigger().whileTrue(uptake.setRoller(1));
+            driverController.leftTrigger().whileTrue(uptake.set(1));
             driverController.rightTrigger().whileTrue(intake.runIntake());
             driverController.leftTrigger().whileTrue(hopper.set(1));
         } else {
             // Shooting on right trigger, intake on left trigger
-            driverController.rightTrigger().whileTrue(uptake.setRoller(1));
+            driverController.rightTrigger().whileTrue(uptake.set(1));
             driverController.leftTrigger().whileTrue(intake.runIntake());
             driverController.rightTrigger().whileTrue(hopper.set(1));
         }
@@ -362,7 +362,7 @@ public class RobotContainer {
     // at a low speed to clear any jams.
     // TODO: remove from RobotContainer and into eventual Superstructure subsystem once it exists.
     private Command forceOuttake() {
-        return uptake.setRoller(-0.5).alongWith(hopper.set(-0.5)).alongWith(intake.set(-0.5));
+        return uptake.set(-0.5).alongWith(hopper.set(-0.5)).alongWith(intake.set(-0.5));
     }
 
     /**
