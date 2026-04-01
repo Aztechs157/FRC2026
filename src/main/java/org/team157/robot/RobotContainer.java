@@ -28,7 +28,8 @@ import org.team157.robot.Constants.ControllerConstants;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.drive.DriveSystem;
-import org.team157.robot.subsystems.flywheel.FlywheelSystem;
+import org.team157.robot.subsystems.flywheel.Flywheel;
+import org.team157.robot.subsystems.flywheel.FlywheelIOTalonFX;
 import org.team157.robot.subsystems.hood.Hood;
 import org.team157.robot.subsystems.hood.HoodIOTalonFX;
 import org.team157.robot.subsystems.hopper.Hopper;
@@ -61,7 +62,7 @@ public class RobotContainer {
 
     public final Turret turret = new Turret();
     public final VisionSystem visionSystem;
-    public final FlywheelSystem flywheel = new FlywheelSystem();
+    public final static Flywheel flywheel = new Flywheel();
     // TODO: consider whether other systems should be static, had to make this static for the dyanmic hood under trench.
     public static final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
@@ -91,7 +92,7 @@ public class RobotContainer {
         slapdown.setIO(new SlapdownIOTalonFX(slapdown));
         hopper.setIO(new HopperIOTalonFX(hopper));
         uptake.setIO(new UptakeIOTalonFX(uptake));
-
+        flywheel.setIO(new FlywheelIOTalonFX(flywheel));
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
         turret.setIO(new TurretIOTalonFX(turret), visionSystem);
 
