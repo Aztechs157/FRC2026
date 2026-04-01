@@ -44,11 +44,8 @@ public interface TurretIO {
 
     /**
      * Stops the turret.
-     * @return a {@link Command} setting the motor's output power to 0.
      */
-    default Command stop() {
-        return Commands.none();
-    }
+    default void stop() {}
 
     /**
      * Sets the target angle of the turret mechanism.

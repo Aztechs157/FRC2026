@@ -29,7 +29,7 @@ public class Turret extends SubsystemBase {
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
     // The current angle the turret is tracking towards.
-    public Angle trackingAngle = Degrees.of(0);
+    public static Angle trackingAngle = Degrees.of(0);
 
     // Reference to the vision system for target tracking.
     private VisionSystem visionSystem;
@@ -85,7 +85,7 @@ public class Turret extends SubsystemBase {
      * @return {@link Command} continuously updating the turret angle to track the target.
      */
     public Command trackTagGlobalRelative() {
-        return io.setTargetAngle(this::getTrackingAngle);
+        return io.setTargetAngle(Turret::getTrackingAngle);
     }
 
     /**
@@ -93,7 +93,7 @@ public class Turret extends SubsystemBase {
      *
      * @return The current tracking angle as an {@link Angle}.
      */
-    public Angle getTrackingAngle() {
+    public static Angle getTrackingAngle() {
         return trackingAngle;
     }
 
