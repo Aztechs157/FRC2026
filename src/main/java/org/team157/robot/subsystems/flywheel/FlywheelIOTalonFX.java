@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.team157.robot.Constants;
-import org.team157.robot.RobotContainer;
 
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.velocity.FlyWheel;
@@ -67,13 +66,13 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     }
 
     @Override
-    public void updateInputs(FlywheelIOInputs inputs) {
+    public void updateInputs(FlywheelIOInputs inputs, AngularVelocity flywheelSetpoint) {
         inputs.supplyCurrentAmps = motor.getSupplyCurrent().map(c -> c.in(Amps)).orElse(0.0);
         inputs.statorCurrentAmps = motor.getStatorCurrent().in(Amps);
         inputs.appliedVolts = motor.getVoltage().in(Volts);
         inputs.temperatureCelsius = motor.getTemperature().in(Celsius);
         inputs.mechanismVelocityRPM = flywheel.getSpeed().in(RPM);
-        inputs.targetVelocityRPM = RobotContainer.flywheel.getDesiredFlywheelVelocity().in(RPM);
+        inputs.targetVelocityRPM = flywheelSetpoint.in(RPM);
     }
 
     @Override

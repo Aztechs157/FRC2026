@@ -84,7 +84,7 @@ public class Hood extends SubsystemBase {
      * Set the dynamic angle of the hood, for targeting the hub or a passing point.
      * 
      * @return A Command setting the angle of the Hood to the desired angle, 
-     *         determined by the FlywheelSystem's ballistics calculations.
+     *         determined by the Flywheel's ballistics calculations.
      */
     public Command setDynamicHoodAngle() {
         return setAngle(Flywheel::getDesiredHoodAngle);

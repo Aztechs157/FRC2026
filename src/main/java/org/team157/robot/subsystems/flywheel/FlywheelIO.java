@@ -32,8 +32,9 @@ public interface FlywheelIO {
      * Updates the inputs to be logged by AdvantageKit.
      *
      * @param inputs The set of inputs to be logged, including information on the motor and mechanism.
+     * @param flywheelSetpoint The current target angular velocity of the flywheel, used for logging the error between the target and actual velocities.
      */
-    default void updateInputs(FlywheelIOInputs inputs) {}
+    default void updateInputs(FlywheelIOInputs inputs, AngularVelocity flywheelSetpoint) {}
 
     /** Updates the values for the simulated version of the flywheel mechanism. */
     default void simIterate() {}

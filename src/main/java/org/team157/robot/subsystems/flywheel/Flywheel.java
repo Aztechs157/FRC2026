@@ -208,7 +208,7 @@ public class Flywheel extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
         // Updates the inputs to be logged by AdvantageKit and writes them to the Logger
-        io.updateInputs(inputs);
+        io.updateInputs(inputs, getDesiredFlywheelVelocity());
         Logger.processInputs("Flywheel", inputs);
     }
 
