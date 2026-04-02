@@ -38,13 +38,8 @@ public interface FlywheelIO {
     /** Updates the values for the simulated version of the flywheel mechanism. */
     default void simIterate() {}
 
-    /**
-     * Stops the flywheel.
-     * @return a {@link Command} setting the motor's output power to 0.
-     */
-    default Command stop() {
-        return Commands.none();
-    }
+    /** Stops the flywheel. */
+    default void stop() {}
 
     /**
      * Directly sets the output duty cycle of the flywheel motor.

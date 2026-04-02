@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.team157.robot.Constants;
-import org.team157.robot.Constants.TelemetryConstants;
 import org.team157.robot.RobotContainer;
 
 import yams.mechanisms.config.FlyWheelConfig;
@@ -39,7 +38,7 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
     public FlywheelIOTalonFX(SubsystemBase subsystem) {
         TalonFX talonFX = new TalonFX(FlywheelConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
-        TalonFX followerMotor = new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_ID, Constants.RIO_CAN_BUS);
+        TalonFX followerTalonFX = new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_ID, Constants.RIO_CAN_BUS);
 
         SmartMotorControllerConfig flywheelMotorConfig = new SmartMotorControllerConfig(subsystem)
             .withControlMode(ControlMode.CLOSED_LOOP)
@@ -49,21 +48,19 @@ public class FlywheelIOTalonFX implements FlywheelIO {
             .withSimClosedLoopController(FlywheelConstants.SIM_KP, FlywheelConstants.SIM_KI, FlywheelConstants.SIM_KD,
                 FlywheelConstants.ANGULAR_VELOCITY, FlywheelConstants.ANGULAR_ACCELERATION)
             .withSimFeedforward(new SimpleMotorFeedforward(FlywheelConstants.SIM_KS, FlywheelConstants.SIM_KV, FlywheelConstants.SIM_KA))
-            .withTelemetry("FlywheelMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
             .withGearing(FlywheelConstants.GEARING)
             .withMotorInverted(false)
             .withIdleMode(MotorMode.COAST)
             .withStatorCurrentLimit(FlywheelConstants.CURRENT_LIMIT)
             .withClosedLoopRampRate(FlywheelConstants.RAMP_RATE)
-            .withFollowers(Pair.of(followerMotor, true));
+            .withFollowers(Pair.of(followerTalonFX, true));
 
         SmartMotorController smartMotor = new TalonFXWrapper(talonFX, DCMotor.getKrakenX60(1), flywheelMotorConfig);
 
         FlyWheelConfig flywheelConfig = new FlyWheelConfig(smartMotor)
             .withDiameter(FlywheelConstants.FLYWHEEL_DIAMETER)
             .withMass(FlywheelConstants.FLYWHEEL_MASS)
-            .withSoftLimit(FlywheelConstants.FLYWHEEL_RPM_LIMIT_LOWER, FlywheelConstants.FLYWHEEL_RPM_LIMIT_UPPER)
-            .withTelemetry("FlywheelDynamics", TelemetryConstants.TELEMETRY_VERBOSITY);
+            .withSoftLimit(FlywheelConstants.FLYWHEEL_RPM_LIMIT_LOWER, FlywheelConstants.FLYWHEEL_RPM_LIMIT_UPPER);
 
         this.flywheel = new FlyWheel(flywheelConfig);
         this.motor = flywheel.getMotor();
@@ -80,8 +77,8 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     }
 
     @Override
-    public Command stop() {
-        return flywheel.set(0);
+    public void stop() {
+        flywheel.setDutyCycleSetpoint(0);
     }
 
     @Override
