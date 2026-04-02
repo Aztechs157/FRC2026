@@ -13,7 +13,6 @@ import org.team157.robot.subsystems.vision.VisionSystem;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -47,9 +46,9 @@ public class Flywheel extends SubsystemBase {
         this.io = io;
     }
 
-    ////////////////////////
-    /// FLYWHEEL COMMANDS //
-    ////////////////////////
+    /////////////////////////
+    /// FLYWHEEL COMMANDS ///
+    /////////////////////////
 
     /**
      * Sets the default command of the flywheel, stopping
@@ -156,7 +155,6 @@ public class Flywheel extends SubsystemBase {
 
         ballVelocity = velocity;
         hoodAngle = Radians.of(theta);
-        SmartDashboard.putNumber("Hood Angle", Math.toDegrees(hoodAngle.magnitude()));
     }
 
     /**
