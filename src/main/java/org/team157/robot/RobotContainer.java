@@ -53,7 +53,6 @@ public class RobotContainer {
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -62,7 +61,7 @@ public class RobotContainer {
 
     public final Turret turret = new Turret();
     public final VisionSystem visionSystem;
-    public final static Flywheel flywheel = new Flywheel();
+    public static final Flywheel flywheel = new Flywheel();
     // TODO: consider whether other systems should be static, had to make this static for the dyanmic hood under trench.
     public static final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
@@ -129,7 +128,7 @@ public class RobotContainer {
 
         // Disable turret movement when no other turret commands are running.
         turret.setDefaultCommand(turret.getDefault());
-        flywheel.setDefaultCommand(flywheel.setDefault());
+        flywheel.setDefaultCommand(flywheel.getDefault());
         slapdown.setDefaultCommand(slapdown.getDefault());
         intake.setDefaultCommand(intake.getDefault());
         hopper.setDefaultCommand(hopper.getDefault());

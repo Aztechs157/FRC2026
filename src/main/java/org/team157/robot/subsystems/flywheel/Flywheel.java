@@ -46,8 +46,8 @@ public class Flywheel extends SubsystemBase {
         this.io = io;
     }
 
-    /////////////////////////
-    /// FLYWHEEL COMMANDS ///
+      /////////////////////////
+     /// FLYWHEEL COMMANDS ///
     /////////////////////////
 
     /**
@@ -56,8 +56,8 @@ public class Flywheel extends SubsystemBase {
      *
      * @return Command setting the duty cycle output of the flywheel's motor to 0
      */
-    public Command setDefault() {
-        return io.stop();
+    public Command getDefault() {
+        return io.set(0);
     }
 
     /**
@@ -90,8 +90,8 @@ public class Flywheel extends SubsystemBase {
         return io.setVelocity(this::getDesiredFlywheelVelocity);
     }
 
-    ////////////////////////
-    /// FLYWHEEL METHODS ///
+      ////////////////////////
+     /// FLYWHEEL METHODS ///
     ////////////////////////
 
     /**
@@ -103,13 +103,22 @@ public class Flywheel extends SubsystemBase {
         return RPM.of(inputs.mechanismVelocityRPM);
     }
 
-    ///////////////////////////////////////////
-    /////// DYNAMIC VELOCITY CALCULATION //////
-    ///////////////////////////////////////////
-    // Calculates required ball velocity (m/s)
-    // for given distance, height, and launch angle
-    // Using projectile motion equations: y = x*tan(θ) - (g*x²)/(2*v₀²*cos²(θ))
-    // Solving for v₀: v₀ = sqrt((g*x²)/(2*cos²(θ)*(x*tan(θ) - y)))
+      ////////////////////////////////////////////
+     /////// DYNAMIC VELOCITY CALCULATION ///////
+    ////////////////////////////////////////////
+
+    /**   Calculates required ball velocity (m/s)
+     * for given distance, height, and launch angle
+     * <br>
+     * Using projectile motion equations: y = x*tan(θ) - (g*x²)/(2*v₀²*cos²(θ))
+     * <br>
+     * Solving for v₀: v₀ = sqrt((g*x²)/(2*cos²(θ)*(x*tan(θ) - y)))
+     * 
+     * @param distance The horizontal distance to the target in meters.
+     * @param height   The vertical height of the target in meters.
+     * @param theta    The launch angle in radians.
+     * @return The required ball velocity in meters per second.
+     */
     static double velocityFunction(double distance, double height, double theta) {
         double g = 9.81;
         double heightDifference = height - FlywheelConstants.HEIGHT.magnitude();
@@ -120,6 +129,12 @@ public class Flywheel extends SubsystemBase {
         return Math.sqrt((g * distance * distance) / denominator);
     }
 
+    /**
+     * Determines the lower bound of the hood angle search space based on whether the robot is under the trench,
+     * since the hood must avoid collisions with the trench structure.
+     * @param isUnderTrench Whether or not the turret is currently under the trench, determined by the drivetrain's position on the field.
+     * @return The lower bound of the hood angle search space, in radians.
+     */
     double getLowerBound(boolean isUnderTrench) {
         if (isUnderTrench) {
             return HoodConstants.UPPER_SOFT_LIMIT.in(Radians);
@@ -189,12 +204,15 @@ public class Flywheel extends SubsystemBase {
 
     @Override
     public void periodic() {
-        io.updateInputs(inputs);
+        // This method will be called once per scheduler run
+        // Updates the inputs to be logged by AdvantageKit and writes them to the Logger
+        io.updateInputs(inputs, getDesiredFlywheelVelocity());
         Logger.processInputs("Flywheel", inputs);
     }
 
     @Override
     public void simulationPeriodic() {
+        // This method will be called once per scheduler run during simulation
         io.simIterate();
     }
 }
