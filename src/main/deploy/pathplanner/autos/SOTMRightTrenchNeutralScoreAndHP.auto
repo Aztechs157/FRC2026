@@ -17,13 +17,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "RightBumpToNeutralAndReturn"
+                  "pathName": "RightTrenchToNeutralAndReturn"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "DeployIntake"
+                  "name": "RunIntake"
                 }
               }
             ]
@@ -34,9 +34,15 @@
           "data": {
             "commands": [
               {
-                "type": "wait",
+                "type": "path",
                 "data": {
-                  "waitTime": 7.5
+                  "pathName": "RightTrenchReturnToHP"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "RunIntake"
                 }
               },
               {
@@ -55,9 +61,34 @@
           }
         },
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "WiggleCubed"
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "RunHopper"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShootBalls"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "WiggleCubed"
+                }
+              }
+            ]
           }
         },
         {
@@ -67,13 +98,19 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 7.5
+                  "waitTime": 5.0
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "RunHopper"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShootBalls"
                 }
               },
               {
