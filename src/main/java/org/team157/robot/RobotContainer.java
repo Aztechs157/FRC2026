@@ -98,10 +98,10 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("DeployIntake", slapdown.deployIntake());
         NamedCommands.registerCommand("RunIntake", intake.runIntake());
-        NamedCommands.registerCommand("RunHopper", hopper.setRoller(0.5));
-        NamedCommands.registerCommand("ShootBalls", uptake.setRoller(1));
-        NamedCommands.registerCommand("Wiggle", intake.wiggleIntake());
-        NamedCommands.registerCommand("WiggleCubed", intake.wiggleIntake().andThen(new WaitCommand(1)).andThen(intake.wiggleIntake()).andThen(new WaitCommand(1)).andThen(intake.wiggleIntake()));
+        NamedCommands.registerCommand("RunHopper", hopper.set(0.5));
+        NamedCommands.registerCommand("ShootBalls", uptake.set(1));
+        NamedCommands.registerCommand("Wiggle", slapdown.wiggleIntake());
+        NamedCommands.registerCommand("WiggleCubed", slapdown.wiggleIntake().andThen(new WaitCommand(1)).andThen(slapdown.wiggleIntake()).andThen(new WaitCommand(1)).andThen(slapdown.wiggleIntake()));
 
         configureBindings();
 
