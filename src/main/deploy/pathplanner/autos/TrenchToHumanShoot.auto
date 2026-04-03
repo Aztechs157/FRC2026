@@ -56,14 +56,14 @@
                 "data": {
                   "name": "ShootBalls"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "WiggleCubed"
+                }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Wiggle"
           }
         },
         {
@@ -92,6 +92,12 @@
                 "type": "named",
                 "data": {
                   "name": "ShootBalls"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "WiggleCubed"
                 }
               }
             ]
