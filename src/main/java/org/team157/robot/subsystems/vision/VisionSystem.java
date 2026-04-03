@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.ejml.simple.SimpleMatrix;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -29,6 +30,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -55,6 +57,7 @@ import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.VisionConstants;
 import org.team157.robot.subsystems.drive.DriveSystem;
 import org.team157.robot.subsystems.turret.Turret;
+import org.team157.robot.subsystems.flywheel.Flywheel;
 import org.team157.robot.Robot;
 
 public class VisionSystem extends SubsystemBase {
@@ -62,6 +65,8 @@ public class VisionSystem extends SubsystemBase {
   // Publishes the turret's target point to NT for field zoning testing.
   public StructPublisher<Pose2d> targetPosePublisher = NetworkTableInstance.getDefault()
       .getStructTopic("Target Pose", Pose2d.struct).publish();
+  public StructPublisher<Pose2d> adjustedTargetPosePublisher = NetworkTableInstance.getDefault()
+      .getStructTopic("Adjusted Target Pose", Pose2d.struct).publish();
 
   public boolean hasTag = false;
 
@@ -98,6 +103,16 @@ public class VisionSystem extends SubsystemBase {
 
   boolean isBlueAlliance = true;
 
+  private double driveRotationalVelocity;
+
+  private double driveLinearVelocityX;
+
+  private double driveLinearVelocityY;
+
+  private double driveFieldRotation;
+
+  private double ballTOF;
+
   /** Creates a new vision. */
   public VisionSystem(Supplier<Pose2d> currentPose, Field2d field) {
 
@@ -125,6 +140,11 @@ public class VisionSystem extends SubsystemBase {
       updatePoseEstimation(drivetrain);
       turret.updateRelativeAngleToTarget(FieldConstants.positionDetails.getTargetPose2d(drivetrain.getPose(), isBlueAlliance),
           drivetrain.getPose());
+      driveLinearVelocityX = drivetrain.getStateCopy().Speeds.vxMetersPerSecond;
+      driveLinearVelocityY = drivetrain.getStateCopy().Speeds.vyMetersPerSecond;
+      driveRotationalVelocity = drivetrain.getStateCopy().Speeds.omegaRadiansPerSecond;
+      driveFieldRotation = drivetrain.getPose().getRotation().getRadians();
+      ballTOF = Flywheel.getBallTimeOfFlight();
     });
 
   }
@@ -363,6 +383,9 @@ public class VisionSystem extends SubsystemBase {
     distanceToTargetFromTurret = PhotonUtils
         .getDistanceToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), tagPose);
     angleToTarget = PhotonUtils.getYawToPose(robotPose, tagPose).getDegrees();
+    // angleToTargetFromTurret =
+    // PhotonUtils.getYawToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+    // tagPose).getDegrees();
     angleToTargetFromTurret = PhotonUtils
         .getYawToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), tagPose).getDegrees();
 
@@ -376,15 +399,51 @@ public class VisionSystem extends SubsystemBase {
    *                   from
    */
   public void setTargetParams(Pose2d targetPose, Pose2d robotPose) {
-    distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, targetPose);
-    distanceToTargetFromTurret = PhotonUtils
-        .getDistanceToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), targetPose);
 
-    angleToTarget = PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();
+    // beginning vector math for momentum shooting
+    double turretToRobotTheta = Math.atan(
+        ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY() / ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX());
+    SimpleMatrix turretToRobotThetaMatrix = new SimpleMatrix(2, 1, true, -Math.sin(turretToRobotTheta),
+        Math.cos(turretToRobotTheta));
+    double dOffsetRobot = Math.hypot(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX(),
+        ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY());
+
+    SimpleMatrix vRotationRobot = turretToRobotThetaMatrix.scale(driveRotationalVelocity * dOffsetRobot);
+
+    SimpleMatrix robotRotationMatrix = new SimpleMatrix(2, 2, true, new double[] { Math.cos(driveFieldRotation),
+        -Math.sin(driveFieldRotation), Math.sin(driveFieldRotation), Math.cos(driveFieldRotation) });
+
+    SimpleMatrix vRotationField = robotRotationMatrix.mult(vRotationRobot);
+
+    SimpleMatrix vShooter = vRotationField
+        .plus(new SimpleMatrix(2, 1, true, driveLinearVelocityX, driveLinearVelocityY));
+
+    SimpleMatrix adjustedTargetPoseMatrix = new SimpleMatrix(2, 1, true, targetPose.getX(), targetPose.getY())
+        .minus(vShooter.scale(ballTOF));
+    
+    Pose2d adjustedTargetPose = new Pose2d(adjustedTargetPoseMatrix.get(0, 0), adjustedTargetPoseMatrix.get(1, 0),
+        targetPose.getRotation());
+
+    // If the hub is the target, rotate the target about the hub by the drive orientation
+    if(Math.round(targetPose.getY()) == Math.round(FieldConstants.FIELD_WIDTH.magnitude()/2))
+    {
+      adjustedTargetPose = adjustedTargetPose.rotateAround(targetPose.getTranslation(), new Rotation2d(driveFieldRotation));
+    }
+    else {
+      adjustedTargetPose = adjustedTargetPose.rotateAround(targetPose.getTranslation(), new Rotation2d(Math.PI - driveFieldRotation));
+    }
+    distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, adjustedTargetPose);
+    distanceToTargetFromTurret = PhotonUtils
+        .getDistanceToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), adjustedTargetPose);
+
+    angleToTarget = PhotonUtils.getYawToPose(robotPose, adjustedTargetPose).getDegrees();
     angleToTargetFromTurret = PhotonUtils
-        .getYawToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), targetPose).getDegrees();
+        .getYawToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), adjustedTargetPose).getDegrees();
+
+    adjustedTargetPosePublisher.set(adjustedTargetPose);
   }
 
+  /**
   /**
    * Camera Enum to select each camera
    */
@@ -498,9 +557,11 @@ public class VisionSystem extends SubsystemBase {
 
     /**
      * Get the result with the least ambiguity from the best tracked target within
-     * the Cache. This may not be the most recent result!
+     * the Cache. This may not be the most
+     * recent result!
      *
      * @return The result in the cache with the least ambiguous best tracked target.
+     *        
      *         This is not the most recent result!
      */
     public Optional<PhotonPipelineResult> getBestResult() {

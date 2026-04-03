@@ -121,9 +121,9 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
         // Telemetry for the drivetrain.
-        drivetrain.registerTelemetry(logger::telemeterize);
-
-        // Update the pose estimation and turret tracking angle while no other vision commands are running.
+        drivetrain.registerTelemetry(logger::telemeterize);        
+      
+        // Update the pose estimation and turret tracking angle while no other vision commands are running. 
         visionSystem.setDefaultCommand(visionSystem.setDefault(drivetrain, turret));
 
         // Disable turret movement when no other turret commands are running.
