@@ -28,7 +28,8 @@ import org.team157.robot.Constants.ControllerConstants;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.drive.DriveSystem;
-import org.team157.robot.subsystems.flywheel.FlywheelSystem;
+import org.team157.robot.subsystems.flywheel.Flywheel;
+import org.team157.robot.subsystems.flywheel.FlywheelIOTalonFX;
 import org.team157.robot.subsystems.hood.Hood;
 import org.team157.robot.subsystems.hood.HoodIOTalonFX;
 import org.team157.robot.subsystems.hopper.Hopper;
@@ -52,7 +53,6 @@ public class RobotContainer {
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -61,7 +61,7 @@ public class RobotContainer {
 
     public final Turret turret = new Turret();
     public final VisionSystem visionSystem;
-    public final FlywheelSystem flywheel = new FlywheelSystem();
+    public static final Flywheel flywheel = new Flywheel();
     // TODO: consider whether other systems should be static, had to make this static for the dyanmic hood under trench.
     public static final DriveSystem drivetrain = TunerConstants.createDrivetrain();
 
@@ -91,7 +91,7 @@ public class RobotContainer {
         slapdown.setIO(new SlapdownIOTalonFX(slapdown));
         hopper.setIO(new HopperIOTalonFX(hopper));
         uptake.setIO(new UptakeIOTalonFX(uptake));
-
+        flywheel.setIO(new FlywheelIOTalonFX(flywheel));
         visionSystem = new VisionSystem(drivetrain::getPose, Robot.m_field);
         turret.setIO(new TurretIOTalonFX(turret), visionSystem);
 
@@ -128,7 +128,7 @@ public class RobotContainer {
 
         // Disable turret movement when no other turret commands are running.
         turret.setDefaultCommand(turret.getDefault());
-        flywheel.setDefaultCommand(flywheel.setDefault());
+        flywheel.setDefaultCommand(flywheel.getDefault());
         slapdown.setDefaultCommand(slapdown.getDefault());
         intake.setDefaultCommand(intake.getDefault());
         hopper.setDefaultCommand(hopper.getDefault());
