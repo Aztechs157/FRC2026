@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.subsystems.drive.DriveSystem;
-import org.team157.robot.subsystems.flywheel.FlywheelSystem;
+import org.team157.robot.subsystems.flywheel.Flywheel;
 import org.team157.utilities.PosUtils;
 
 import org.littletonrobotics.junction.Logger;
@@ -84,10 +84,10 @@ public class Hood extends SubsystemBase {
      * Set the dynamic angle of the hood, for targeting the hub or a passing point.
      * 
      * @return A Command setting the angle of the Hood to the desired angle, 
-     *         determined by the FlywheelSystem's ballistics calculations.
+     *         determined by the Flywheel's ballistics calculations.
      */
     public Command setDynamicHoodAngle() {
-        return setAngle(FlywheelSystem::getDesiredHoodAngle);
+        return setAngle(Flywheel::getDesiredHoodAngle);
     }
 
     /**

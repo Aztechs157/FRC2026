@@ -172,20 +172,20 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putNumber("Match Time", Timer.getMatchTime());
     // Gets hub activity status to display on the dashboard.
     SmartDashboard.putBoolean("Hub Active?", m_robotContainer.isHubActive());
-    SmartDashboard.putBoolean("Under Trench?", m_robotContainer.drivetrain.isUnderTrench());
+    SmartDashboard.putBoolean("Under Trench?", RobotContainer.drivetrain.isUnderTrench());
 
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    m_robotContainer.visionSystem.updatePoseEstimation(m_robotContainer.drivetrain);
+    m_robotContainer.visionSystem.updatePoseEstimation(RobotContainer.drivetrain);
   }
 
   @Override
   public void disabledPeriodic() {
-    m_robotContainer.visionSystem.resetPoseEstimation(m_robotContainer.drivetrain);
-    m_robotContainer.visionSystem.updatePoseEstimation(m_robotContainer.drivetrain);
+    m_robotContainer.visionSystem.resetPoseEstimation(RobotContainer.drivetrain);
+    m_robotContainer.visionSystem.updatePoseEstimation(RobotContainer.drivetrain);
 
   }
 
