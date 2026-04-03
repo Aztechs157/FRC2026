@@ -10,7 +10,6 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Supplier;
 
-import org.team157.robot.Constants.TelemetryConstants;
 import org.team157.utilities.PosUtils;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -45,7 +44,6 @@ public class SlapdownIOTalonFX implements SlapdownIO {
             .withIdleMode(MotorMode.BRAKE)
             .withMotorInverted(true)
             .withGearing(SlapdownConstants.PIVOT_GEARING)
-            .withTelemetry("Intake Pivot Motor", TelemetryConstants.TELEMETRY_VERBOSITY)
             .withStatorCurrentLimit(SlapdownConstants.CURRENT_LIMIT)
             .withClosedLoopRampRate(SlapdownConstants.RAMP_RATE);
 
@@ -57,7 +55,6 @@ public class SlapdownIOTalonFX implements SlapdownIO {
             .withStartingPosition(Degrees.of(mapEncoder(SlapdownConstants.MIN_ANGLE, SlapdownConstants.MAX_ANGLE)))
             .withHardLimit(SlapdownConstants.LOWER_HARD_LIMIT, SlapdownConstants.UPPER_HARD_LIMIT)
             .withSoftLimits(SlapdownConstants.LOWER_SOFT_LIMIT, SlapdownConstants.UPPER_SOFT_LIMIT)
-            .withTelemetry("Intake Pivot", TelemetryConstants.TELEMETRY_VERBOSITY)
             .withMOI(Meters.of(0.75), Kilograms.of(1));
 
         // Create the pivot system with the above configuration.

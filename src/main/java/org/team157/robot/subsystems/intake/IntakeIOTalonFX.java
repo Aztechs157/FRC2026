@@ -12,8 +12,6 @@ import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.team157.robot.Constants;
-import org.team157.robot.Constants.TelemetryConstants;
-
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.Pair;
@@ -43,7 +41,6 @@ public class IntakeIOTalonFX implements IntakeIO {
        
         SmartMotorControllerConfig intakeMotorConfig = new SmartMotorControllerConfig(subsystem)
             .withControlMode(ControlMode.OPEN_LOOP)
-            .withTelemetry("IntakeRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
             .withGearing(1)
             .withMotorInverted(false)
             .withIdleMode(MotorMode.COAST)
@@ -54,7 +51,6 @@ public class IntakeIOTalonFX implements IntakeIO {
         SmartMotorController smartIntakeMotor = new TalonFXWrapper(talonfx, DCMotor.getKrakenX60(1), intakeMotorConfig);
 
         FlyWheelConfig intakeConfig = new FlyWheelConfig(smartIntakeMotor)
-            .withTelemetry("Intake", TelemetryConstants.TELEMETRY_VERBOSITY)
             .withDiameter(Inches.of(3))
             //TODO: measure mass of the intake roller and update this constant
             .withMass(Kilograms.of(0.5)); 

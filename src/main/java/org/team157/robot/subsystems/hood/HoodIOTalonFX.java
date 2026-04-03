@@ -28,7 +28,6 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 import org.team157.robot.Constants;
-import org.team157.robot.Constants.TelemetryConstants;
 import org.team157.utilities.PosUtils;
 
 /**
@@ -59,7 +58,6 @@ public class HoodIOTalonFX implements HoodIO {
             .withIdleMode(MotorMode.BRAKE)
             .withMotorInverted(false)
             .withGearing(HoodConstants.GEARING)
-            .withTelemetry("Hood Motor", TelemetryConstants.TELEMETRY_VERBOSITY)
             .withSoftLimit(HoodConstants.LOWER_SOFT_LIMIT, HoodConstants.UPPER_SOFT_LIMIT)
             .withStatorCurrentLimit(HoodConstants.CURRENT_LIMIT)
             .withClosedLoopRampRate(HoodConstants.RAMP_RATE);
@@ -71,7 +69,6 @@ public class HoodIOTalonFX implements HoodIO {
         PivotConfig hoodConfig = new PivotConfig(smartHoodMotor)
             .withStartingPosition(Degrees.of(mapHoodEncoder(HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE)))
             .withHardLimit(HoodConstants.LOWER_HARD_LIMIT, HoodConstants.UPPER_HARD_LIMIT)
-            .withTelemetry("Hood", TelemetryConstants.TELEMETRY_VERBOSITY)
             .withMOI(Meters.of(0.2), Kilograms.of(0.5));
 
         // Create the hood pivot system with the above configuration.

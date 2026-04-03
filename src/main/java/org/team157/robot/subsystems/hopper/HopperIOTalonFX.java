@@ -8,8 +8,6 @@ import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.team157.robot.Constants;
-import org.team157.robot.Constants.TelemetryConstants;
-
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -33,7 +31,6 @@ public class HopperIOTalonFX implements HopperIO {
 
         SmartMotorControllerConfig hopperRollerMotorConfig = new SmartMotorControllerConfig(subsystem)
             .withControlMode(ControlMode.OPEN_LOOP)
-            .withTelemetry("HopperRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
             .withMotorInverted(true)
             .withIdleMode(MotorMode.COAST)
             .withStatorCurrentLimit((HopperConstants.CURRENT_LIMIT))
@@ -44,8 +41,7 @@ public class HopperIOTalonFX implements HopperIO {
 
         FlyWheelConfig hopperRollerConfig = new FlyWheelConfig(smartRollerMotor)
             .withMass(Kilograms.of(0.5))
-            .withDiameter(Inches.of(1))
-            .withTelemetry("Hopper", TelemetryConstants.TELEMETRY_VERBOSITY);
+            .withDiameter(Inches.of(1));
 
         this.hopper = new FlyWheel(hopperRollerConfig);
         this.motor = hopper.getMotor();
