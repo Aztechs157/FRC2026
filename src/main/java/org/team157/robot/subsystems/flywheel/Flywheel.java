@@ -30,6 +30,8 @@ public class Flywheel extends SubsystemBase {
 
     /** The calculated ball velocity in meters per second required for the current shot. */
     public static double ballVelocity = 0;
+    public static double ballTimeOfFlight = 0;
+
 
     /** The calculated hood angle in radians required for the current shot. */
     public static Angle hoodAngle = Radians.of(0);
@@ -170,6 +172,8 @@ public class Flywheel extends SubsystemBase {
 
         ballVelocity = velocity;
         hoodAngle = Radians.of(theta);
+        ballTimeOfFlight = (velocity * Math.sin(theta) - Math.sqrt(Math.pow(velocity * Math.sin(theta),2) - 2 * 9.81 * (height - FlywheelConstants.HEIGHT.magnitude()))) / 9.81;
+
     }
 
     /**
@@ -190,6 +194,10 @@ public class Flywheel extends SubsystemBase {
         double flywheelDiameterMeters = FlywheelConstants.FLYWHEEL_DIAMETER.in(Meters);
         double desiredRPM = (ballVelocity * 60) / (Math.PI * flywheelDiameterMeters) * FlywheelConstants.SPEED_FACTOR;
         return RPM.of(Math.max(2800, desiredRPM));
+    }
+
+    public static double getBallTimeOfFlight() {
+        return ballTimeOfFlight;
     }
 
     /**

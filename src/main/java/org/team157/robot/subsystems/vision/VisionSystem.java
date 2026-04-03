@@ -57,8 +57,7 @@ import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.VisionConstants;
 import org.team157.robot.subsystems.drive.DriveSystem;
 import org.team157.robot.subsystems.turret.Turret;
-import org.team157.robot.subsystems.turret.TurretSystem;
-import org.team157.robot.subsystems.flywheel.FlywheelSystem;
+import org.team157.robot.subsystems.flywheel.Flywheel;
 import org.team157.robot.Robot;
 
 public class VisionSystem extends SubsystemBase {
@@ -145,9 +144,7 @@ public class VisionSystem extends SubsystemBase {
       driveLinearVelocityY = drivetrain.getStateCopy().Speeds.vyMetersPerSecond;
       driveRotationalVelocity = drivetrain.getStateCopy().Speeds.omegaRadiansPerSecond;
       driveFieldRotation = drivetrain.getPose().getRotation().getRadians();
-      ballTOF = FlywheelSystem.getBallTimeOfFlight();
-      // turret.updateRelativeAngleToTag(26, drivetrain.getPose());
-
+      ballTOF = Flywheel.getBallTimeOfFlight();
     });
 
   }
