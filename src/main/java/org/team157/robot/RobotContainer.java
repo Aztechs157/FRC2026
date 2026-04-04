@@ -8,12 +8,13 @@ import static edu.wpi.first.units.Units.*;
 
 import java.util.Optional;
 
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -24,11 +25,19 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import org.team157.robot.Constants.ControllerConstants;
+import org.team157.robot.Constants.Mode;
 import org.team157.robot.Constants.ModifierConstants;
-import org.team157.robot.generated.TunerConstants;
-import org.team157.robot.subsystems.drive.DriveSystem;
+import org.team157.robot.commands.DriveCommands;
+import org.team157.robot.generated.AKitTunerConstants;
+import org.team157.robot.subsystems.drive.Drive;
+import org.team157.robot.subsystems.drive.GyroIO;
+import org.team157.robot.subsystems.drive.GyroIOPigeon2;
+import org.team157.robot.subsystems.drive.ModuleIO;
+import org.team157.robot.subsystems.drive.ModuleIOSim;
+import org.team157.robot.subsystems.drive.ModuleIOTalonFX;
 import org.team157.robot.subsystems.flywheel.Flywheel;
 import org.team157.robot.subsystems.flywheel.FlywheelIOTalonFX;
 import org.team157.robot.subsystems.hood.Hood;
@@ -46,16 +55,8 @@ import org.team157.robot.subsystems.turret.TurretIOTalonFX;
 import org.team157.robot.subsystems.vision.VisionSystem;
 
 public class RobotContainer {
-    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxSpeed = AKitTunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-
-    /* Setting up bindings for necessary control of the swerve drive platform */
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-
-    private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController driverController = new CommandXboxController(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
@@ -63,8 +64,38 @@ public class RobotContainer {
     public final Turret turret = new Turret();
     public final VisionSystem visionSystem;
     public static final Flywheel flywheel = new Flywheel();
-    // TODO: consider whether other systems should be static, had to make this static for the dyanmic hood under trench.
-    public static final DriveSystem drivetrain = TunerConstants.createDrivetrain();
+    public static final Drive drivetrain;
+
+    static {
+        switch (Constants.currentMode) {
+            case REAL:
+                drivetrain = new Drive(
+                    new GyroIOPigeon2(),
+                    new ModuleIOTalonFX(AKitTunerConstants.FrontLeft),
+                    new ModuleIOTalonFX(AKitTunerConstants.FrontRight),
+                    new ModuleIOTalonFX(AKitTunerConstants.BackLeft),
+                    new ModuleIOTalonFX(AKitTunerConstants.BackRight));
+                break;
+            case SIM:
+                drivetrain = new Drive(
+                    new GyroIO() {},
+                    new ModuleIOSim(AKitTunerConstants.FrontLeft),
+                    new ModuleIOSim(AKitTunerConstants.FrontRight),
+                    new ModuleIOSim(AKitTunerConstants.BackLeft),
+                    new ModuleIOSim(AKitTunerConstants.BackRight));
+                break;
+            default:
+                drivetrain = new Drive(
+                    new GyroIO() {},
+                    new ModuleIO() {},
+                    new ModuleIO() {},
+                    new ModuleIO() {},
+                    new ModuleIO() {});
+                break;
+        }
+    }
+
+    
 
     public final Hood hood = new Hood();
     public final Intake intake = new Intake();
@@ -74,6 +105,8 @@ public class RobotContainer {
 
 
     private final SendableChooser<Command> autoChooser;
+
+    
 
     public static boolean manualOverride = false; // When true, allows manual control of the turret, hood, and flywheel, disabling any dynamic control.
 
@@ -103,11 +136,30 @@ public class RobotContainer {
         NamedCommands.registerCommand("Wiggle", slapdown.wiggleIntake());
         NamedCommands.registerCommand("WiggleCubed", slapdown.wiggleIntake().andThen(new WaitCommand(1)).andThen(slapdown.wiggleIntake()).andThen(new WaitCommand(1)).andThen(slapdown.wiggleIntake()));
 
+        autoChooser = AutoBuilder.buildAutoChooser("New Auto");
+
+
+    // Set up SysId routines
+    autoChooser.addOption(
+        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drivetrain));
+    autoChooser.addOption(
+        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drivetrain));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Forward)",
+        drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)",
+        drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Forward)", drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Reverse)", drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+
         configureBindings();
 
 
 
-        autoChooser = AutoBuilder.buildAutoChooser("New Auto");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
     }
@@ -117,14 +169,6 @@ public class RobotContainer {
         /// DEFAULT COMMANDS ///
         ////////////////////////
 
-        // Idle while the robot is disabled. This ensures the configured neutral mode is applied to the drive motors while disabled.
-
-        final var idle = new SwerveRequest.Idle();
-        RobotModeTriggers.disabled().whileTrue(
-                drivetrain.applyRequest(() -> idle).ignoringDisable(true));
-        // Telemetry for the drivetrain.
-        drivetrain.registerTelemetry(logger::telemeterize);        
-      
         // Update the pose estimation and turret tracking angle while no other vision commands are running. 
         visionSystem.setDefaultCommand(visionSystem.setDefault(drivetrain, turret));
 
@@ -149,31 +193,40 @@ public class RobotContainer {
         //////////////////////////////////////////////
 
         // Note that X is defined as forward according to WPILib convention, and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-                // Drivetrain will execute this command periodically
-                drivetrain.applyRequest(() -> drive
-                        .withVelocityX(MathUtil.applyDeadband(-driverController.getLeftY(),
-                                ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxSpeed)) // Drive forward with
-                                                                                                // negative Y
-                        // (forward)
-                        .withVelocityY(MathUtil.applyDeadband(-driverController.getLeftX(),
-                                ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxSpeed)) // Drive left with
-                                                                                                // negative X (left)
-                        .withRotationalRate(MathUtil.applyDeadband(-driverController.getRightX(),
-                                ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxAngularRate)) // Drive
-                                                                                                      // counterclockwise
-                                                                                                      // with
-                // negative X (left)
-                ));
+        // drivetrain.setDefaultCommand(
+        //         drivetrain.run(() -> {
+        //             // Field-centric driving with joystick inputs
+        //             double xSpeed = MathUtil.applyDeadband(-driverController.getLeftY(),
+        //                     ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxSpeed);
+        //             double ySpeed = MathUtil.applyDeadband(-driverController.getLeftX(),
+        //                     ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxSpeed);
+        //             double rotSpeed = MathUtil.applyDeadband(-driverController.getRightX(),
+        //                     ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxAngularRate);
 
-        // Reset the field-centric heading on start and back button press.
-        driverController.start().and(driverController.back()).onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        //             drivetrain.runVelocity(
+        //                 ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, drivetrain.getRotation()));
+        //         }));
+
+
+        drivetrain.setDefaultCommand(
+            DriveCommands.joystickDrive(
+                drivetrain,
+                () -> MathUtil.applyDeadband(-driverController.getLeftY(), ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxSpeed),
+                () -> MathUtil.applyDeadband(-driverController.getLeftX(), ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxSpeed),
+                () -> MathUtil.applyDeadband(-driverController.getRightX(), ControllerConstants.JOYSTICK_DEADBAND) * modifySpeed(MaxAngularRate))
+            );
+
+
+        // Reset the field-centric heading by resetting the pose with the current position but zero rotation.
+        driverController.start().and(driverController.back()).onTrue(drivetrain.runOnce(() -> {
+            drivetrain.setPose(new Pose2d(drivetrain.getPose().getTranslation(), Rotation2d.kZero));
+        }));
         // Reset the robot pose to the alliance-specific manual reset pose when both start and back are pressed together on both controllers
         operatorController.start().and(operatorController.back().and(driverController.start()
-              .and(driverController.back()))).onTrue(drivetrain.resetPose());
+              .and(driverController.back()))).onTrue(drivetrain.resetPoseCommand());
 
-        // When the B button is held, the robot will brake in place, holding its position against external forces. 
-        driverController.b().whileTrue(drivetrain.applyRequest(() -> brake));
+        // When the B button is held, the robot will brake in place by commanding X-pattern wheel angles.
+        driverController.b().whileTrue(drivetrain.run(() -> drivetrain.stopWithX()));
 
 
 

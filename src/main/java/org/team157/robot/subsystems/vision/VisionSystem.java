@@ -55,7 +55,7 @@ import yams.mechanisms.swerve.SwerveDrive;
 import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.VisionConstants;
-import org.team157.robot.subsystems.drive.DriveSystem;
+import org.team157.robot.subsystems.drive.Drive;
 import org.team157.robot.subsystems.turret.Turret;
 import org.team157.robot.subsystems.flywheel.Flywheel;
 import org.team157.robot.Robot;
@@ -135,14 +135,14 @@ public class VisionSystem extends SubsystemBase {
     setDefaultCommand(getDefaultCommand());
   }
 
-  public Command setDefault(DriveSystem drivetrain, Turret turret) {
+  public Command setDefault(Drive drivetrain, Turret turret) {
     return run(() -> {
       updatePoseEstimation(drivetrain);
       turret.updateRelativeAngleToTarget(FieldConstants.positionDetails.getTargetPose2d(drivetrain.getPose(), isBlueAlliance),
           drivetrain.getPose());
-      driveLinearVelocityX = drivetrain.getStateCopy().Speeds.vxMetersPerSecond;
-      driveLinearVelocityY = drivetrain.getStateCopy().Speeds.vyMetersPerSecond;
-      driveRotationalVelocity = drivetrain.getStateCopy().Speeds.omegaRadiansPerSecond;
+      driveLinearVelocityX = drivetrain.getChassisSpeeds().vxMetersPerSecond;
+      driveLinearVelocityY = drivetrain.getChassisSpeeds().vyMetersPerSecond;
+      driveRotationalVelocity = drivetrain.getChassisSpeeds().omegaRadiansPerSecond;
       driveFieldRotation = drivetrain.getPose().getRotation().getRadians();
       ballTOF = Flywheel.getBallTimeOfFlight();
     });
@@ -189,9 +189,9 @@ public class VisionSystem extends SubsystemBase {
    * Update the pose estimation inside of {@link SwerveDrive} with all of the
    * given poses.
    *
-   * @param swerveDrive {@link SwerveDrive} instance.
+   * @param swerveDrive {@link Drive} instance.
    */
-  public void updatePoseEstimation(DriveSystem swerveDrive) {
+  public void updatePoseEstimation(Drive swerveDrive) {
     for (Cameras camera : Cameras.values()) {
       // ignore turretCamera for global positioning
       if (!camera.useForPositioning) {
@@ -218,9 +218,9 @@ public class VisionSystem extends SubsystemBase {
    * Reset the pose estimation inside of {@link SwerveDrive} with all of the given
    * poses.
    *
-   * @param swerveDrive {@link SwerveDrive} instance.
+   * @param swerveDrive {@link Drive} instance.
    */
-  public void resetPoseEstimation(DriveSystem swerveDrive) {
+  public void resetPoseEstimation(Drive swerveDrive) {
     for (Cameras camera : Cameras.values()) {
       // ignore turretCamera for global positioning
       if (!camera.useForPositioning) {
@@ -232,7 +232,7 @@ public class VisionSystem extends SubsystemBase {
         if (filteredPose.isPresent()) {
           var pose = filteredPose.get();
 
-          swerveDrive.resetPose(pose.estimatedPose.toPose2d());
+          swerveDrive.setPose(pose.estimatedPose.toPose2d());
 
           field2d.getObject("Vision").setPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
           field2d.setRobotPose(swerveDrive.getPose()); // photon's pose combined with robot's known pose
