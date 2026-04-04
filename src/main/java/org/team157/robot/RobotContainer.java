@@ -227,11 +227,11 @@ public class RobotContainer {
         // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator controller.
         operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(168.5)));
         // operatorController.povUpRight().toggleOnTrue(turret.setAngle(Degrees.of(-5)));
-        operatorController.povRight().whileTrue(turret.setAngle(Degrees.of(78.5)));
+        operatorController.povRight().toggleOnTrue(turret.setAngle(Degrees.of(78.5)));
         // operatorController.povDownRight().toggleOnTrue(turret.setAngle(Degrees.of(85)));
         operatorController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(-12.5)));
         // operatorController.povDownLeft().toggleOnTrue(turret.setAngle(Degrees.of(175)));
-        operatorController.povLeft().whileTrue(turret.setAngle(Degrees.of(-102.5)));
+        operatorController.povLeft().toggleOnTrue(turret.setAngle(Degrees.of(-102.5)));
         // operatorController.povUpLeft().toggleOnTrue(turret.setAngle(Degrees.of(265)));
         
           ///////////////////////
