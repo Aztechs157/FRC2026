@@ -4,7 +4,11 @@
 
 package org.team157.robot;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedPowerDistribution;
@@ -15,11 +19,16 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.ctre.phoenix6.HootAutoReplay;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -191,6 +200,30 @@ public class Robot extends LoggedRobot {
   public void disabledPeriodic() {
     m_robotContainer.visionSystem.resetPoseEstimation(RobotContainer.drivetrain);
     m_robotContainer.visionSystem.updatePoseEstimation(RobotContainer.drivetrain);
+
+    newAlliance = DriverStation.getAlliance();
+    newAutoName = m_robotContainer.getAutonomousCommand().getName();
+    if (autoName != newAutoName || alliance != newAlliance) {
+      autoName = newAutoName;
+      alliance = newAlliance;
+      if (AutoBuilder.getAllAutoNames().contains(autoName)) {
+        try {
+          List<PathPlannerPath> pathPlannerPaths = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
+          List<Pose2d> poses = new ArrayList<>();
+          for (PathPlannerPath path : pathPlannerPaths) {
+            if (alliance.isPresent() && alliance.get() == Alliance.Red) {
+              path = path.flipPath();
+            }
+            poses.addAll(path.getAllPathPoints().stream()
+                .map(point -> new Pose2d(point.position.getX(), point.position.getY(), new Rotation2d()))
+                .collect(Collectors.toList()));
+          }
+          m_field.getObject("path").setPoses(poses);
+        } catch (IOException | org.json.simple.parser.ParseException e) {
+          e.printStackTrace();
+        }
+      }
+    }
 
   }
 

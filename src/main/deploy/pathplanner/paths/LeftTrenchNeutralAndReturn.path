@@ -68,28 +68,44 @@
         "y": 5.352423245614034
       },
       "prevControl": {
-        "x": 7.048244070022342,
-        "y": 5.209001564487162
+        "x": 6.927931844775214,
+        "y": 5.000308881049969
       },
       "nextControl": {
-        "x": 5.960678940438067,
-        "y": 5.527372699708498
+        "x": 6.2774465049928665,
+        "y": 5.619985734664765
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.65438596491228,
-        "y": 7.458377192982456
+        "x": 6.558311403508773,
+        "y": 6.978544935805992
       },
       "prevControl": {
-        "x": 7.0047146140999335,
-        "y": 6.941520814337098
+        "x": 6.793994421180802,
+        "y": 6.692369778552072
       },
       "nextControl": {
-        "x": 4.990278693601897,
-        "y": 7.712573147047439
+        "x": 6.057489300998572,
+        "y": 7.586661911554922
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.757194901508775,
+        "y": 7.414415861800428
+      },
+      "prevControl": {
+        "x": 4.373736797555336,
+        "y": 7.563494504423934
+      },
+      "nextControl": {
+        "x": 3.140653005462214,
+        "y": 7.2653372191769225
       },
       "isLocked": false,
       "linkedName": null
@@ -134,6 +150,19 @@
       "constraints": {
         "maxVelocity": 1.75,
         "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Slow for trench",
+      "minWaypointRelativePos": 5.237002025658317,
+      "maxWaypointRelativePos": 5.804186360567181,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 2.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,

@@ -249,7 +249,7 @@ public class RobotContainer {
         // Set the hood to preset angles based on the bumpers and triggers of the
         // Operator controller.
         operatorController.leftTrigger().toggleOnTrue(hood.setAngle(Degrees.of(45)));
-        operatorController.leftBumper().toggleOnTrue(hood.setAngle(Degrees.of(60)));
+        operatorController.leftBumper().toggleOnTrue(hood.setAngle(Degrees.of(65)));
 
         ///////////////////////
         /// INTAKE COMMANDS ///
@@ -268,7 +268,7 @@ public class RobotContainer {
 
     // If the A button is held, apply the precision modifier of 0.5x speed.
     public double modifySpeed(final double speed) {
-        if (driverController.rightBumper().getAsBoolean()) {
+        if (driverController.rightBumper().getAsBoolean() || drivetrain.isUnderTrench()) {
             return speed * ModifierConstants.PRECISION_DRIVE_MODIFIER;
         } else {
             return speed;
