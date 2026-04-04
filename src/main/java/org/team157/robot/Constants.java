@@ -16,8 +16,24 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
+
+  public static final Mode simMode = Mode.SIM;
+  public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+
+  public static enum Mode {
+    /** Running on a real robot. */
+    REAL,
+
+    /** Running a physics simulator. */
+    SIM,
+
+    /** Replaying from a log file. */
+    REPLAY
+  }
+
   public static final CANBus RIO_CAN_BUS = new CANBus("rio", "./logs/example.hoot");
   public static final CANBus DRIVE_CAN_BUS = new CANBus("canivore", "./logs/example2.hoot");
 
