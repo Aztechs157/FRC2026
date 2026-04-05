@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 0.5385526315789475,
-        "y": 0.6789364035087715
+        "x": 0.77,
+        "y": 0.67
       },
       "prevControl": {
-        "x": 0.952936224958395,
-        "y": 0.6848327582756186
+        "x": 1.1843835933794475,
+        "y": 0.6758963547668472
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "HPStation"
     }
   ],
   "rotationTargets": [],

@@ -17,7 +17,7 @@ public class HoodConstants {
     public static final int MOTOR_ID = 21;
     public static final int ENCODER_ID = 2;
 
-    public static final double MIN_ENCODER_POSITION = 0.33, MAX_ENCODER_POSITION = 0.85; 
+    public static final double MIN_ENCODER_POSITION = 0.32, MAX_ENCODER_POSITION = 0.86; 
     public static final double MIN_ANGLE = 40, MAX_ANGLE = 65;
     public static final Angle LOWER_SOFT_LIMIT = Degrees.of(42), UPPER_SOFT_LIMIT = Degrees.of(63);
     public static final Angle LOWER_HARD_LIMIT = Degrees.of(40), UPPER_HARD_LIMIT = Degrees.of(65);

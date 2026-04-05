@@ -181,12 +181,14 @@ public class Robot extends LoggedRobot {
 
     // Gets the manual override status from RobotContainer to display on the
     // dashboard.
-    SmartDashboard.putBoolean("Manual Override", RobotContainer.manualOverride);
+    Logger.recordOutput("Manual Override", RobotContainer.manualOverride);
     // Gets the match time from the FMS to display for the driver.
-    SmartDashboard.putNumber("Match Time", Timer.getMatchTime());
+    Logger.recordOutput("Match Time", Timer.getMatchTime());
     // Gets hub activity status to display on the dashboard.
-    SmartDashboard.putBoolean("Hub Active?", m_robotContainer.isHubActive());
-    SmartDashboard.putBoolean("Under Trench?", RobotContainer.drivetrain.isUnderTrench());
+    Logger.recordOutput("Hub Active?", m_robotContainer.isHubActive());
+    Logger.recordOutput("Under Trench?", RobotContainer.drivetrain.isUnderTrench());
+    Logger.recordOutput("Robot Field Pose", RobotContainer.drivetrain.getPose());
+    m_field.setRobotPose(RobotContainer.drivetrain.getPose());
 
   }
 

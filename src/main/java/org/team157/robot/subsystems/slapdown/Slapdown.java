@@ -87,7 +87,7 @@ public class Slapdown extends SubsystemBase {
      * @return a {@link Command} setting the slapdown's target angle to 40°, then back down to 0°.
      */
     public Command wiggleIntake() {
-        return setAngleThenStop(Degrees.of(40)).andThen(setAngleThenStop(Degrees.of(0)));
+        return setAngleThenStop(Degrees.of(50)).andThen(setAngleThenStop(Degrees.of(0)));
     }
 
     /**
