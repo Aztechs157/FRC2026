@@ -39,6 +39,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -359,12 +360,37 @@ public class Drive extends SubsystemBase {
     };
   }
 
-    /**
-     * Returns whether or not the turret is underneath the trench.
-     * 
-     * @return true if the turret (offset from drivebase center) is within a trench zone, false otherwise.
-     */
-    public boolean isUnderTrench() {
-        return FieldConstants.positionDetails.isUnderTrench(getPose().plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET));
+  /**
+   * Returns whether or not the turret is underneath the trench.
+   *
+   * @return true if the turret (offset from drivebase center) is within a trench zone, false
+   *     otherwise.
+   */
+  public boolean isUnderTrench() {
+    return FieldConstants.positionDetails.isUnderTrench(
+        getPose().plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET));
+  }
+
+  /**
+   * Returns the pose to which the drivetrain should be reset, based on the current alliance.
+   *
+   * @return A Pose2d of the current alliance's Human Player Station corner.
+   */
+  public Pose2d getResetPose() {
+    // Gets the current alliance from the DriverStation.
+
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    // If the alliance is Red, return the Red reset pose.
+    // Otherwise, return the Blue reset pose.
+    if (alliance.isPresent() && alliance.get() == Alliance.Red) {
+      return FieldConstants.MANUAL_RESET_POSE_RED;
+    } else {
+      return FieldConstants.MANUAL_RESET_POSE_BLUE;
     }
+  }
+
+  /** Resets the pose of the drivetrain to the reset pose. */
+  public Command resetPose() {
+    return runOnce(() -> setPose(getResetPose()));
+  }
 }
