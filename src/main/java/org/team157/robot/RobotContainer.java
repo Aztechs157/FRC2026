@@ -1,10 +1,3 @@
-// Copyright (c) 2021-2026 Littleton Robotics
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
-
 package org.team157.robot;
 
 import static edu.wpi.first.units.Units.*;
@@ -30,6 +23,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.commands.DriveCommands;
 import org.team157.robot.generated.TunerConstants;
+import org.team157.robot.subsystems.LEDs;
 import org.team157.robot.subsystems.drive.Drive;
 import org.team157.robot.subsystems.drive.GyroIO;
 import org.team157.robot.subsystems.drive.GyroIOPigeon2;
@@ -75,6 +69,7 @@ public class RobotContainer {
   public final Hopper hopper = new Hopper();
   public final Uptake uptake = new Uptake();
   public final Slapdown slapdown = new Slapdown();
+  public final LEDs leds = new LEDs();
 
   // Controllers
   private final CommandXboxController driverController = new CommandXboxController(0);
