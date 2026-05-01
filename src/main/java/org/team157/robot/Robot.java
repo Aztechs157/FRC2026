@@ -1,28 +1,15 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Copyright (c) 2021-2026 Littleton Robotics
+// http://github.com/Mechanical-Advantage
+//
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
 
 package org.team157.robot;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.littletonrobotics.junction.LogFileUtil;
-import org.littletonrobotics.junction.LoggedPowerDistribution;
-import org.littletonrobotics.junction.LoggedRobot;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGReader;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
-import com.ctre.phoenix6.HootAutoReplay;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,59 +18,55 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedPowerDistribution;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 /**
- * The methods in this class are called automatically 
- * corresponding to each mode, as described in the TimedRobot documentation. 
- * If you change the name of this class or the package after 
- * creating this project, you must also update the Main.java file in the project.
+ * The VM is configured to automatically run this class, and to call the functions corresponding to
+ * each mode, as described in the TimedRobot documentation. If you change the name of this class or
+ * the package after creating this project, you must also update the build.gradle file in the
+ * project.
  */
 public class Robot extends LoggedRobot {
-  public static enum Mode {
-    /** Running on a real robot. */
-    REAL,
-
-    /** Running a physics simulator. */
-    SIM,
-
-    /** Replaying from a log file. */
-    REPLAY
-  }
-
-  // Change to Mode.REPLAY to enable REPLAY.
-  public static final Mode simMode     = Mode.SIM;
-  public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
-
-
   private String autoName, newAutoName;
   private Optional<Alliance> alliance, newAlliance;
-  private Command m_autonomousCommand;
+  private Command autonomousCommand;
 
-  public static Pose3d[] zeroArray = new Pose3d[4];
-  public static Pose3d[] finalArray = new Pose3d[4];
-  public static Pose3d[] cameras = new Pose3d[3];
-
+  private RobotContainer m_robotContainer;
   public static final Field2d m_field = new Field2d();
 
-  private final RobotContainer m_robotContainer;
-
-  private final HootAutoReplay m_timeAndJoystickReplay = new HootAutoReplay()
-      .withTimestampReplay()
-      .withJoystickReplay();
-
-  /**
-   * This function is run when the robot is first started up and should be used
-   * for any
-   * initialization code.
-   */
   public Robot() {
-    switch (currentMode) {
+    // Record metadata
+    Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    Logger.recordMetadata(
+        "GitDirty",
+        switch (BuildConstants.DIRTY) {
+          case 0 -> "All changes committed";
+          case 1 -> "Uncommitted changes";
+          default -> "Unknown";
+        });
+
+    // Set up data receivers & replay source
+    switch (Constants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new WPILOGWriter());
@@ -104,104 +87,75 @@ public class Robot extends LoggedRobot {
         break;
     }
 
+    // Set the PDH's ID
     LoggedPowerDistribution.getInstance(51, ModuleType.kRev);
 
     // Start AdvantageKit logger
     Logger.start();
 
-    // Instantiate our RobotContainer. This will perform 
-    //all our button bindings, and put our
-    // autonomous chooser on the dashboard.
+    // Instantiate our RobotContainer. This will perform all our button bindings,
+    // and put our autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
     SmartDashboard.putData("Field", m_field);
   }
 
-  /**
-   * This function is called every 20 ms, no matter the mode. Use this for items
-   * like diagnostics
-   * that you want ran during disabled, autonomous, teleoperated and test.
-   *
-   * <p>
-   * This runs after the mode specific periodic functions, but before LiveWindow
-   * and
-   * SmartDashboard integrated updating.
-   */
+  /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-    m_timeAndJoystickReplay.update();
-    // Runs the Scheduler. This is responsible 
-    // for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, 
-    // removing finished or interrupted commands,
-    // and running subsystem periodic() methods. 
-    //This must be called from the robot's periodic block 
-    //in order for anything in the Command-based framework to work.
+    // Optionally switch the thread to high priority to improve loop
+    // timing (see the template project documentation for details)
+    // Threads.setCurrentThreadPriority(true, 99);
+
+    // Runs the Scheduler. This is responsible for polling buttons, adding
+    // newly-scheduled commands, running already-scheduled commands, removing
+    // finished or interrupted commands, and running subsystem periodic() methods.
+    // This must be called from the robot's periodic block in order for anything in
+    // the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-    // // these are just for model calibration
-    // zeroArray = new Pose3d[] {
-    // // turret base
-    // new Pose3d(),
-    // // turret hood
-    // new Pose3d(),
-    // // intake pivot
-    // new Pose3d(),
-    // // hopper walls
-    // new Pose3d()
-    // };
-    // zeroedPoses.set(zeroArray);
+    // Return to non-RT thread priority (do not modify the first argument)
+    // Threads.setCurrentThreadPriority(false, 10);
 
-    // Gets mechanism poses to be used for the AdvantageScope model.
-
-    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {
-      // turret base 
-      m_robotContainer.turret.getBasePose(), 
-      // turret hood
-      m_robotContainer.turret.getHoodPivotPose(new Transform3d(0,0,0, 
-        new Rotation3d(0, Math.toRadians(m_robotContainer.hood.getScaledPosAngleSim()), 0))),
-      // intake pivot
-      m_robotContainer.slapdown.getIntakePivotPose(), 
-      // hopper walls
-      m_robotContainer.slapdown.getHopperWallsPose()} 
-    );
-    // Send mechanism poses to NT.
-    // finalPoses.set(finalArray);
-
-    // // used for model camera position calibration
-    // cameras = new Pose3d[] {
-    // new
-    // Pose3d(m_robotContainer.drivetrain.getPose()).plus(VisionConstants.FRONTLEFT_CAMERA_PLACEMENT),
-    // new
-    // Pose3d(m_robotContainer.drivetrain.getPose()).plus(VisionConstants.FRONTRIGHT_CAMERA_PLACEMENT),
-    // new
-    // Pose3d(m_robotContainer.drivetrain.getPose()).plus(VisionConstants.BACK_CAMERA_PLACEMENT)
-    // };
-    // cameraPoses.set(cameras);
-
-    // Gets the manual override status from RobotContainer to display on the
-    // dashboard.
+    Logger.recordOutput(
+        "FinalComponentPoses",
+        new Pose3d[] {
+          // turret base
+          m_robotContainer.turret.getBasePose(),
+          // turret hood
+          m_robotContainer.turret.getHoodPivotPose(
+              new Transform3d(
+                  0,
+                  0,
+                  0,
+                  new Rotation3d(
+                      0, Math.toRadians(m_robotContainer.hood.getScaledPosAngleSim()), 0))),
+          // intake pivot
+          m_robotContainer.slapdown.getIntakePivotPose(),
+          // hopper walls
+          m_robotContainer.slapdown.getHopperWallsPose()
+        });
     Logger.recordOutput("Manual Override", RobotContainer.manualOverride);
     // Gets the match time from the FMS to display for the driver.
     Logger.recordOutput("Match Time", Timer.getMatchTime());
     // Gets hub activity status to display on the dashboard.
     Logger.recordOutput("Hub Active?", m_robotContainer.isHubActive());
-    Logger.recordOutput("Under Trench?", RobotContainer.drivetrain.isUnderTrench());
-    Logger.recordOutput("Robot Field Pose", RobotContainer.drivetrain.getPose());
-    m_field.setRobotPose(RobotContainer.drivetrain.getPose());
-
+    Logger.recordOutput("Under Trench?", RobotContainer.drive.isUnderTrench());
+    Logger.recordOutput("Robot Field Pose", RobotContainer.drive.getPose());
+    m_field.setRobotPose(RobotContainer.drive.getPose());
   }
 
-  /** This function is called once each time the robot enters Disabled mode. */
+  /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    m_robotContainer.visionSystem.updatePoseEstimation(RobotContainer.drivetrain);
+    m_robotContainer.visionSystem.updatePoseEstimation(RobotContainer.drive);
   }
 
+  /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    m_robotContainer.visionSystem.resetPoseEstimation(RobotContainer.drivetrain);
-    m_robotContainer.visionSystem.updatePoseEstimation(RobotContainer.drivetrain);
+    m_robotContainer.visionSystem.resetPoseEstimation(RobotContainer.drive);
+    m_robotContainer.visionSystem.updatePoseEstimation(RobotContainer.drive);
 
     newAlliance = DriverStation.getAlliance();
     newAutoName = m_robotContainer.getAutonomousCommand().getName();
@@ -210,15 +164,20 @@ public class Robot extends LoggedRobot {
       alliance = newAlliance;
       if (AutoBuilder.getAllAutoNames().contains(autoName)) {
         try {
-          List<PathPlannerPath> pathPlannerPaths = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
+          List<PathPlannerPath> pathPlannerPaths =
+              PathPlannerAuto.getPathGroupFromAutoFile(autoName);
           List<Pose2d> poses = new ArrayList<>();
           for (PathPlannerPath path : pathPlannerPaths) {
             if (alliance.isPresent() && alliance.get() == Alliance.Red) {
               path = path.flipPath();
             }
-            poses.addAll(path.getAllPathPoints().stream()
-                .map(point -> new Pose2d(point.position.getX(), point.position.getY(), new Rotation2d()))
-                .collect(Collectors.toList()));
+            poses.addAll(
+                path.getAllPathPoints().stream()
+                    .map(
+                        point ->
+                            new Pose2d(
+                                point.position.getX(), point.position.getY(), new Rotation2d()))
+                    .collect(Collectors.toList()));
           }
           m_field.getObject("path").setPoses(poses);
         } catch (IOException | org.json.simple.parser.ParseException e) {
@@ -226,45 +185,40 @@ public class Robot extends LoggedRobot {
         }
       }
     }
-
   }
 
-  /**
-   * This autonomous runs the autonomous command selected by your
-   * {@link RobotContainer} class.
-   */
+  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(m_autonomousCommand);
+    if (autonomousCommand != null) {
+      CommandScheduler.getInstance().schedule(autonomousCommand);
     }
   }
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-  }
+  public void autonomousPeriodic() {}
 
+  /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    if (autonomousCommand != null) {
+      autonomousCommand.cancel();
     }
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {
+  public void teleopPeriodic() {}
 
-  }
-
+  /** This function is called once when test mode is enabled. */
   @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.
@@ -273,16 +227,13 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {
-  }
+  public void testPeriodic() {}
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {
-  }
+  public void simulationInit() {}
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {
-  }
+  public void simulationPeriodic() {}
 }

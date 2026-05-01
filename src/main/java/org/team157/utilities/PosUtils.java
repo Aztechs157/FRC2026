@@ -13,20 +13,22 @@ import edu.wpi.first.networktables.StringTopic;
 public interface PosUtils {
 
   /**
-   * checks if the currentPos is within posTolerance of desiredPos and the
-   * motorVelocity is within velocityTolerance in the direction towards
-   * desiredPos.
-   * 
-   * @param desiredPos        - the position you wish the system to reach
-   * @param currentPos        - the position the system is currently at
-   * @param posTolerance      - the allowable deviation from the desired position
-   * @param motorVelocity     - the velocity that the motor is currently spinning
-   *                          at
-   * @param velocityTolerance - the maximum motor velocity for the system to not
-   *                          overshoot the desired position tolerance
+   * checks if the currentPos is within posTolerance of desiredPos and the motorVelocity is within
+   * velocityTolerance in the direction towards desiredPos.
+   *
+   * @param desiredPos - the position you wish the system to reach
+   * @param currentPos - the position the system is currently at
+   * @param posTolerance - the allowable deviation from the desired position
+   * @param motorVelocity - the velocity that the motor is currently spinning at
+   * @param velocityTolerance - the maximum motor velocity for the system to not overshoot the
+   *     desired position tolerance
    * @return - boolean
    */
-  static boolean isOscillating(double desiredPos, double currentPos, double posTolerance, double motorVelocity,
+  static boolean isOscillating(
+      double desiredPos,
+      double currentPos,
+      double posTolerance,
+      double motorVelocity,
       double velocityTolerance) {
     boolean retval = false;
 
@@ -43,20 +45,20 @@ public interface PosUtils {
   /**
    * Maps a value from one range to another, based on code found <a href=
    * "https://reference.arduino.cc/reference/en/language/functions/math/map/#_appendix">here.</a>
-   * Note that while the arduino version uses integers, the calculation is the
-   * same for doubles, so the warning about integer math is not applicable here.
-   * 
-   * @param input     The current reading of the value
-   * @param minInput  The minimum reading possible for the value, this will be
-   *                  mapped to <code>minOutput</code>
-   * @param maxInput  The maximum reading possible for the value, this will be
-   *                  mapped to <code>maxOutput</code>
+   * Note that while the arduino version uses integers, the calculation is the same for doubles, so
+   * the warning about integer math is not applicable here.
+   *
+   * @param input The current reading of the value
+   * @param minInput The minimum reading possible for the value, this will be mapped to <code>
+   *     minOutput</code>
+   * @param maxInput The maximum reading possible for the value, this will be mapped to <code>
+   *     maxOutput</code>
    * @param minOutput The minimum value for the new range
    * @param maxOutput The maximum value for the new range
-   * @return The input value after being properly scaled to fit inside of the new
-   *         range
+   * @return The input value after being properly scaled to fit inside of the new range
    */
-  static double mapRange(double input, double minInput, double maxInput, double minOutput, double maxOutput) {
+  static double mapRange(
+      double input, double minInput, double maxInput, double minOutput, double maxOutput) {
     return (input - minInput) * (maxOutput - minOutput) / (maxInput - minInput) + minOutput;
   }
 
@@ -74,8 +76,8 @@ public interface PosUtils {
     }
   }
 
-  
-  static double runWithLimits(double speed, double currentPos, double limitMargin, double minPos, double maxPos) {
+  static double runWithLimits(
+      double speed, double currentPos, double limitMargin, double minPos, double maxPos) {
     if (currentPos >= maxPos - limitMargin && speed < 0) {
       return 0;
     } else if (currentPos >= (maxPos * 0.9) - limitMargin && speed < 0) {
@@ -89,8 +91,8 @@ public interface PosUtils {
     }
   }
 
-  static boolean isWithin(double value, double target, double tolerance){
-    return(value > target-tolerance && value < target+tolerance);
+  static boolean isWithin(double value, double target, double tolerance) {
+    return (value > target - tolerance && value < target + tolerance);
   }
 
   static final StringTopic selectedTabTopic =
@@ -98,18 +100,17 @@ public interface PosUtils {
   static final StringPublisher selectedTabPublisher =
       selectedTabTopic.publish(PubSubOption.keepDuplicates(true));
 
-      public static void selectTab(String tabName) {
-        selectedTabPublisher.set(tabName);
-      }
-    
-      /**
-       * Selects the tab of the dashboard at the given index. If this index is greater than or equal to
-       * the number of tabs, this will have no effect.
-       *
-       * @param tabIndex the index of the tab to select.
-       */
-      public static void selectTab(int tabIndex) {
-        selectTab(Integer.toString(tabIndex));
-      }
+  public static void selectTab(String tabName) {
+    selectedTabPublisher.set(tabName);
+  }
 
+  /**
+   * Selects the tab of the dashboard at the given index. If this index is greater than or equal to
+   * the number of tabs, this will have no effect.
+   *
+   * @param tabIndex the index of the tab to select.
+   */
+  public static void selectTab(int tabIndex) {
+    selectTab(Integer.toString(tabIndex));
+  }
 }

@@ -5,14 +5,13 @@
 package org.team157.robot.subsystems.uptake;
 
 import static edu.wpi.first.units.Units.Amps;
+
+import edu.wpi.first.units.measure.Current;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
-import edu.wpi.first.units.measure.Current;
-
-
 
 public final class UptakeConstants {
-public static final int MOTOR_ID = 18, FOLLOWER_MOTOR_ID = 19;
-    public static final Current CURRENT_LIMIT = Amps.of(40);
-    public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("9:1"));
-  }
+  public static final int MOTOR_ID = 18, FOLLOWER_MOTOR_ID = 19;
+  public static final Current CURRENT_LIMIT = Amps.of(40);
+  public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("9:1"));
+}

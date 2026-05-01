@@ -8,22 +8,6 @@ import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
-
-import org.ejml.simple.SimpleMatrix;
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.PhotonUtils;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
@@ -50,23 +34,38 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import yams.mechanisms.swerve.SwerveDrive;
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
+import org.ejml.simple.SimpleMatrix;
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.PhotonUtils;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Constants.VisionConstants;
-import org.team157.robot.subsystems.drive.DriveSystem;
-import org.team157.robot.subsystems.turret.Turret;
-import org.team157.robot.subsystems.flywheel.Flywheel;
 import org.team157.robot.Robot;
+import org.team157.robot.subsystems.drive.Drive;
+import org.team157.robot.subsystems.flywheel.Flywheel;
+import org.team157.robot.subsystems.turret.Turret;
+import yams.mechanisms.swerve.SwerveDrive;
 
 public class VisionSystem extends SubsystemBase {
 
   // Publishes the turret's target point to NT for field zoning testing.
-  public StructPublisher<Pose2d> targetPosePublisher = NetworkTableInstance.getDefault()
-      .getStructTopic("Target Pose", Pose2d.struct).publish();
-  public StructPublisher<Pose2d> adjustedTargetPosePublisher = NetworkTableInstance.getDefault()
-      .getStructTopic("Adjusted Target Pose", Pose2d.struct).publish();
+  public StructPublisher<Pose2d> targetPosePublisher =
+      NetworkTableInstance.getDefault().getStructTopic("Target Pose", Pose2d.struct).publish();
+  public StructPublisher<Pose2d> adjustedTargetPosePublisher =
+      NetworkTableInstance.getDefault()
+          .getStructTopic("Adjusted Target Pose", Pose2d.struct)
+          .publish();
 
   public boolean hasTag = false;
 
@@ -118,10 +117,13 @@ public class VisionSystem extends SubsystemBase {
 
     this.currentPose = currentPose;
     this.field2d = field;
-    Shuffleboard.getTab("vision").add("vision based field", field2d).withWidget(BuiltInWidgets.kField);
+    Shuffleboard.getTab("vision")
+        .add("vision based field", field2d)
+        .withWidget(BuiltInWidgets.kField);
 
     try {
-      fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2026RebuiltAndymark.m_resourceFile);
+      fieldLayout =
+          AprilTagFieldLayout.loadFromResource(AprilTagFields.k2026RebuiltAndymark.m_resourceFile);
     } catch (IOException exception) {
       frontRightCamera.close();
       frontLeftCamera.close();
@@ -135,44 +137,44 @@ public class VisionSystem extends SubsystemBase {
     setDefaultCommand(getDefaultCommand());
   }
 
-  public Command setDefault(DriveSystem drivetrain, Turret turret) {
-    return run(() -> {
-      updatePoseEstimation(drivetrain);
-      turret.updateRelativeAngleToTarget(FieldConstants.positionDetails.getTargetPose2d(drivetrain.getPose(), isBlueAlliance),
-          drivetrain.getPose());
-      driveLinearVelocityX = drivetrain.getStateCopy().Speeds.vxMetersPerSecond;
-      driveLinearVelocityY = drivetrain.getStateCopy().Speeds.vyMetersPerSecond;
-      driveRotationalVelocity = drivetrain.getStateCopy().Speeds.omegaRadiansPerSecond;
-      driveFieldRotation = drivetrain.getPose().getRotation().getRadians();
-      ballTOF = Flywheel.getBallTimeOfFlight();
-    });
-
+  public Command setDefault(Drive drivetrain, Turret turret) {
+    return run(
+        () -> {
+          updatePoseEstimation(drivetrain);
+          turret.updateRelativeAngleToTarget(
+              FieldConstants.positionDetails.getTargetPose2d(drivetrain.getPose(), isBlueAlliance),
+              drivetrain.getPose());
+          driveLinearVelocityX = drivetrain.getChassisSpeeds().vxMetersPerSecond;
+          driveLinearVelocityY = drivetrain.getChassisSpeeds().vyMetersPerSecond;
+          driveRotationalVelocity = drivetrain.getChassisSpeeds().omegaRadiansPerSecond;
+          driveFieldRotation = drivetrain.getPose().getRotation().getRadians();
+          ballTOF = Flywheel.getBallTimeOfFlight();
+        });
   }
 
   /**
-   * Gets the aiming target of the turret, based on the current alliance, and the
-   * robot's current location on the field.
-   * 
-   * @return the target point on the field the turret should be aiming at, as a
-   *         Pose2d.
+   * Gets the aiming target of the turret, based on the current alliance, and the robot's current
+   * location on the field.
+   *
+   * @return the target point on the field the turret should be aiming at, as a Pose2d.
    */
   public Pose2d getDesiredPose() {
     return FieldConstants.positionDetails.getTargetPose2d(currentPose.get(), isBlueAlliance);
   }
 
   public void updateAlliance() {
-    isBlueAlliance = DriverStation.getAlliance()
-        .orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
+    isBlueAlliance =
+        DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
+            == DriverStation.Alliance.Blue;
     SmartDashboard.putBoolean("Is Blue Alliance", isBlueAlliance);
   }
 
   /**
    * Calculates a target pose relative to an AprilTag on the field.
    *
-   * @param aprilTag    The ID of the AprilTag.
-   * @param robotOffset The offset {@link Transform2d} of the robot to apply to
-   *                    the pose for the robot to position
-   *                    itself correctly.
+   * @param aprilTag The ID of the AprilTag.
+   * @param robotOffset The offset {@link Transform2d} of the robot to apply to the pose for the
+   *     robot to position itself correctly.
    * @return The target pose of the AprilTag.
    */
   public static Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset) {
@@ -180,18 +182,17 @@ public class VisionSystem extends SubsystemBase {
     if (aprilTagPose3d.isPresent()) {
       return aprilTagPose3d.get().toPose2d().transformBy(robotOffset);
     } else {
-      throw new RuntimeException("Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
+      throw new RuntimeException(
+          "Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
     }
-
   }
 
   /**
-   * Update the pose estimation inside of {@link SwerveDrive} with all of the
-   * given poses.
+   * Update the pose estimation inside of {@link SwerveDrive} with all of the given poses.
    *
    * @param swerveDrive {@link SwerveDrive} instance.
    */
-  public void updatePoseEstimation(DriveSystem swerveDrive) {
+  public void updatePoseEstimation(Drive swerveDrive) {
     for (Cameras camera : Cameras.values()) {
       // ignore turretCamera for global positioning
       if (!camera.useForPositioning) {
@@ -203,24 +204,24 @@ public class VisionSystem extends SubsystemBase {
         if (filteredPose.isPresent()) {
           var pose = filteredPose.get();
 
-          swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
-              pose.timestampSeconds,
-              camera.curStdDevs);
-          field2d.getObject("Vision").setPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
-          field2d.setRobotPose(swerveDrive.getPose()); // photon's pose combined with robot's known pose
+          swerveDrive.addVisionMeasurement(
+              pose.estimatedPose.toPose2d(), pose.timestampSeconds, camera.curStdDevs);
+          field2d
+              .getObject("Vision")
+              .setPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
+          field2d.setRobotPose(
+              swerveDrive.getPose()); // photon's pose combined with robot's known pose
         }
       }
     }
-
   }
 
   /**
-   * Reset the pose estimation inside of {@link SwerveDrive} with all of the given
-   * poses.
+   * Reset the pose estimation inside of {@link SwerveDrive} with all of the given poses.
    *
    * @param swerveDrive {@link SwerveDrive} instance.
    */
-  public void resetPoseEstimation(DriveSystem swerveDrive) {
+  public void resetPoseEstimation(Drive swerveDrive) {
     for (Cameras camera : Cameras.values()) {
       // ignore turretCamera for global positioning
       if (!camera.useForPositioning) {
@@ -232,27 +233,30 @@ public class VisionSystem extends SubsystemBase {
         if (filteredPose.isPresent()) {
           var pose = filteredPose.get();
 
-          swerveDrive.resetPose(pose.estimatedPose.toPose2d());
+          swerveDrive.setPose(pose.estimatedPose.toPose2d());
 
-          field2d.getObject("Vision").setPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
-          field2d.setRobotPose(swerveDrive.getPose()); // photon's pose combined with robot's known pose
+          field2d
+              .getObject("Vision")
+              .setPose(pose.estimatedPose.toPose2d()); // photon's percieved pose
+          field2d.setRobotPose(
+              swerveDrive.getPose()); // photon's pose combined with robot's known pose
 
           break;
         }
       }
     }
-
   }
 
   /**
    * Generates the estimated robot pose. Returns empty if:
+   *
    * <ul>
-   * <li>No Pose Estimates could be generated</li>
-   * <li>The generated pose estimate was considered not accurate</li>
+   *   <li>No Pose Estimates could be generated
+   *   <li>The generated pose estimate was considered not accurate
    * </ul>
    *
-   * @return an {@link EstimatedRobotPose} with an estimated pose, timestamp, and
-   *         targets used to create the estimate
+   * @return an {@link EstimatedRobotPose} with an estimated pose, timestamp, and targets used to
+   *     create the estimate
    */
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Cameras camera) {
     Optional<EstimatedRobotPose> poseEst = camera.getEstimatedGlobalPose();
@@ -260,9 +264,8 @@ public class VisionSystem extends SubsystemBase {
   }
 
   /**
-   * Filter pose via the ambiguity and find best estimate between all of the
-   * camera's throwing out distances more than
-   * 10m for a short amount of time.
+   * Filter pose via the ambiguity and find best estimate between all of the camera's throwing out
+   * distances more than 10m for a short amount of time.
    *
    * @param pose Estimated robot pose.
    * @return Could be empty if there isn't a good reading.
@@ -282,7 +285,8 @@ public class VisionSystem extends SubsystemBase {
       }
 
       // est pose is very far from recorded robot pose
-      if (PhotonUtils.getDistanceToPose(currentPose.get(), pose.get().estimatedPose.toPose2d()) > 1) {
+      if (PhotonUtils.getDistanceToPose(currentPose.get(), pose.get().estimatedPose.toPose2d())
+          > 1) {
         longDistangePoseEstimationCount++;
 
         // if it calculates that were 10 meter away for more than 10 times in a row its
@@ -297,13 +301,15 @@ public class VisionSystem extends SubsystemBase {
     }
     return Optional.empty();
   }
-    public Command disableCams() {
-      return runOnce(() -> {
-        for (Cameras cam : Cameras.values()) {
-          cam.useForPositioning = false;
-        }
-      });
-    }
+
+  public Command disableCams() {
+    return runOnce(
+        () -> {
+          for (Cameras cam : Cameras.values()) {
+            cam.useForPositioning = false;
+          }
+        });
+  }
 
   /**
    * Get distance of the robot from the AprilTag pose.
@@ -313,13 +319,14 @@ public class VisionSystem extends SubsystemBase {
    */
   public double getDistanceFromAprilTag(int id) {
     Optional<Pose3d> tag = fieldLayout.getTagPose(id);
-    return tag.map(pose3d -> PhotonUtils.getDistanceToPose(currentPose.get(), pose3d.toPose2d())).orElse(-1.0);
+    return tag.map(pose3d -> PhotonUtils.getDistanceToPose(currentPose.get(), pose3d.toPose2d()))
+        .orElse(-1.0);
   }
 
   /**
    * Get tracked target from a camera of AprilTagID
    *
-   * @param id     AprilTag ID
+   * @param id AprilTag ID
    * @param camera Camera to check.
    * @return Tracked target.
    */
@@ -335,12 +342,9 @@ public class VisionSystem extends SubsystemBase {
       }
     }
     return target;
-
   }
 
-  /**
-   * Update the {@link Field2d} to include tracked targets/
-   */
+  /** Update the {@link Field2d} to include tracked targets/ */
   public void updateVisionField() {
 
     List<PhotonTrackedTarget> targets = new ArrayList<PhotonTrackedTarget>();
@@ -369,186 +373,185 @@ public class VisionSystem extends SubsystemBase {
   }
 
   /**
-   * Get a tag's 2d location on the field, and calculate the angle and distance to
-   * it from the robot's pose.
-   * 
-   * @param id        the tag ID to extract a Pose2d from
-   * @param robotPose the current Pose2d of the robot to calculate angle/distance
-   *                  from
+   * Get a tag's 2d location on the field, and calculate the angle and distance to it from the
+   * robot's pose.
+   *
+   * @param id the tag ID to extract a Pose2d from
+   * @param robotPose the current Pose2d of the robot to calculate angle/distance from
    */
   public void setTargetParams(int id, Pose2d robotPose) {
     Pose2d tagPose = fieldLayout.getTagPose(id).get().toPose2d();
 
     distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, tagPose);
-    distanceToTargetFromTurret = PhotonUtils
-        .getDistanceToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), tagPose);
+    distanceToTargetFromTurret =
+        PhotonUtils.getDistanceToPose(
+            robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), tagPose);
     angleToTarget = PhotonUtils.getYawToPose(robotPose, tagPose).getDegrees();
     // angleToTargetFromTurret =
     // PhotonUtils.getYawToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
     // tagPose).getDegrees();
-    angleToTargetFromTurret = PhotonUtils
-        .getYawToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), tagPose).getDegrees();
-
+    angleToTargetFromTurret =
+        PhotonUtils.getYawToPose(
+                robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), tagPose)
+            .getDegrees();
   }
 
   /**
    * Calculate the angle and distance to a certain target from the robot's pose.
-   * 
+   *
    * @param targetPose the target Pose2d to calculate angle/distance to
-   * @param robotPose  the current Pose2d of the robot to calculate angle/distance
-   *                   from
+   * @param robotPose the current Pose2d of the robot to calculate angle/distance from
    */
   public void setTargetParams(Pose2d targetPose, Pose2d robotPose) {
 
     // beginning vector math for momentum shooting
-    double turretToRobotTheta = Math.atan(
-        ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY() / ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX());
-    SimpleMatrix turretToRobotThetaMatrix = new SimpleMatrix(2, 1, true, -Math.sin(turretToRobotTheta),
-        Math.cos(turretToRobotTheta));
-    double dOffsetRobot = Math.hypot(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX(),
-        ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY());
+    double turretToRobotTheta =
+        Math.atan(
+            ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY()
+                / ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX());
+    SimpleMatrix turretToRobotThetaMatrix =
+        new SimpleMatrix(2, 1, true, -Math.sin(turretToRobotTheta), Math.cos(turretToRobotTheta));
+    double dOffsetRobot =
+        Math.hypot(
+            ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX(),
+            ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY());
 
-    SimpleMatrix vRotationRobot = turretToRobotThetaMatrix.scale(driveRotationalVelocity * dOffsetRobot);
+    SimpleMatrix vRotationRobot =
+        turretToRobotThetaMatrix.scale(driveRotationalVelocity * dOffsetRobot);
 
-    SimpleMatrix robotRotationMatrix = new SimpleMatrix(2, 2, true, new double[] { Math.cos(driveFieldRotation),
-        -Math.sin(driveFieldRotation), Math.sin(driveFieldRotation), Math.cos(driveFieldRotation) });
+    SimpleMatrix robotRotationMatrix =
+        new SimpleMatrix(
+            2,
+            2,
+            true,
+            new double[] {
+              Math.cos(driveFieldRotation),
+              -Math.sin(driveFieldRotation),
+              Math.sin(driveFieldRotation),
+              Math.cos(driveFieldRotation)
+            });
 
     SimpleMatrix vRotationField = robotRotationMatrix.mult(vRotationRobot);
 
-    SimpleMatrix vShooter = vRotationField
-        .plus(new SimpleMatrix(2, 1, true, driveLinearVelocityX, driveLinearVelocityY));
+    SimpleMatrix vShooter =
+        vRotationField.plus(
+            new SimpleMatrix(2, 1, true, driveLinearVelocityX, driveLinearVelocityY));
 
-    SimpleMatrix adjustedTargetPoseMatrix = new SimpleMatrix(2, 1, true, targetPose.getX(), targetPose.getY())
-        .minus(vShooter.scale(ballTOF));
-    
-    Pose2d adjustedTargetPose = new Pose2d(adjustedTargetPoseMatrix.get(0, 0), adjustedTargetPoseMatrix.get(1, 0),
-        targetPose.getRotation());
+    SimpleMatrix adjustedTargetPoseMatrix =
+        new SimpleMatrix(2, 1, true, targetPose.getX(), targetPose.getY())
+            .minus(vShooter.scale(ballTOF));
+
+    Pose2d adjustedTargetPose =
+        new Pose2d(
+            adjustedTargetPoseMatrix.get(0, 0),
+            adjustedTargetPoseMatrix.get(1, 0),
+            targetPose.getRotation());
 
     // If the hub is the target, rotate the target about the hub by the drive orientation
-    if(Math.round(targetPose.getY()) == Math.round(FieldConstants.FIELD_WIDTH.magnitude()/2))
-    {
-      adjustedTargetPose = adjustedTargetPose.rotateAround(targetPose.getTranslation(), new Rotation2d(driveFieldRotation));
-    }
-    else {
-      adjustedTargetPose = adjustedTargetPose.rotateAround(targetPose.getTranslation(), new Rotation2d(Math.PI - driveFieldRotation));
+    if (Math.round(targetPose.getY()) == Math.round(FieldConstants.FIELD_WIDTH.magnitude() / 2)) {
+      adjustedTargetPose =
+          adjustedTargetPose.rotateAround(
+              targetPose.getTranslation(), new Rotation2d(driveFieldRotation));
+    } else {
+      adjustedTargetPose =
+          adjustedTargetPose.rotateAround(
+              targetPose.getTranslation(), new Rotation2d(Math.PI - driveFieldRotation));
     }
     distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, adjustedTargetPose);
-    distanceToTargetFromTurret = PhotonUtils
-        .getDistanceToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), adjustedTargetPose);
+    distanceToTargetFromTurret =
+        PhotonUtils.getDistanceToPose(
+            robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), adjustedTargetPose);
 
     angleToTarget = PhotonUtils.getYawToPose(robotPose, adjustedTargetPose).getDegrees();
-    angleToTargetFromTurret = PhotonUtils
-        .getYawToPose(robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), adjustedTargetPose).getDegrees();
+    angleToTargetFromTurret =
+        PhotonUtils.getYawToPose(
+                robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), adjustedTargetPose)
+            .getDegrees();
 
     adjustedTargetPosePublisher.set(adjustedTargetPose);
   }
 
-  /**
-  /**
-   * Camera Enum to select each camera
-   */
+  /** /** Camera Enum to select each camera */
   enum Cameras {
-    /**
-     * Left Camera
-     */
-    LEFT_CAM(VisionConstants.FRONTLEFT_CAMERA_NICKNAME,
+    /** Left Camera */
+    LEFT_CAM(
+        VisionConstants.FRONTLEFT_CAMERA_NICKNAME,
         VisionConstants.FRONTLEFT_CAMERA_ROTATION,
         VisionConstants.FRONTLEFT_CAMERA_TRANSLATION,
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-    /**
-     * Right Camera
-     */
-    RIGHT_CAM(VisionConstants.FRONTRIGHT_CAMERA_NICKNAME,
+        VecBuilder.fill(4, 4, 8),
+        VecBuilder.fill(0.5, 0.5, 1)),
+    /** Right Camera */
+    RIGHT_CAM(
+        VisionConstants.FRONTRIGHT_CAMERA_NICKNAME,
         VisionConstants.FRONTRIGHT_CAMERA_ROTATION,
         VisionConstants.FRONTRIGHT_CAMERA_TRANSLATION,
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-    /**
-     * Back Camera
-     */
-    BACK_CAM(VisionConstants.BACK_CAMERA_NICKNAME,
+        VecBuilder.fill(4, 4, 8),
+        VecBuilder.fill(0.5, 0.5, 1)),
+    /** Back Camera */
+    BACK_CAM(
+        VisionConstants.BACK_CAMERA_NICKNAME,
         VisionConstants.BACK_CAMERA_ROTATION,
         VisionConstants.BACK_CAMERA_TRANSLATION,
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
-    /**
-     * flag to ignore the turret cam for positioning
-     */
+        VecBuilder.fill(4, 4, 8),
+        VecBuilder.fill(0.5, 0.5, 1));
+    /** flag to ignore the turret cam for positioning */
     private boolean useForPositioning = true;
 
-    /**
-     * Latency alert to use when high latency is detected.
-     */
+    /** Latency alert to use when high latency is detected. */
     public final Alert latencyAlert;
-    /**
-     * Camera instance for comms.
-     */
+    /** Camera instance for comms. */
     public final PhotonCamera camera;
-    /**
-     * Pose estimator for camera.
-     */
+    /** Pose estimator for camera. */
     public final PhotonPoseEstimator poseEstimator;
-    /**
-     * Standard Deviation for single tag readings for pose estimation.
-     */
+    /** Standard Deviation for single tag readings for pose estimation. */
     private final Matrix<N3, N1> singleTagStdDevs;
-    /**
-     * Standard deviation for multi-tag readings for pose estimation.
-     */
+    /** Standard deviation for multi-tag readings for pose estimation. */
     private final Matrix<N3, N1> multiTagStdDevs;
-    /**
-     * Transform of the camera rotation and translation relative to the center of
-     * the robot
-     */
+    /** Transform of the camera rotation and translation relative to the center of the robot */
     private final Transform3d robotToCamTransform;
-    /**
-     * Current standard deviations used.
-     */
+    /** Current standard deviations used. */
     public Matrix<N3, N1> curStdDevs;
-    /**
-     * Estimated robot pose.
-     */
+    /** Estimated robot pose. */
     public Optional<EstimatedRobotPose> estimatedRobotPose = Optional.empty();
 
-    /**
-     * Simulated camera instance which only exists during simulations.
-     */
+    /** Simulated camera instance which only exists during simulations. */
     public PhotonCameraSim cameraSim;
-    /**
-     * Results list to be updated periodically and cached to avoid unnecessary
-     * queries.
-     */
+    /** Results list to be updated periodically and cached to avoid unnecessary queries. */
     public List<PhotonPipelineResult> resultsList = new ArrayList<>();
-    /**
-     * Last read from the camera timestamp to prevent lag due to slow data fetches.
-     */
+    /** Last read from the camera timestamp to prevent lag due to slow data fetches. */
     private double lastReadTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
 
     /**
-     * Construct a Photon Camera class with help. Standard deviations are fake
-     * values, experiment and determine
-     * estimation noise on an actual robot.
+     * Construct a Photon Camera class with help. Standard deviations are fake values, experiment
+     * and determine estimation noise on an actual robot.
      *
-     * @param name                  Name of the PhotonVision camera found in the PV
-     *                              UI.
-     * @param robotToCamRotation    {@link Rotation3d} of the camera.
-     * @param robotToCamTranslation {@link Translation3d} relative to the center of
-     *                              the robot.
-     * @param singleTagStdDevs      Single AprilTag standard deviations of estimated
-     *                              poses from the camera.
-     * @param multiTagStdDevsMatrix Multi AprilTag standard deviations of estimated
-     *                              poses from the camera.
+     * @param name Name of the PhotonVision camera found in the PV UI.
+     * @param robotToCamRotation {@link Rotation3d} of the camera.
+     * @param robotToCamTranslation {@link Translation3d} relative to the center of the robot.
+     * @param singleTagStdDevs Single AprilTag standard deviations of estimated poses from the
+     *     camera.
+     * @param multiTagStdDevsMatrix Multi AprilTag standard deviations of estimated poses from the
+     *     camera.
      */
-    Cameras(String name, Rotation3d robotToCamRotation, Translation3d robotToCamTranslation,
-        Matrix<N3, N1> singleTagStdDevs, Matrix<N3, N1> multiTagStdDevsMatrix) {
-      latencyAlert = new Alert("'" + name + "' Camera is experiencing high latency.", AlertType.kWarning);
+    Cameras(
+        String name,
+        Rotation3d robotToCamRotation,
+        Translation3d robotToCamTranslation,
+        Matrix<N3, N1> singleTagStdDevs,
+        Matrix<N3, N1> multiTagStdDevsMatrix) {
+      latencyAlert =
+          new Alert("'" + name + "' Camera is experiencing high latency.", AlertType.kWarning);
 
       camera = new PhotonCamera(name);
 
       // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
       robotToCamTransform = new Transform3d(robotToCamTranslation, robotToCamRotation);
 
-      poseEstimator = new PhotonPoseEstimator(VisionSystem.fieldLayout,
-          PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-          robotToCamTransform);
+      poseEstimator =
+          new PhotonPoseEstimator(
+              VisionSystem.fieldLayout,
+              PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+              robotToCamTransform);
       poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
       this.singleTagStdDevs = singleTagStdDevs;
@@ -556,13 +559,11 @@ public class VisionSystem extends SubsystemBase {
     }
 
     /**
-     * Get the result with the least ambiguity from the best tracked target within
-     * the Cache. This may not be the most
-     * recent result!
+     * Get the result with the least ambiguity from the best tracked target within the Cache. This
+     * may not be the most recent result!
      *
      * @return The result in the cache with the least ambiguous best tracked target.
-     *        
-     *         This is not the most recent result!
+     *     <p>This is not the most recent result!
      */
     public Optional<PhotonPipelineResult> getBestResult() {
       if (resultsList.isEmpty()) {
@@ -585,16 +586,14 @@ public class VisionSystem extends SubsystemBase {
     /**
      * Get the latest result from the current cache.
      *
-     * @return Empty optional if nothing is found. Latest result if something is
-     *         there.
+     * @return Empty optional if nothing is found. Latest result if something is there.
      */
     public Optional<PhotonPipelineResult> getLatestResult() {
       return resultsList.isEmpty() ? Optional.empty() : Optional.of(resultsList.get(0));
     }
 
     /**
-     * Get the estimated robot pose. Updates the current
-     * robot pose estimation standard deviations
+     * Get the estimated robot pose. Updates the current robot pose estimation standard deviations
      * and flushes the cache of results.
      *
      * @return Estimated pose.
@@ -605,11 +604,12 @@ public class VisionSystem extends SubsystemBase {
     }
 
     /**
-     * Update the latest results, cached with a maximum refresh rate of 1req/15ms.
-     * Sorts the list by timestamp.
+     * Update the latest results, cached with a maximum refresh rate of 1req/15ms. Sorts the list by
+     * timestamp.
      */
     private void updateUnreadResults() {
-      double mostRecentTimestamp = resultsList.isEmpty() ? 0.0 : resultsList.get(0).getTimestampSeconds();
+      double mostRecentTimestamp =
+          resultsList.isEmpty() ? 0.0 : resultsList.get(0).getTimestampSeconds();
       double currentTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
       double debounceTime = Milliseconds.of(15).in(Seconds);
       for (PhotonPipelineResult result : resultsList) {
@@ -618,30 +618,29 @@ public class VisionSystem extends SubsystemBase {
 
       // resultsList = Robot.isReal() ? camera.getAllUnreadResults() :
       // cameraSim.getCamera().getAllUnreadResults();
-      resultsList = Robot.isReal() ? camera.getAllUnreadResults() : new ArrayList<PhotonPipelineResult>(); // ß
+      resultsList =
+          Robot.isReal()
+              ? camera.getAllUnreadResults()
+              : new ArrayList<PhotonPipelineResult>(); // ß
       lastReadTimestamp = currentTimestamp;
-      resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
-        return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
-      });
+      resultsList.sort(
+          (PhotonPipelineResult a, PhotonPipelineResult b) -> {
+            return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
+          });
       if (!resultsList.isEmpty()) {
         updateEstimatedGlobalPose();
       }
-
     }
 
     /**
-     * The latest estimated robot pose on the field from vision data. This may be
-     * empty. This should only be called once
-     * per loop.
+     * The latest estimated robot pose on the field from vision data. This may be empty. This should
+     * only be called once per loop.
      *
-     * <p>
-     * Also includes updates for the standard deviations, which can (optionally) be
-     * retrieved with
-     * {@link Cameras#updateEstimationStdDevs}
+     * <p>Also includes updates for the standard deviations, which can (optionally) be retrieved
+     * with {@link Cameras#updateEstimationStdDevs}
      *
-     * @return An {@link EstimatedRobotPose} with an estimated pose, estimate
-     *         timestamp, and targets used for
-     *         estimation.
+     * @return An {@link EstimatedRobotPose} with an estimated pose, estimate timestamp, and targets
+     *     used for estimation.
      */
     private void updateEstimatedGlobalPose() {
       Optional<EstimatedRobotPose> visionEst = Optional.empty();
@@ -653,12 +652,11 @@ public class VisionSystem extends SubsystemBase {
     }
 
     /**
-     * Calculates new standard deviations. This algorithm is 
-     * a heuristic that creates dynamic standard deviations based
-     * on number of tags, estimation strategy, and distance from the tags.
+     * Calculates new standard deviations. This algorithm is a heuristic that creates dynamic
+     * standard deviations based on number of tags, estimation strategy, and distance from the tags.
      *
      * @param estimatedPose The estimated pose to guess standard deviations for.
-     * @param targets       All targets in this camera frame
+     * @param targets All targets in this camera frame
      */
     private void updateEstimationStdDevs(
         Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
@@ -680,11 +678,12 @@ public class VisionSystem extends SubsystemBase {
             continue;
           }
           numTags++;
-          avgDist += tagPose
-              .get()
-              .toPose2d()
-              .getTranslation()
-              .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+          avgDist +=
+              tagPose
+                  .get()
+                  .toPose2d()
+                  .getTranslation()
+                  .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
         }
 
         if (numTags == 0) {
@@ -707,7 +706,6 @@ public class VisionSystem extends SubsystemBase {
         }
       }
     }
-
   }
 
   @Override

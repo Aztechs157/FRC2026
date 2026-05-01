@@ -4,10 +4,9 @@
 
 package org.team157.robot.subsystems.intake;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
 
@@ -20,7 +19,7 @@ public class Intake extends SubsystemBase {
 
   /**
    * Specifies the IO implementation to be used for the hood.
-   * 
+   *
    * @param io An implementation of the Hood's IO layer, i.e. HoodIOTalonFX
    */
   public void setIO(IntakeIO io) {
@@ -28,9 +27,8 @@ public class Intake extends SubsystemBase {
   }
 
   /**
-   * Sets the default command of the hood, stopping motor output when no other
-   * commands are running.
-   * 
+   * Sets the default command of the hood, stopping motor output when no other commands are running.
+   *
    * @return Command setting the duty cycle output of the hood's motor to 0
    */
   public Command getDefault() {
@@ -38,9 +36,8 @@ public class Intake extends SubsystemBase {
   }
 
   /**
-   * Set the duty cycle output of the intake motor.
-   * Primarily used for manual control
-   * 
+   * Set the duty cycle output of the intake motor. Primarily used for manual control
+   *
    * @param dutycycle The power to be applied to the motor.
    */
   public Command set(double dutycycle) {
@@ -48,9 +45,8 @@ public class Intake extends SubsystemBase {
   }
 
   /**
-   * Run the intake at a set speed.
-   * Used for autonomous and button bindings.
-   * 
+   * Run the intake at a set speed. Used for autonomous and button bindings.
+   *
    * @return a {@link Command} running the intake motors at 100% duty cycle
    */
   public Command runIntake() {
@@ -70,5 +66,4 @@ public class Intake extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
     io.simIterate();
   }
-
 }

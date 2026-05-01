@@ -1,27 +1,25 @@
 package org.team157.robot.subsystems.hopper;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 /**
- * Represents the Hopper subsystem, which feeds balls 
- * from the intake into the uptake for shooting.
+ * Represents the Hopper subsystem, which feeds balls from the intake into the uptake for shooting.
  */
 public class Hopper extends SubsystemBase {
-  
+
   // The IO interface for interacting with the hopper's motor.
   private HopperIO io;
 
   // Inputs from the motor and mechanism, to be updated periodically and logged.
   private final HopperIOInputsAutoLogged inputs = new HopperIOInputsAutoLogged();
-  
-    /** Creates a new Hopper. */
-    public Hopper() {}
+
+  /** Creates a new Hopper. */
+  public Hopper() {}
   /**
    * Specifies the IO implementation to be used for the hopper.
-   * 
+   *
    * @param io An implementation of the Hopper's IO layer, i.e. HopperIOTalonFX
    */
   public void setIO(HopperIO io) {
@@ -29,9 +27,9 @@ public class Hopper extends SubsystemBase {
   }
 
   /**
-   * Sets the default command of the hopper, stopping 
-   * motor output when no other commands are running.
-   * 
+   * Sets the default command of the hopper, stopping motor output when no other commands are
+   * running.
+   *
    * @return Command setting the duty cycle of the hopper's motor to 0
    */
   public Command getDefault() {
@@ -39,9 +37,8 @@ public class Hopper extends SubsystemBase {
   }
 
   /**
-   * Set the duty cycle output of the intake motor.
-   * Primarily used for manual control
-   * 
+   * Set the duty cycle output of the intake motor. Primarily used for manual control
+   *
    * @param dutycycle The power to be applied to the motor.
    */
   public Command set(double dutycycle) {
@@ -61,5 +58,4 @@ public class Hopper extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
     io.simIterate();
   }
-
 }

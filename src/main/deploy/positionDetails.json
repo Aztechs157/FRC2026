@@ -1,86 +1,86 @@
 {
+  "blue": {
+    "hub": {
+      "x": 4.6238,
+      "y": 4.040981,
+      "z": 1.439863
+    },
+    "passingZoneHigh": {
+      "x": 2.0838,
+      "y": 5.580981,
+      "z": 0.0
+    },
+    "passingZoneLow": {
+      "x": 2.0838,
+      "y": 2.500981,
+      "z": 0.0
+    }
+  },
+  "red": {
+    "hub": {
+      "x": 11.9126,
+      "y": 4.040981,
+      "z": 1.439863
+    },
+    "passingZoneLow": {
+      "x": 14.4526,
+      "y": 2.500981,
+      "z": 0.0
+    },
+    "passingZoneHigh": {
+      "x": 14.4526,
+      "y": 5.580981,
+      "z": 0.0
+    }
+  },
+  "zones": {
     "blue": {
-        "hub": {
-            "x": 4.6238,
-            "y": 4.040981,
-            "z": 1.439863
-        },
-        "passingZoneHigh": {
-            "x": 2.0838,
-            "y": 5.580981,
-            "z": 0.0
-        },
-        "passingZoneLow": {
-            "x": 2.0838,
-            "y": 2.500981,
-            "z": 0.0
-        }
+      "xMin": 0,
+      "yMin": 0,
+      "xMax": 4.0269,
+      "yMax": 7.98703
     },
     "red": {
-        "hub": {
-            "x": 11.9126,
-            "y": 4.040981,
-            "z": 1.439863
-        },
-        "passingZoneLow": {
-            "x": 14.4526,
-            "y": 2.500981,
-            "z": 0.0
-        },
-        "passingZoneHigh": {
-            "x": 14.4526,
-            "y": 5.580981,
-            "z": 0.0
-        }
+      "xMin": 12.5105,
+      "yMin": 0,
+      "xMax": 16.4894,
+      "yMax": 7.98703
     },
-    "zones": {
-        "blue": {
-            "xMin": 0,
-            "yMin": 0,
-            "xMax": 4.0269,
-            "yMax": 7.98703
-        },
-        "red": {
-            "xMin": 12.5105,
-            "yMin": 0,
-            "xMax": 16.4894,
-            "yMax": 7.98703
-        },
-        "neutralLow": {
-            "xMin": 0,
-            "yMin": 0,
-            "xMax": 16.535400,
-            "yMax": 4.040981
-        },
-        "neutralHigh": {
-            "xMin": 0,
-            "yMin": 4.040981,
-            "xMax": 16.535400,
-            "yMax": 7.98703
-        },
-        "blueTrenchLow": {
-            "xMin": 2.5259,
-            "yMin": -10,
-            "xMax": 6.7197,
-            "yMax": 1.589881
-        },
-        "blueTrenchHigh": {
-            "xMin": 2.5259,
-            "yMin": 6.492081,
-            "xMax": 6.7197,
-            "yMax": 18.096644
-        },
-        "redTrenchLow": {
-            "xMin": 9.815700,
-            "yMin": -10,
-            "xMax": 14.004738,
-            "yMax": 1.589881
-        },
-        "redTrenchHigh": {
-            "xMin": 9.815700,
-            "yMin": 6.492081,
-            "xMax": 14.004738,
-            "yMax": 18.096644
-        }
+    "neutralLow": {
+      "xMin": 0,
+      "yMin": 0,
+      "xMax": 16.535400,
+      "yMax": 4.040981
+    },
+    "neutralHigh": {
+      "xMin": 0,
+      "yMin": 4.040981,
+      "xMax": 16.535400,
+      "yMax": 7.98703
+    },
+    "blueTrenchLow": {
+      "xMin": 2.5259,
+      "yMin": -10,
+      "xMax": 6.7197,
+      "yMax": 1.589881
+    },
+    "blueTrenchHigh": {
+      "xMin": 2.5259,
+      "yMin": 6.492081,
+      "xMax": 6.7197,
+      "yMax": 18.096644
+    },
+    "redTrenchLow": {
+      "xMin": 9.815700,
+      "yMin": -10,
+      "xMax": 14.004738,
+      "yMax": 1.589881
+    },
+    "redTrenchHigh": {
+      "xMin": 9.815700,
+      "yMin": 6.492081,
+      "xMax": 14.004738,
+      "yMax": 18.096644
     }
+  }
 }
