@@ -16,11 +16,11 @@
     },
     {
       "anchor": {
-        "x": 0.6,
+        "x": 0.77,
         "y": 0.67
       },
       "prevControl": {
-        "x": 0.85,
+        "x": 1.02,
         "y": 0.67
       },
       "nextControl": null,
@@ -45,7 +45,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "ToHP",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

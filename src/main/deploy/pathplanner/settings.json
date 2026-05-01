@@ -1,11 +1,21 @@
 {
-  "robotWidth": 0.762,
-  "robotLength": 0.762,
+  "robotWidth": 0.851,
+  "robotLength": 0.838,
   "holonomicMode": true,
-  "pathFolders": [],
-  "autoFolders": [],
-  "defaultMaxVel": 3.0,
-  "defaultMaxAccel": 3.0,
+  "pathFolders": [
+    "Neutral Zone",
+    "Depot",
+    "Preloads",
+    "ToHP"
+  ],
+  "autoFolders": [
+    "Depot",
+    "Neutral Zone",
+    "Human Player",
+    "Preloads"
+  ],
+  "defaultMaxVel": 4.0,
+  "defaultMaxAccel": 4.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "defaultNominalVoltage": 12.0,
@@ -28,5 +38,7 @@
   "brModuleY": -0.273,
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
-  "robotFeatures": []
+  "robotFeatures": [
+    "{\"name\":\"Rectangle\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.5335,\"y\":0.0},\"size\":{\"width\":0.67,\"length\":0.229},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":false}}"
+  ]
 }
