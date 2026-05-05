@@ -25,8 +25,8 @@ public final class FlywheelConstants {
   // IDs of both motors powering the flywheel.
   public static final int MOTOR_ID = 22, FOLLOWER_MOTOR_ID = 23;
   // Closed-loop control values for the flywheel.
-  public static final double KP = 2, KI = 0, KD = 0;
-  public static final double KS = 0.0, KV = 0.0, KA = 0.0;
+  public static final double KP = 3.57, KI = 0, KD = 0;
+  public static final double KS = 0.0, KV = 0.37, KA = 0.27;
   public static final double SIM_KP = 1.57, SIM_KI = 0, SIM_KD = 0.157;
   public static final double SIM_KS = 0.0,
       SIM_KV = 0.37,
@@ -34,7 +34,7 @@ public final class FlywheelConstants {
   // SysID to verify these values.
   public static final AngularVelocity ANGULAR_VELOCITY = RPM.of(5800);
   public static final AngularAcceleration ANGULAR_ACCELERATION =
-      RotationsPerSecondPerSecond.of(11600);
+      RotationsPerSecondPerSecond.of(5800);
   // Gear ratio between the motor and the flywheel.
   public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("17:17"));
   // Diameter of the flywheel, in meters.
