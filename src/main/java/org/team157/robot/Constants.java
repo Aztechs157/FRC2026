@@ -69,30 +69,30 @@ public final class Constants {
     public static final double JOYSTICK_DEADBAND = 0.05;
   }
 
-  public static class VisionConstants {
-    public static final String FRONTLEFT_CAMERA_NICKNAME = "frontLeftCam";
-    public static final Rotation3d FRONTLEFT_CAMERA_ROTATION =
-        new Rotation3d(0, 0, Math.toRadians(65));
-    public static final Translation3d FRONTLEFT_CAMERA_TRANSLATION =
-        new Translation3d(-0.127, 0.3302, 0.3556);
-    public static final Transform3d FRONTLEFT_CAMERA_PLACEMENT =
-        new Transform3d(FRONTLEFT_CAMERA_TRANSLATION, FRONTLEFT_CAMERA_ROTATION);
+//   public static class VisionConstants {
+//     public static final String FRONTLEFT_CAMERA_NICKNAME = "frontLeftCam";
+//     public static final Rotation3d FRONTLEFT_CAMERA_ROTATION =
+//         new Rotation3d(0, 0, Math.toRadians(65));
+//     public static final Translation3d FRONTLEFT_CAMERA_TRANSLATION =
+//         new Translation3d(-0.127, 0.3302, 0.3556);
+//     public static final Transform3d FRONTLEFT_CAMERA_PLACEMENT =
+//         new Transform3d(FRONTLEFT_CAMERA_TRANSLATION, FRONTLEFT_CAMERA_ROTATION);
 
-    public static final String FRONTRIGHT_CAMERA_NICKNAME = "frontRightCam";
-    public static final Rotation3d FRONTRIGHT_CAMERA_ROTATION =
-        new Rotation3d(0, 0, Math.toRadians(-65));
-    public static final Translation3d FRONTRIGHT_CAMERA_TRANSLATION =
-        new Translation3d(-0.127, -0.3302, 0.3556);
-    public static final Transform3d FRONTRIGHT_CAMERA_PLACEMENT =
-        new Transform3d(FRONTRIGHT_CAMERA_TRANSLATION, FRONTRIGHT_CAMERA_ROTATION);
+//     public static final String FRONTRIGHT_CAMERA_NICKNAME = "frontRightCam";
+//     public static final Rotation3d FRONTRIGHT_CAMERA_ROTATION =
+//         new Rotation3d(0, 0, Math.toRadians(-65));
+//     public static final Translation3d FRONTRIGHT_CAMERA_TRANSLATION =
+//         new Translation3d(-0.127, -0.3302, 0.3556);
+//     public static final Transform3d FRONTRIGHT_CAMERA_PLACEMENT =
+//         new Transform3d(FRONTRIGHT_CAMERA_TRANSLATION, FRONTRIGHT_CAMERA_ROTATION);
 
-    public static final String BACK_CAMERA_NICKNAME = "backCam";
-    public static final Rotation3d BACK_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(180));
-    public static final Translation3d BACK_CAMERA_TRANSLATION =
-        new Translation3d(-0.32326, 0, 0.3556);
-    public static final Transform3d BACK_CAMERA_PLACEMENT =
-        new Transform3d(BACK_CAMERA_TRANSLATION, BACK_CAMERA_ROTATION);
-  }
+//     public static final String BACK_CAMERA_NICKNAME = "backCam";
+//     public static final Rotation3d BACK_CAMERA_ROTATION = new Rotation3d(0, 0, Math.toRadians(180));
+//     public static final Translation3d BACK_CAMERA_TRANSLATION =
+//         new Translation3d(-0.32326, 0, 0.3556);
+//     public static final Transform3d BACK_CAMERA_PLACEMENT =
+//         new Transform3d(BACK_CAMERA_TRANSLATION, BACK_CAMERA_ROTATION);
+//   }
 
   public static class TelemetryConstants {
     public static final TelemetryVerbosity TELEMETRY_VERBOSITY = TelemetryVerbosity.LOW;
