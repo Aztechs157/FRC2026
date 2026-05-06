@@ -13,7 +13,6 @@ import org.littletonrobotics.junction.Logger;
 import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Robot;
 import org.team157.robot.subsystems.vision.Vision;
-import org.team157.robot.subsystems.vision.VisionSystem;
 
 /**
  * Represents the Turret subsystem, which rotates horizontally to aim the hood and flywheel at a
@@ -104,7 +103,7 @@ public class Turret extends SubsystemBase {
   public void updateRelativeAngleToTarget(Pose2d targetPose, Pose2d robotPose) {
     vision.setTargetParams(targetPose, robotPose);
     double turretToRobotAngleOffset =
-        VisionSystem.angleToTargetFromTurret + TurretConstants.TURRET_ANGLE_OFFSET;
+        Vision.angleToTargetFromTurret + TurretConstants.TURRET_ANGLE_OFFSET;
     if (Robot.isReal()) {
       if (turretToRobotAngleOffset > 180) {
         turretToRobotAngleOffset -= 360;
@@ -115,7 +114,7 @@ public class Turret extends SubsystemBase {
       trackingAngle = Degrees.of(turretToRobotAngleOffset);
     } else {
       // Disable turret offset in simulation, as simulated 0 is forward.
-      trackingAngle = Degrees.of(VisionSystem.angleToTargetFromTurret);
+      trackingAngle = Degrees.of(Vision.angleToTargetFromTurret);
     }
   }
 

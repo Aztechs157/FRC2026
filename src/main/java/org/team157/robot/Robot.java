@@ -140,16 +140,11 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {
-    m_robotContainer.visionSystem.updatePoseEstimation(RobotContainer.drive);
-  }
+  public void disabledInit() {}
 
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    m_robotContainer.visionSystem.resetPoseEstimation(RobotContainer.drive);
-    m_robotContainer.visionSystem.updatePoseEstimation(RobotContainer.drive);
-
     newAlliance = DriverStation.getAlliance();
     newAutoName = m_robotContainer.getAutonomousCommand().getName();
     if (autoName != newAutoName || alliance != newAlliance) {

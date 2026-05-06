@@ -49,7 +49,6 @@ import org.team157.robot.subsystems.vision.VisionConstants;
 import org.team157.robot.subsystems.vision.VisionIO;
 import org.team157.robot.subsystems.vision.VisionIOPhotonVision;
 import org.team157.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import org.team157.robot.subsystems.vision.VisionSystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -68,7 +67,7 @@ public class RobotContainer {
   private final Vision vision;
   public static Drive drive;
   public final Turret turret = new Turret();
-//   public final VisionSystem visionSystem;
+  //   public final VisionSystem visionSystem;
   public static final Flywheel flywheel = new Flywheel();
   public final Hood hood = new Hood();
   public final Intake intake = new Intake();
@@ -91,62 +90,68 @@ public class RobotContainer {
   public RobotContainer() {
 
     switch (Constants.currentMode) {
-        case REAL:
-            // Real robot, instantiate hardware IO implementations
-            // ModuleIOTalonFX is intended for modules with
-            // TalonFX drive, TalonFX turn, and a CANcoder
-            drive =
-                new Drive(
-                    new GyroIOPigeon2(),
-                    new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                    new ModuleIOTalonFX(TunerConstants.FrontRight),
-                    new ModuleIOTalonFX(TunerConstants.BackLeft),
-                    new ModuleIOTalonFX(TunerConstants.BackRight));
-            vision =
-                new Vision(
-                    drive::addVisionMeasurement,
-                    new VisionIOPhotonVision(VisionConstants.camera0Name, VisionConstants.robotToCamera0),
-                    new VisionIOPhotonVision(VisionConstants.camera1Name, VisionConstants.robotToCamera1),
-                    new VisionIOPhotonVision(VisionConstants.camera2Name, VisionConstants.robotToCamera2));
-            break;
+      case REAL:
+        // Real robot, instantiate hardware IO implementations
+        // ModuleIOTalonFX is intended for modules with
+        // TalonFX drive, TalonFX turn, and a CANcoder
+        drive =
+            new Drive(
+                new GyroIOPigeon2(),
+                new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                new ModuleIOTalonFX(TunerConstants.FrontRight),
+                new ModuleIOTalonFX(TunerConstants.BackLeft),
+                new ModuleIOTalonFX(TunerConstants.BackRight));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVision(
+                    VisionConstants.camera0Name, VisionConstants.robotToCamera0),
+                new VisionIOPhotonVision(
+                    VisionConstants.camera1Name, VisionConstants.robotToCamera1),
+                new VisionIOPhotonVision(
+                    VisionConstants.camera2Name, VisionConstants.robotToCamera2));
+        break;
 
-        case SIM:
-            // Sim robot, instantiate physics sim IO implementations
-            drive =
-                new Drive(
-                    new GyroIO() {},
-                    new ModuleIOSim(TunerConstants.FrontLeft),
-                    new ModuleIOSim(TunerConstants.FrontRight),
-                    new ModuleIOSim(TunerConstants.BackLeft),
-                    new ModuleIOSim(TunerConstants.BackRight));
-            vision =
-                new Vision(
-                    drive::addVisionMeasurement,
-                    new VisionIOPhotonVisionSim(VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
-                    new VisionIOPhotonVisionSim(VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose),
-                    new VisionIOPhotonVisionSim(VisionConstants.camera2Name, VisionConstants.robotToCamera2, drive::getPose));
-            break;
+      case SIM:
+        // Sim robot, instantiate physics sim IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIOSim(TunerConstants.FrontLeft),
+                new ModuleIOSim(TunerConstants.FrontRight),
+                new ModuleIOSim(TunerConstants.BackLeft),
+                new ModuleIOSim(TunerConstants.BackRight));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.camera2Name, VisionConstants.robotToCamera2, drive::getPose));
+        break;
 
-        default:
-            // Replayed robot, disable IO implementations
-            drive =
-                new Drive(
-                    new GyroIO() {},
-                    new ModuleIO() {},
-                    new ModuleIO() {},
-                    new ModuleIO() {},
-                    new ModuleIO() {});
-            vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-            break;
+      default:
+        // Replayed robot, disable IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        break;
     }
 
     // Adjusts drive speed based on if the robot is in rookie/demo mode.
-        if (ModifierConstants.DEMO_MODE) {
-            MaxSpeed = MaxSpeed * ModifierConstants.DEMO_DRIVE_MODIFIER;
-            MaxAngularRate = MaxAngularRate * ModifierConstants.DEMO_DRIVE_MODIFIER;
-        } else if (ModifierConstants.ROOKIE_MODE) {
-            MaxSpeed = MaxSpeed * ModifierConstants.ROOKIE_DRIVE_MODIFIER;
-        }
+    if (ModifierConstants.DEMO_MODE) {
+      MaxSpeed = MaxSpeed * ModifierConstants.DEMO_DRIVE_MODIFIER;
+      MaxAngularRate = MaxAngularRate * ModifierConstants.DEMO_DRIVE_MODIFIER;
+    } else if (ModifierConstants.ROOKIE_MODE) {
+      MaxSpeed = MaxSpeed * ModifierConstants.ROOKIE_DRIVE_MODIFIER;
+    }
 
     // Specify the IO implementation to be used for each subsystem
     intake.setIO(new IntakeIOTalonFX(intake));

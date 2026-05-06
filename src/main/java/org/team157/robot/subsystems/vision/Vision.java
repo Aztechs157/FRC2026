@@ -24,8 +24,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Supplier;
-
 import org.ejml.simple.SimpleMatrix;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonUtils;
@@ -44,23 +42,20 @@ public class Vision extends SubsystemBase {
 
   private boolean isBlueAlliance = true;
 
-    public double angleToTarget = 0;
+  public double angleToTarget = 0;
   public double distanceToTarget = 0;
   public static double distanceToTargetFromTurret = 0;
   public static double angleToTargetFromTurret = 0;
-
 
   private double driveLinearVelocityX;
   private double driveLinearVelocityY;
   private double driveRotationalVelocity;
   private double driveFieldRotation;
   private double ballTOF;
-  private Supplier<Pose2d> currentPose;
 
-  public Vision(Supplier<Pose2d> currentPose, VisionConsumer consumer, VisionIO... io) {
+  public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
     this.io = io;
-    this.currentPose = currentPose;
 
     // Initialize inputs
     this.inputs = new VisionIOInputsAutoLogged[io.length];
@@ -86,7 +81,7 @@ public class Vision extends SubsystemBase {
     return inputs[cameraIndex].latestTargetObservation.tx();
   }
 
-    public Command setDefault(Drive drivetrain, Turret turret) {
+  public Command setDefault(Drive drivetrain, Turret turret) {
     return run(
         () -> {
           turret.updateRelativeAngleToTarget(
@@ -97,6 +92,7 @@ public class Vision extends SubsystemBase {
           driveRotationalVelocity = drivetrain.getChassisSpeeds().omegaRadiansPerSecond;
           driveFieldRotation = drivetrain.getPose().getRotation().getRadians();
           ballTOF = Flywheel.getBallTimeOfFlight();
+          Logger.recordOutput("Target Pose", getDesiredPose(drivetrain.getPose()));
         });
   }
 
@@ -106,8 +102,8 @@ public class Vision extends SubsystemBase {
    *
    * @return the target point on the field the turret should be aiming at, as a Pose2d.
    */
-  public Pose2d getDesiredPose() {
-    return FieldConstants.positionDetails.getTargetPose2d(currentPose.get(), isBlueAlliance);
+  public Pose2d getDesiredPose(Pose2d robotPose) {
+    return FieldConstants.positionDetails.getTargetPose2d(robotPose, isBlueAlliance);
   }
 
   public void updateAlliance() {
@@ -117,7 +113,7 @@ public class Vision extends SubsystemBase {
     SmartDashboard.putBoolean("Is Blue Alliance", isBlueAlliance);
   }
 
-    /**
+  /**
    * Calculate the angle and distance to a certain target from the robot's pose.
    *
    * @param targetPose the target Pose2d to calculate angle/distance to
@@ -198,6 +194,7 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
+    updateAlliance();
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
       Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
