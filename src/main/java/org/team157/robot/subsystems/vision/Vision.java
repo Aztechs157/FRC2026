@@ -92,7 +92,7 @@ public class Vision extends SubsystemBase {
           driveRotationalVelocity = drivetrain.getChassisSpeeds().omegaRadiansPerSecond;
           driveFieldRotation = drivetrain.getPose().getRotation().getRadians();
           ballTOF = Flywheel.getBallTimeOfFlight();
-          Logger.recordOutput("Target Pose", getDesiredPose(drivetrain.getPose()));
+          Logger.recordOutput("Targeting/Target Pose", getDesiredPose(drivetrain.getPose()));
         });
   }
 
@@ -185,11 +185,11 @@ public class Vision extends SubsystemBase {
                 robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET), adjustedTargetPose)
             .getDegrees();
 
-    Logger.recordOutput("Adjusted Target Pose", adjustedTargetPose);
-    Logger.recordOutput("Distance to Target", distanceToTarget);
-    Logger.recordOutput("Angle to Target", angleToTarget);
-    Logger.recordOutput("Distance to Target from Turret", distanceToTargetFromTurret);
-    Logger.recordOutput("Angle to Target from Turret", angleToTargetFromTurret);
+    Logger.recordOutput("Targeting/Adjusted Target Pose", adjustedTargetPose);
+    Logger.recordOutput("Targeting/Distance to Target", distanceToTarget);
+    Logger.recordOutput("Targeting/Angle to Target", angleToTarget);
+    Logger.recordOutput("Targeting/Distance to Target from Turret", distanceToTargetFromTurret);
+    Logger.recordOutput("Targeting/Angle to Target from Turret", angleToTargetFromTurret);
   }
 
   @Override

@@ -128,13 +128,12 @@ public class Robot extends LoggedRobot {
           // hopper walls
           m_robotContainer.slapdown.getHopperWallsPose()
         });
-    Logger.recordOutput("Manual Override", RobotContainer.manualOverride);
+    Logger.recordOutput("Misc/Manual Override Active?", RobotContainer.manualOverride);
     // Gets the match time from the FMS to display for the driver.
-    Logger.recordOutput("Match Time", Timer.getMatchTime());
+    Logger.recordOutput("Misc/Match Time", Timer.getMatchTime());
     // Gets hub activity status to display on the dashboard.
-    Logger.recordOutput("Hub Active?", m_robotContainer.isHubActive());
-    Logger.recordOutput("Under Trench?", RobotContainer.drive.isUnderTrench());
-    Logger.recordOutput("Robot Field Pose", RobotContainer.drive.getPose());
+    Logger.recordOutput("Misc/Hub Active?", m_robotContainer.isHubActive());
+    Logger.recordOutput("Misc/Under Trench?", RobotContainer.drive.isUnderTrench());
     m_field.setRobotPose(RobotContainer.drive.getPose());
   }
 
