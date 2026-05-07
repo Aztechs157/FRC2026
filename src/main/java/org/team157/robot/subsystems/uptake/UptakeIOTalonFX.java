@@ -24,58 +24,60 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class UptakeIOTalonFX implements UptakeIO {
 
-  private final FlyWheel uptake;
-  private final SmartMotorController motor;
+    private final FlyWheel uptake;
+    private final SmartMotorController motor;
 
-  public UptakeIOTalonFX(SubsystemBase subsystem) {
-    TalonFX talonfx = new TalonFX(UptakeConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
-    TalonFX followerTalonfx = new TalonFX(UptakeConstants.FOLLOWER_MOTOR_ID, Constants.RIO_CAN_BUS);
+    public UptakeIOTalonFX(SubsystemBase subsystem) {
+        TalonFX talonfx = new TalonFX(UptakeConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
+        TalonFX followerTalonfx =
+                new TalonFX(UptakeConstants.FOLLOWER_MOTOR_ID, Constants.RIO_CAN_BUS);
 
-    SmartMotorControllerConfig uptakeRollerMotorConfig =
-        new SmartMotorControllerConfig(subsystem)
-            .withControlMode(ControlMode.OPEN_LOOP)
-            .withTelemetry("UptakeRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
-            .withMotorInverted(true)
-            .withIdleMode(MotorMode.COAST)
-            .withStatorCurrentLimit(UptakeConstants.CURRENT_LIMIT)
-            .withGearing(UptakeConstants.GEARING)
-            .withFollowers(Pair.of(followerTalonfx, false));
+        SmartMotorControllerConfig uptakeRollerMotorConfig =
+                new SmartMotorControllerConfig(subsystem)
+                        .withControlMode(ControlMode.OPEN_LOOP)
+                        .withTelemetry("UptakeRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
+                        .withMotorInverted(true)
+                        .withIdleMode(MotorMode.COAST)
+                        .withStatorCurrentLimit(UptakeConstants.CURRENT_LIMIT)
+                        .withGearing(UptakeConstants.GEARING)
+                        .withFollowers(Pair.of(followerTalonfx, false));
 
-    SmartMotorController smartRollerMotor =
-        new TalonFXWrapper(talonfx, DCMotor.getKrakenX44(1), uptakeRollerMotorConfig);
+        SmartMotorController smartRollerMotor =
+                new TalonFXWrapper(talonfx, DCMotor.getKrakenX44(1), uptakeRollerMotorConfig);
 
-    FlyWheelConfig uptakeRollerConfig =
-        new FlyWheelConfig(smartRollerMotor)
-            .withTelemetry("Uptake", TelemetryConstants.TELEMETRY_VERBOSITY)
-            .withMass(Kilograms.of(0.5))
-            .withDiameter(Inches.of(2));
+        FlyWheelConfig uptakeRollerConfig =
+                new FlyWheelConfig(smartRollerMotor)
+                        .withTelemetry("Uptake", TelemetryConstants.TELEMETRY_VERBOSITY)
+                        .withMass(Kilograms.of(0.5))
+                        .withDiameter(Inches.of(2));
 
-    this.uptake = new FlyWheel(uptakeRollerConfig);
-    this.motor = uptake.getMotor();
-  }
+        this.uptake = new FlyWheel(uptakeRollerConfig);
+        this.motor = uptake.getMotor();
+    }
 
-  @Override
-  public void updateInputs(UptakeIOInputs inputs) {
-    inputs.supplyCurrentAmps = motor.getSupplyCurrent().map(c -> c.in(Amps)).orElse(0.0);
-    inputs.statorCurrentAmps = motor.getStatorCurrent().in(Amps);
-    inputs.appliedVolts = motor.getVoltage().in(Volts);
-    inputs.temperatureCelsius = motor.getTemperature().in(Celsius);
-    inputs.mechanismVelocityDegreesPerSecond = motor.getMechanismVelocity().in(DegreesPerSecond);
-    inputs.uptakeRunning = uptake.gte(DegreesPerSecond.of(5)).getAsBoolean();
-  }
+    @Override
+    public void updateInputs(UptakeIOInputs inputs) {
+        inputs.supplyCurrentAmps = motor.getSupplyCurrent().map(c -> c.in(Amps)).orElse(0.0);
+        inputs.statorCurrentAmps = motor.getStatorCurrent().in(Amps);
+        inputs.appliedVolts = motor.getVoltage().in(Volts);
+        inputs.temperatureCelsius = motor.getTemperature().in(Celsius);
+        inputs.mechanismVelocityDegreesPerSecond =
+                motor.getMechanismVelocity().in(DegreesPerSecond);
+        inputs.uptakeRunning = uptake.gte(DegreesPerSecond.of(5)).getAsBoolean();
+    }
 
-  @Override
-  public Command stop() {
-    return uptake.set(0);
-  }
+    @Override
+    public Command stop() {
+        return uptake.set(0);
+    }
 
-  @Override
-  public Command set(double dutyCycle) {
-    return uptake.set(dutyCycle);
-  }
+    @Override
+    public Command set(double dutyCycle) {
+        return uptake.set(dutyCycle);
+    }
 
-  @Override
-  public void simIterate() {
-    uptake.simIterate();
-  }
+    @Override
+    public void simIterate() {
+        uptake.simIterate();
+    }
 }

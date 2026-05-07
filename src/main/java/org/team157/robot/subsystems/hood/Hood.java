@@ -19,97 +19,98 @@ import org.team157.utilities.PosUtils;
  */
 public class Hood extends SubsystemBase {
 
-  // The IO interface for interacting with the hood's motor.
-  private HoodIO io;
+    // The IO interface for interacting with the hood's motor.
+    private HoodIO io;
 
-  // Inputs from the motor, encoder, and mechanism, to be updated periodically and logged.
-  private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
+    // Inputs from the motor, encoder, and mechanism, to be updated periodically and logged.
+    private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
 
-  /** Creates a Hood. */
-  public Hood() {}
+    /** Creates a Hood. */
+    public Hood() {}
 
-  /**
-   * Specifies the IO implementation to be used for the hood.
-   *
-   * @param io An implementation of the Hood's IO layer, i.e. HoodIOTalonFX
-   */
-  public void setIO(HoodIO io) {
-    this.io = io;
-  }
+    /**
+     * Specifies the IO implementation to be used for the hood.
+     *
+     * @param io An implementation of the Hood's IO layer, i.e. HoodIOTalonFX
+     */
+    public void setIO(HoodIO io) {
+        this.io = io;
+    }
 
-  /**
-   * Sets the default command of the hood, stopping motor output when no other commands are running.
-   *
-   * @return Command setting the duty cycle output of the hood's motor to 0
-   */
-  public Command getDefault(Drive drivetrain) {
-    return io.setTargetAngle(HoodConstants.UPPER_SOFT_LIMIT);
-  }
+    /**
+     * Sets the default command of the hood, stopping motor output when no other commands are
+     * running.
+     *
+     * @return Command setting the duty cycle output of the hood's motor to 0
+     */
+    public Command getDefault(Drive drivetrain) {
+        return io.setTargetAngle(HoodConstants.UPPER_SOFT_LIMIT);
+    }
 
-  /**
-   * Set the target angle of the hood.
-   *
-   * @param angle Angle to go to.
-   */
-  public Command setAngle(Angle angle) {
-    return io.setTargetAngle(angle);
-  }
+    /**
+     * Set the target angle of the hood.
+     *
+     * @param angle Angle to go to.
+     */
+    public Command setAngle(Angle angle) {
+        return io.setTargetAngle(angle);
+    }
 
-  /**
-   * Set the target angle of the hood, with a Supplier angle.
-   *
-   * @param angle Angle to go to.
-   */
-  public Command setAngle(Supplier<Angle> angle) {
-    return io.setTargetAngle(angle);
-  }
+    /**
+     * Set the target angle of the hood, with a Supplier angle.
+     *
+     * @param angle Angle to go to.
+     */
+    public Command setAngle(Supplier<Angle> angle) {
+        return io.setTargetAngle(angle);
+    }
 
-  /**
-   * Set the duty cycle output of the hood motor. Primarily used for manual control
-   *
-   * @param dutycycle The power to be applied to the motor.
-   */
-  public Command set(double dutycycle) {
-    return io.set(dutycycle);
-  }
+    /**
+     * Set the duty cycle output of the hood motor. Primarily used for manual control
+     *
+     * @param dutycycle The power to be applied to the motor.
+     */
+    public Command set(double dutycycle) {
+        return io.set(dutycycle);
+    }
 
-  /**
-   * Set the dynamic angle of the hood, for targeting the hub or a passing point.
-   *
-   * @return A Command setting the angle of the Hood to the desired angle, determined by the
-   *     Flywheel's ballistics calculations.
-   */
-  public Command setDynamicHoodAngle() {
-    return setAngle(Flywheel::getDesiredHoodAngle);
-  }
+    /**
+     * Set the dynamic angle of the hood, for targeting the hub or a passing point.
+     *
+     * @return A Command setting the angle of the Hood to the desired angle, determined by the
+     *     Flywheel's ballistics calculations.
+     */
+    public Command setDynamicHoodAngle() {
+        return setAngle(Flywheel::getDesiredHoodAngle);
+    }
 
-  /**
-   * Get the current angle of the hood, based on the YAMS pivot system, relative to the simulated
-   * zero position.
-   *
-   * @return The angle of the hood, in degrees, from -180 to 180, using the YAMS pivot system.
-   */
-  public double getScaledPosAngleSim() {
-    return PosUtils.mapRange(
-            inputs.angleDegrees,
-            HoodConstants.MIN_ANGLE,
-            HoodConstants.MAX_ANGLE,
-            HoodConstants.MAX_ANGLE,
-            HoodConstants.MIN_ANGLE)
-        - 40;
-  }
+    /**
+     * Get the current angle of the hood, based on the YAMS pivot system, relative to the simulated
+     * zero position.
+     *
+     * @return The angle of the hood, in degrees, from -180 to 180, using the YAMS pivot system.
+     */
+    public double getScaledPosAngleSim() {
+        return PosUtils.mapRange(
+                        inputs.angleDegrees,
+                        HoodConstants.MIN_ANGLE,
+                        HoodConstants.MAX_ANGLE,
+                        HoodConstants.MAX_ANGLE,
+                        HoodConstants.MIN_ANGLE)
+                - 40;
+    }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    // Updates the inputs to be logged by AdvantageKit and writes them to the Logger
-    io.updateInputs(inputs);
-    Logger.processInputs("Hood", inputs);
-  }
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+        // Updates the inputs to be logged by AdvantageKit and writes them to the Logger
+        io.updateInputs(inputs);
+        Logger.processInputs("Hood", inputs);
+    }
 
-  @Override
-  public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-    io.simIterate();
-  }
+    @Override
+    public void simulationPeriodic() {
+        // This method will be called once per scheduler run during simulation
+        io.simIterate();
+    }
 }
