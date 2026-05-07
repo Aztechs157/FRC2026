@@ -47,18 +47,11 @@ public class SunstoneV2Mechanism3D extends SubsystemBase {
         public static final Translation3d ORIGIN_TO_TURRET_BASE_OFFSET =
                 new Translation3d(-0.12192, -0.11557, 0.396535);
 
-        /** 3D offset from the robot origin to the hood's pivot point, in meters. */
-        public static final Translation3d ORIGIN_TO_HOOD_PIVOT_POINT_OFFSET =
-                new Translation3d(-0.0465, 0, 0.530);
-
         /** 3D offset from the robot origin to the slapdown's pivot point, in meters. */
         public static final Translation3d ORIGIN_TO_SLAPDOWN_PIVOT_POINT_OFFSET =
                 new Translation3d(0.146050, 0, 0.197803);
 
-        /**
-         * 2D offset from the robot's origin to the turret base, used in position-based dynamic
-         * shooting calculations.
-         */
+        /** 2D offset from the robot's origin to the turret base, used in ballistic calculations. */
         public static final Transform2d XY_ORIGIN_TO_TURRET_BASE_OFFSET =
                 new Transform2d(-0.12192, -0.11557, new Rotation2d());
     }
@@ -81,8 +74,8 @@ public class SunstoneV2Mechanism3D extends SubsystemBase {
      */
     public Transform3d getHoodPivotLocation() {
         return new Transform3d(
-                0.1245 * Math.cos(turret.getTurretRotation().in(Radians)),
-                0.1245 * Math.sin(turret.getTurretRotation().in(Radians)),
+                0.1 * Math.cos(turret.getTurretRotation().in(Radians)),
+                0.1 * Math.sin(turret.getTurretRotation().in(Radians)),
                 0.070,
                 new Rotation3d(0, 0, turret.getTurretRotation().in(Radians)));
     }
@@ -157,7 +150,24 @@ public class SunstoneV2Mechanism3D extends SubsystemBase {
      */
     public Pose3d[] getMechanismPoses() {
         return new Pose3d[] {
-            getTurretBasePose(), getHoodPose(), getSlapdownPose(), getHopperWallsPose()
+            getTurretBasePose(), //
+            getHoodPose(), //
+            getSlapdownPose(), //
+            getHopperWallsPose()
+        };
+    }
+
+    /**
+     * Gets an array of blank poses for model calibration
+     *
+     * @return a {@link Pose3d} array containing blank Pose3d objects.
+     */
+    public Pose3d[] getCalibrationPoses() {
+        return new Pose3d[] {
+            new Pose3d(), //
+            new Pose3d(), //
+            new Pose3d(), //
+            new Pose3d()
         };
     }
 
@@ -165,5 +175,6 @@ public class SunstoneV2Mechanism3D extends SubsystemBase {
     public void periodic() {
         // Publish poses to NT and/or save them to the log file.
         Logger.recordOutput("Mechanism Poses", getMechanismPoses());
+        Logger.recordOutput("Calibration Poses", getCalibrationPoses());
     }
 }
