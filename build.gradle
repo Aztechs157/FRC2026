@@ -184,11 +184,10 @@ spotless {
             exclude "**/build/**", "**/build-*/**"
         }
         toggleOffOn()
-        eclipse().configFile('formatter.xml')
+        googleJavaFormat().aosp()
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
-        indentWithSpaces(4)
     }
     groovyGradle {
         target fileTree(".") {
