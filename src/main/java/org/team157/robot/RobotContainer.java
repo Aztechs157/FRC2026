@@ -24,6 +24,7 @@ import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.commands.DriveCommands;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.LEDs;
+import org.team157.robot.subsystems.SunstoneV2Mechanism3D;
 import org.team157.robot.subsystems.drive.Drive;
 import org.team157.robot.subsystems.drive.GyroIO;
 import org.team157.robot.subsystems.drive.GyroIOPigeon2;
@@ -66,15 +67,16 @@ public class RobotContainer {
   // Subsystems
   private final Vision vision;
   public static Drive drive;
-  public final Turret turret = new Turret();
+  public static SunstoneV2Mechanism3D mechanism3D;
+  public static final Turret turret = new Turret();
   //   public final VisionSystem visionSystem;
   public static final Flywheel flywheel = new Flywheel();
-  public final Hood hood = new Hood();
-  public final Intake intake = new Intake();
-  public final Hopper hopper = new Hopper();
-  public final Uptake uptake = new Uptake();
-  public final Slapdown slapdown = new Slapdown();
-  public final LEDs leds = new LEDs();
+  public static final Hood hood = new Hood();
+  public static final Intake intake = new Intake();
+  public static final Hopper hopper = new Hopper();
+  public static final Uptake uptake = new Uptake();
+  public static final Slapdown slapdown = new Slapdown();
+  public static final LEDs leds = new LEDs();
 
   // Controllers
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -88,6 +90,8 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    mechanism3D = new SunstoneV2Mechanism3D(turret, hood, slapdown);
 
     switch (Constants.currentMode) {
       case REAL:

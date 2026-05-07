@@ -1,16 +1,13 @@
 package org.team157.robot.subsystems.turret;
 
-import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
-import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Robot;
 import org.team157.robot.subsystems.vision.Vision;
 
@@ -119,39 +116,13 @@ public class Turret extends SubsystemBase {
   }
 
   /**
-   * Gets the 3D pose of the turret base for mechanism visualization.
+   * Gets the 2D rotational pose (yaw) of the turret for mechanism visualization. Feeds into the
+   * {@link SunstoneV2Mechanism3D} class for the AdvantageScope model.
    *
-   * @return The {@link Pose3d} of the turret base.
+   * @return The {@link Rotation2d} of the turret base.
    */
-  public Pose3d getBasePose() {
-    return new Pose3d(
-        ModelConstants.ORIGIN_TO_TURRET_BASE_OFFSET,
-        new Rotation3d(0, 0, Math.toRadians(inputs.angleDegrees)));
-  }
-
-  /**
-   * Gets the 3D transform from the turret base to the hood pivot point.
-   *
-   * @return The {@link Transform3d} from the turret base to the hood pivot.
-   */
-  public Transform3d getHoodPivotLocation() {
-    return new Transform3d(
-        0.1245 * Math.cos(Math.toRadians(inputs.angleDegrees)),
-        0.1245 * Math.sin(Math.toRadians(inputs.angleDegrees)),
-        0.070,
-        new Rotation3d(0, 0, Math.toRadians(inputs.angleDegrees)));
-  }
-
-  /**
-   * Gets the 3D pose of the hood pivot point after applying an additional transform.
-   *
-   * @param rotation The additional {@link Transform3d} to apply to the hood pivot location.
-   * @return The resulting {@link Pose3d} of the hood pivot.
-   */
-  public Pose3d getHoodPivotPose(Transform3d rotation) {
-    return new Pose3d(ModelConstants.ORIGIN_TO_TURRET_BASE_OFFSET, new Rotation3d())
-        .transformBy(getHoodPivotLocation())
-        .transformBy(rotation);
+  public Angle getTurretRotation() {
+    return Radians.of(Math.toRadians(inputs.angleDegrees));
   }
 
   @Override

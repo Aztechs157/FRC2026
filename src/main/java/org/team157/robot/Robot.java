@@ -4,10 +4,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -110,24 +107,6 @@ public class Robot extends LoggedRobot {
     // Return to non-RT thread priority (do not modify the first argument)
     // Threads.setCurrentThreadPriority(false, 10);
 
-    Logger.recordOutput(
-        "FinalComponentPoses",
-        new Pose3d[] {
-          // turret base
-          m_robotContainer.turret.getBasePose(),
-          // turret hood
-          m_robotContainer.turret.getHoodPivotPose(
-              new Transform3d(
-                  0,
-                  0,
-                  0,
-                  new Rotation3d(
-                      0, Math.toRadians(m_robotContainer.hood.getScaledPosAngleSim()), 0))),
-          // intake pivot
-          m_robotContainer.slapdown.getIntakePivotPose(),
-          // hopper walls
-          m_robotContainer.slapdown.getHopperWallsPose()
-        });
     Logger.recordOutput("Misc/Manual Override Active?", RobotContainer.manualOverride);
     // Gets the match time from the FMS to display for the driver.
     Logger.recordOutput("Misc/Match Time", Timer.getMatchTime());

@@ -47,8 +47,8 @@ import org.littletonrobotics.junction.Logger;
 import org.team157.robot.Constants;
 import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.Mode;
-import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.generated.TunerConstants;
+import org.team157.robot.subsystems.SunstoneV2Mechanism3D;
 import org.team157.robot.util.LocalADStarAK;
 
 public class Drive extends SubsystemBase {
@@ -368,7 +368,7 @@ public class Drive extends SubsystemBase {
    */
   public boolean isUnderTrench() {
     return FieldConstants.positionDetails.isUnderTrench(
-        getPose().plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET));
+        getPose().plus(SunstoneV2Mechanism3D.Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET));
   }
 
   /**
