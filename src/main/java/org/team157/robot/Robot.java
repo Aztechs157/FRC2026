@@ -114,6 +114,7 @@ public class Robot extends LoggedRobot {
         // Gets hub activity status to display on the dashboard.
         Logger.recordOutput("Misc/Hub Active?", m_robotContainer.isHubActive());
         Logger.recordOutput("Misc/Under Trench?", RobotContainer.drive.isUnderTrench());
+        Logger.recordOutput("Flywheel Modifier", RobotContainer.ballisticSpeedModifier);
         m_field.setRobotPose(RobotContainer.drive.getPose());
     }
 
