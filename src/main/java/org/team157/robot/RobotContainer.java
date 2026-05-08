@@ -236,9 +236,9 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> -driverController.getLeftY(),
-                        () -> -driverController.getLeftX(),
-                        () -> -driverController.getRightX()));
+                        () -> modifySpeed(-driverController.getLeftY()),
+                        () -> modifySpeed(-driverController.getLeftX()),
+                        () -> modifySpeed(-driverController.getRightX())));
         // Update the pose estimation and turret tracking angle while no other vision commands are
         // running.
         vision.setDefaultCommand(vision.setDefault(drive, turret));
@@ -281,8 +281,12 @@ public class RobotContainer {
         /// FlYWHEEL HOOD ///
         /////////////////////
         // Enables dynamic control of the flywheel and hood.
-        driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
-        driverController.a().toggleOnTrue(hood.setDynamicHoodAngle());
+        driverController
+            .a()
+            .toggleOnTrue(flywheel.setDynamicVelocity());
+        driverController
+            .a()
+            .toggleOnTrue(hood.setDynamicHoodAngle());
 
         ////////////////////////////
         /// INTAKE UPTAKE HOPPER ///
@@ -300,9 +304,13 @@ public class RobotContainer {
             driverController.rightTrigger().whileTrue(hopper.set(1));
         }
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
-        driverController.y().whileTrue(forceOuttake());
+        driverController
+            .y()
+            .whileTrue(forceOuttake());
         // Wiggles the intake up and down to free up stuck balls
-        driverController.x().toggleOnTrue(slapdown.wiggleIntake());
+        driverController
+            .x()
+            .toggleOnTrue(slapdown.wiggleIntake());
         //////////////////////////////////////////////////
         ///             OPERATOR COMMANDS              ///
         //////////////////////////////////////////////////
@@ -315,9 +323,13 @@ public class RobotContainer {
 
         // Disables automatic turret tracking when manual override is enabled,
         // allowing the operator to control the turret without interference from vision tracking.
-        turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
-        turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
-        turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());
+        turretTrackingTrigger()
+            .whileTrue(turret.trackTagGlobalRelative());
+        turretTrackingTrigger()
+            .whileTrue(flywheel.setDynamicVelocity());
+        turretTrackingTrigger()
+            .and(driverController.rightTrigger())
+            .whileTrue(hood.setDynamicHoodAngle());
 
         ///////////////////////
         /// MANUAL FLYWHEEL ///
@@ -365,9 +377,12 @@ public class RobotContainer {
                 .toggleOnTrue(slapdown.retractIntake());
     }
 
-    // If the right bumper is held, apply the precision modifier of 0.5x speed.
+    /** Apply a speed modifier when the right bumper (dedicated toggle) 
+     * or shooting trigger are held, or the robot is under the trench. */
     public double modifySpeed(final double speed) {
-        if (driverController.rightBumper().getAsBoolean() || drive.isUnderTrench()) {
+        if (driverController.rightBumper().getAsBoolean()
+                || driverController.rightTrigger().getAsBoolean()
+                || drive.isUnderTrench()) {
             return speed * ModifierConstants.PRECISION_DRIVE_MODIFIER;
         } else {
             return speed;

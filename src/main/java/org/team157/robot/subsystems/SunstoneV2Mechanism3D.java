@@ -76,7 +76,7 @@ public class SunstoneV2Mechanism3D extends SubsystemBase {
         return new Transform3d(
                 0.1 * Math.cos(turret.getTurretRotation().in(Radians)),
                 0.1 * Math.sin(turret.getTurretRotation().in(Radians)),
-                0.070,
+                0.064,
                 new Rotation3d(0, 0, turret.getTurretRotation().in(Radians)));
     }
 
