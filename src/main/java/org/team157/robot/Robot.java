@@ -143,9 +143,7 @@ public class Robot extends LoggedRobot {
 
     /** This function is called once when the robot is disabled. */
     @Override
-    public void disabledInit() {
-        RobotContainer.vision.updateAlliance();
-    }
+    public void disabledInit() {}
 
     /** This function is called periodically when disabled. */
     @Override
