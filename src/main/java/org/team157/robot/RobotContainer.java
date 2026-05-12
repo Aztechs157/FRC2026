@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.Optional;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.team157.robot.Constants.Mode;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.commands.DriveCommands;
 import org.team157.robot.generated.TunerConstants;
@@ -31,18 +32,25 @@ import org.team157.robot.subsystems.drive.ModuleIO;
 import org.team157.robot.subsystems.drive.ModuleIOSim;
 import org.team157.robot.subsystems.drive.ModuleIOTalonFX;
 import org.team157.robot.subsystems.flywheel.Flywheel;
+import org.team157.robot.subsystems.flywheel.FlywheelIO;
 import org.team157.robot.subsystems.flywheel.FlywheelIOTalonFX;
 import org.team157.robot.subsystems.hood.Hood;
+import org.team157.robot.subsystems.hood.HoodIO;
 import org.team157.robot.subsystems.hood.HoodIOTalonFX;
 import org.team157.robot.subsystems.hopper.Hopper;
+import org.team157.robot.subsystems.hopper.HopperIO;
 import org.team157.robot.subsystems.hopper.HopperIOTalonFX;
 import org.team157.robot.subsystems.intake.Intake;
+import org.team157.robot.subsystems.intake.IntakeIO;
 import org.team157.robot.subsystems.intake.IntakeIOTalonFX;
 import org.team157.robot.subsystems.slapdown.Slapdown;
+import org.team157.robot.subsystems.slapdown.SlapdownIO;
 import org.team157.robot.subsystems.slapdown.SlapdownIOTalonFX;
 import org.team157.robot.subsystems.turret.Turret;
+import org.team157.robot.subsystems.turret.TurretIO;
 import org.team157.robot.subsystems.turret.TurretIOTalonFX;
 import org.team157.robot.subsystems.uptake.Uptake;
+import org.team157.robot.subsystems.uptake.UptakeIO;
 import org.team157.robot.subsystems.uptake.UptakeIOTalonFX;
 import org.team157.robot.subsystems.vision.Vision;
 import org.team157.robot.subsystems.vision.VisionConstants;
@@ -66,7 +74,7 @@ public class RobotContainer {
                     .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     // Subsystems
-    private final Vision vision;
+    public static Vision vision;
     public static Drive drive;
     public final Turret turret = new Turret();
     //   public final VisionSystem visionSystem;
@@ -88,7 +96,7 @@ public class RobotContainer {
     // Manual Override Status
     public static boolean manualOverride = false;
 
-    /** The container for the robot. Contains subsystems, OI devices, and commands. */
+    /** The container for the robot. Contains subsystems, IO devices, and commands. */
     public RobotContainer() {
 
         switch (Constants.currentMode) {
@@ -154,7 +162,10 @@ public class RobotContainer {
                                 new ModuleIO() {});
                 vision =
                         new Vision(
-                                drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+                                drive::addVisionMeasurement,
+                                new VisionIO() {},
+                                new VisionIO() {},
+                                new VisionIO() {});
                 break;
         }
 
@@ -167,14 +178,28 @@ public class RobotContainer {
         }
 
         // Specify the IO implementation to be used for each subsystem
-        intake.setIO(new IntakeIOTalonFX(intake));
-        hood.setIO(new HoodIOTalonFX(hood));
-        slapdown.setIO(new SlapdownIOTalonFX(slapdown));
-        hopper.setIO(new HopperIOTalonFX(hopper));
-        uptake.setIO(new UptakeIOTalonFX(uptake));
-        flywheel.setIO(new FlywheelIOTalonFX(flywheel));
-        // visionSystem = new VisionSystem(drive::getPose, Robot.m_field);
-        turret.setIO(new TurretIOTalonFX(turret), vision);
+        if (Constants.currentMode == Mode.REPLAY) {
+            // Disable IO implementations during log REPLAY
+            intake.setIO(new IntakeIO() {});
+            hood.setIO(new HoodIO() {});
+            slapdown.setIO(new SlapdownIO() {});
+            hopper.setIO(new HopperIO() {});
+            uptake.setIO(new UptakeIO() {});
+            flywheel.setIO(new FlywheelIO() {});
+            turret.setIO(new TurretIO() {}, vision);
+        } else {
+            // Use TalonFX IO implementations on REAL or SIM robot.
+            // Not included in initial switch case, as the TalonFX
+            // IO layers automatically switch between real and sim
+            // implementations based on the curren mode.
+            intake.setIO(new IntakeIOTalonFX(intake));
+            hood.setIO(new HoodIOTalonFX(hood));
+            slapdown.setIO(new SlapdownIOTalonFX(slapdown));
+            hopper.setIO(new HopperIOTalonFX(hopper));
+            uptake.setIO(new UptakeIOTalonFX(uptake));
+            flywheel.setIO(new FlywheelIOTalonFX(flywheel));
+            turret.setIO(new TurretIOTalonFX(turret), vision);
+        }
 
         NamedCommands.registerCommand("DeployIntake", slapdown.deployIntake());
         NamedCommands.registerCommand("RunIntake", intake.runIntake());
