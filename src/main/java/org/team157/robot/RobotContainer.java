@@ -287,7 +287,7 @@ public class RobotContainer {
         /////////////////////
         // Enables dynamic control of the flywheel and hood.
         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
-        driverController.a().toggleOnTrue(hood.setDynamicHoodAngle());
+        // driverController.a().toggleOnTrue(hood.setDynamicHoodAngle());
 
         ////////////////////////////
         /// INTAKE UPTAKE HOPPER ///
@@ -297,19 +297,12 @@ public class RobotContainer {
         driverController.rightTrigger().whileTrue(hopper.set(1));
 
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
-        driverController
-            .y()
-            .whileTrue(forceOuttake());
+        driverController.y().whileTrue(forceOuttake());
         // Wiggles the intake up and down to free up stuck balls
-        driverController
-            .x()
-            .toggleOnTrue(slapdown.wiggleIntake());
+        driverController.x().toggleOnTrue(slapdown.wiggleIntake());
 
         // (in/de)creases the ballistic modifier
-        operatorController
-                .x()
-                .or(operatorController.b())
-                .onTrue(setModifier());
+        operatorController.x().or(operatorController.b()).onTrue(setModifier());
         //////////////////////////////////////////////////
         ///             OPERATOR COMMANDS              ///
         //////////////////////////////////////////////////
@@ -322,10 +315,8 @@ public class RobotContainer {
 
         // Disables automatic turret tracking when manual override is enabled,
         // allowing the operator to control the turret without interference from vision tracking.
-        turretTrackingTrigger()
-                .whileTrue(turret.trackTagGlobalRelative());
-        turretTrackingTrigger()
-                .whileTrue(flywheel.setDynamicVelocity());
+        turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
+        turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
         turretTrackingTrigger()
                 .and(driverController.rightTrigger())
                 .whileTrue(hood.setDynamicHoodAngle());
@@ -369,10 +360,7 @@ public class RobotContainer {
 
         // Deploy and retract the intake with the A and Y buttons, but only when the
         // back button is held to prevent accidental activation during teleop.
-        operatorController
-                .a()
-                .and(operatorController.back())
-                .toggleOnTrue(slapdown.deployIntake());
+        operatorController.a().and(operatorController.back()).toggleOnTrue(slapdown.deployIntake());
         operatorController
                 .y()
                 .and(operatorController.back())
@@ -396,9 +384,9 @@ public class RobotContainer {
 
     /** Update the ballistic equation modifier based on the operator's button presses */
     public void setBallisticSpeedModifier() {
-        if (driverController.x().getAsBoolean()) {
+        if (operatorController.x().getAsBoolean()) {
             ballisticSpeedModifier = ballisticSpeedModifier + 0.1;
-        } else if (driverController.b().getAsBoolean()) {
+        } else if (operatorController.b().getAsBoolean()) {
             ballisticSpeedModifier = ballisticSpeedModifier - 0.1;
         }
     }
