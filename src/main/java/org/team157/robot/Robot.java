@@ -132,28 +132,22 @@ public class Robot extends LoggedRobot {
                     // hopper walls
                     m_robotContainer.slapdown.getHopperWallsPose()
                 });
-        Logger.recordOutput("Manual Override", RobotContainer.manualOverride);
+        Logger.recordOutput("Misc/Manual Override Active?", RobotContainer.manualOverride);
         // Gets the match time from the FMS to display for the driver.
-        Logger.recordOutput("Match Time", Timer.getMatchTime());
+        Logger.recordOutput("Misc/Match Time", Timer.getMatchTime());
         // Gets hub activity status to display on the dashboard.
-        Logger.recordOutput("Hub Active?", m_robotContainer.isHubActive());
-        Logger.recordOutput("Under Trench?", RobotContainer.drive.isUnderTrench());
-        Logger.recordOutput("Robot Field Pose", RobotContainer.drive.getPose());
+        Logger.recordOutput("Misc/Hub Active?", m_robotContainer.isHubActive());
+        Logger.recordOutput("Misc/Under Trench?", RobotContainer.drive.isUnderTrench());
         m_field.setRobotPose(RobotContainer.drive.getPose());
     }
 
     /** This function is called once when the robot is disabled. */
     @Override
-    public void disabledInit() {
-        m_robotContainer.visionSystem.updatePoseEstimation(RobotContainer.drive);
-    }
+    public void disabledInit() {}
 
     /** This function is called periodically when disabled. */
     @Override
     public void disabledPeriodic() {
-        m_robotContainer.visionSystem.resetPoseEstimation(RobotContainer.drive);
-        m_robotContainer.visionSystem.updatePoseEstimation(RobotContainer.drive);
-
         newAlliance = DriverStation.getAlliance();
         newAutoName = m_robotContainer.getAutonomousCommand().getName();
         if (autoName != newAutoName || alliance != newAlliance) {
@@ -191,6 +185,8 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void autonomousInit() {
+        RobotContainer.vision.updateAlliance();
+
         autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         // schedule the autonomous command (example)
@@ -210,6 +206,8 @@ public class Robot extends LoggedRobot {
         // teleop starts running. If you want the autonomous to
         // continue until interrupted by another command, remove
         // this line or comment it out.
+        RobotContainer.vision.updateAlliance();
+
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }

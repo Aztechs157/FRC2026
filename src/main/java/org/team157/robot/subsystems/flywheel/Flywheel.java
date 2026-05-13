@@ -13,7 +13,7 @@ import org.littletonrobotics.junction.Logger;
 import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.RobotContainer;
 import org.team157.robot.subsystems.hood.HoodConstants;
-import org.team157.robot.subsystems.vision.VisionSystem;
+import org.team157.robot.subsystems.vision.Vision;
 
 /**
  * Represents the Flywheel subsystem, which spins up to launch balls at a calculated velocity
@@ -195,7 +195,7 @@ public class Flywheel extends SubsystemBase {
      */
     public AngularVelocity getDesiredFlywheelVelocity() {
         double heightMeters = FieldConstants.positionDetails.getTargetHeight();
-        double distanceMeters = VisionSystem.distanceToTargetFromTurret;
+        double distanceMeters = Vision.distanceToTargetFromTurret;
 
         setShotParams(heightMeters, distanceMeters);
 

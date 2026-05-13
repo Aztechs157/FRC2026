@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.Robot;
-import org.team157.robot.subsystems.vision.VisionSystem;
+import org.team157.robot.subsystems.vision.Vision;
 
 /**
  * Represents the Turret subsystem, which rotates horizontally to aim the hood and flywheel at a
@@ -30,7 +30,7 @@ public class Turret extends SubsystemBase {
     public static Angle trackingAngle = Degrees.of(0);
 
     // Reference to the vision system for target tracking.
-    private VisionSystem visionSystem;
+    private Vision vision;
 
     /** Creates a new Turret. */
     public Turret() {}
@@ -39,11 +39,11 @@ public class Turret extends SubsystemBase {
      * Specifies the IO implementation and vision system to be used for the Turret.
      *
      * @param io An implementation of the Turret's IO layer, i.e. TurretIOTalonFX
-     * @param visionSystem The vision system used for target tracking
+     * @param vision The vision system used for target tracking
      */
-    public void setIO(TurretIO io, VisionSystem visionSystem) {
+    public void setIO(TurretIO io, Vision vision) {
         this.io = io;
-        this.visionSystem = visionSystem;
+        this.vision = vision;
     }
 
     /**
@@ -101,9 +101,9 @@ public class Turret extends SubsystemBase {
      * @param robotPose The current robot position on the field as a {@link Pose2d}.
      */
     public void updateRelativeAngleToTarget(Pose2d targetPose, Pose2d robotPose) {
-        visionSystem.setTargetParams(targetPose, robotPose);
+        vision.setTargetParams(targetPose, robotPose);
         double turretToRobotAngleOffset =
-                VisionSystem.angleToTargetFromTurret + TurretConstants.TURRET_ANGLE_OFFSET;
+                Vision.angleToTargetFromTurret + TurretConstants.TURRET_ANGLE_OFFSET;
         if (Robot.isReal()) {
             if (turretToRobotAngleOffset > 180) {
                 turretToRobotAngleOffset -= 360;
@@ -114,7 +114,7 @@ public class Turret extends SubsystemBase {
             trackingAngle = Degrees.of(turretToRobotAngleOffset);
         } else {
             // Disable turret offset in simulation, as simulated 0 is forward.
-            trackingAngle = Degrees.of(VisionSystem.angleToTargetFromTurret);
+            trackingAngle = Degrees.of(Vision.angleToTargetFromTurret);
         }
     }
 
