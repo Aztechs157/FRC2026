@@ -23,7 +23,21 @@ public class VisionConstants {
     public static String camera2Name = "backCam";
 
     // Robot to camera transforms
-    // (Not used by Limelight, configure in web UI instead)
+    // Transform:
+    //      x, y, z:
+    //      All in meters, relative to the Pigeon IMU.
+    // Rotation:
+    //      roll (about x axis) pitch (about y axis), yaw (about z axis):
+    //      All in Radians (convert from degrees), relative to the Pigeon IMU
+    // Measure these values in Onshape by selecting the Pigeon
+    //      (or origin, if that's easier, but account for the
+    //      offset from origin -> pigeon for the linear transforms)
+    //      and the lens of the camera you're measuring.
+    // Onshape coords to robot coords:
+    //      +X -> -Y
+    //      +Y -> -X
+    //      +Z -> +Z (the same)
+
     public static Transform3d robotToCamera0 =
             new Transform3d(-0.127, 0.3302, 0.3556, new Rotation3d(0.0, 0.0, Math.toRadians(65)));
     public static Transform3d robotToCamera1 =
@@ -44,9 +58,9 @@ public class VisionConstants {
     // (Adjust to trust some cameras more than others)
     public static double[] cameraStdDevFactors =
             new double[] {
-                1.0, // Camera 0
-                1.0, // Camera 1
-                1.0 // Camera 2
+                1.0, // Camera 0 (frontLeftCam)
+                1.0, // Camera 1 (frontRightCam)
+                1.0 // Camera 2 (backCam)
             };
 
     // Multipliers to apply for MegaTag 2 observations
