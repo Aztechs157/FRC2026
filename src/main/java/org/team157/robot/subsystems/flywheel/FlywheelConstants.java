@@ -25,7 +25,7 @@ public final class FlywheelConstants {
   // IDs of both motors powering the flywheel.
   public static final int MOTOR_ID = 22, FOLLOWER_MOTOR_ID = 23;
   // Closed-loop control values for the flywheel.
-  public static final double KP = 0.005, KI = 0, KD = 0.0;
+  public static final double KP = 0.007, KI = 0, KD = 0.02;
   public static final double KS = 0.0, KV = 0.116, KA = 0.05;
   public static final double SIM_KP = 1.57, SIM_KI = 0, SIM_KD = 0.157;
   public static final double SIM_KS = 0.0,
