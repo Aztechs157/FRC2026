@@ -107,13 +107,13 @@ public class SunstoneV2Mechanism3D extends SubsystemBase {
     }
 
     /**
-     * Gets the current position of the hopper walls.
+     * Gets the current position of the hopper walls, based on the current angle of the slapdown.
      *
      * @return the current displacement of the hopper walls from their stowed position, in meters.
      */
     public double getHopperWallsPosition() {
         return PosUtils.mapRange(
-                slapdown.getSlapdownAngle().in(Radians),
+                slapdown.getSlapdownAngle().in(Degrees),
                 SlapdownConstants.MIN_ANGLE,
                 SlapdownConstants.MAX_ANGLE,
                 0.3048,
@@ -174,7 +174,8 @@ public class SunstoneV2Mechanism3D extends SubsystemBase {
     @Override
     public void periodic() {
         // Publish poses to NT and/or save them to the log file.
-        Logger.recordOutput("Mechanism Poses", getMechanismPoses());
-        Logger.recordOutput("Calibration Poses", getCalibrationPoses());
+        Logger.recordOutput("Odometry/Mechanism Poses", getMechanismPoses());
+        // Uncomment the line below to calibrate pose offsets
+        // Logger.recordOutput("Odometry/Calibration Poses", getCalibrationPoses());
     }
 }

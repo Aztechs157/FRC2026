@@ -117,6 +117,7 @@ public class Slapdown extends SubsystemBase {
         io.simIterate();
     }
 
+    /** Gets the angle of the pivot to pose the slapdown and hopper walls in the Mechanism3D */
     public Angle getSlapdownAngle() {
         return Radians.of(inputs.angleFromEncoderDegrees);
     }
