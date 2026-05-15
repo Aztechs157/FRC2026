@@ -28,7 +28,7 @@ import org.ejml.simple.SimpleMatrix;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonUtils;
 import org.team157.robot.Constants.FieldConstants;
-import org.team157.robot.subsystems.SunstoneV2Mechanism3D;
+import org.team157.robot.subsystems.SunstoneMechanism3D.Mechanism3DConstants;
 import org.team157.robot.subsystems.drive.Drive;
 import org.team157.robot.subsystems.flywheel.Flywheel;
 import org.team157.robot.subsystems.turret.Turret;
@@ -127,20 +127,15 @@ public class Vision extends SubsystemBase {
         // beginning vector math for momentum shooting
         double turretToRobotTheta =
                 Math.atan(
-                        SunstoneV2Mechanism3D.Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET
-                                        .getY()
-                                / SunstoneV2Mechanism3D.Mechanism3DConstants
-                                        .XY_ORIGIN_TO_TURRET_BASE_OFFSET
-                                        .getX());
+                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY()
+                                / Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX());
         SimpleMatrix turretToRobotThetaMatrix =
                 new SimpleMatrix(
                         2, 1, true, -Math.sin(turretToRobotTheta), Math.cos(turretToRobotTheta));
         double dOffsetRobot =
                 Math.hypot(
-                        SunstoneV2Mechanism3D.Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET
-                                .getX(),
-                        SunstoneV2Mechanism3D.Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET
-                                .getY());
+                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX(),
+                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY());
 
         SimpleMatrix vRotationRobot =
                 turretToRobotThetaMatrix.scale(driveRotationalVelocity * dOffsetRobot);
@@ -188,17 +183,14 @@ public class Vision extends SubsystemBase {
         distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, adjustedTargetPose);
         distanceToTargetFromTurret =
                 PhotonUtils.getDistanceToPose(
-                        robotPose.plus(
-                                SunstoneV2Mechanism3D.Mechanism3DConstants
-                                        .XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                        robotPose.plus(Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
                         adjustedTargetPose);
 
         angleToTarget = PhotonUtils.getYawToPose(robotPose, adjustedTargetPose).getDegrees();
         angleToTargetFromTurret =
                 PhotonUtils.getYawToPose(
                                 robotPose.plus(
-                                        SunstoneV2Mechanism3D.Mechanism3DConstants
-                                                .XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
                                 adjustedTargetPose)
                         .getDegrees();
 
@@ -211,7 +203,6 @@ public class Vision extends SubsystemBase {
 
     @Override
     public void periodic() {
-        updateAlliance();
         for (int i = 0; i < io.length; i++) {
             io[i].updateInputs(inputs[i]);
             Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
