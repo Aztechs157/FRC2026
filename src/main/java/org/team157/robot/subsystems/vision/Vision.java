@@ -28,7 +28,7 @@ import org.ejml.simple.SimpleMatrix;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonUtils;
 import org.team157.robot.Constants.FieldConstants;
-import org.team157.robot.subsystems.SunstoneV2Mechanism3D.Mechanism3DConstants;
+import org.team157.robot.subsystems.SunstoneMechanism3D.Mechanism3DConstants;
 import org.team157.robot.subsystems.drive.Drive;
 import org.team157.robot.subsystems.flywheel.Flywheel;
 import org.team157.robot.subsystems.turret.Turret;

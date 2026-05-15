@@ -117,7 +117,7 @@ public class Turret extends SubsystemBase {
 
     /**
      * Gets the 2D rotational pose (yaw) of the turret for mechanism visualization. Feeds into the
-     * {@link SunstoneV2Mechanism3D} class for the AdvantageScope model.
+     * {@link SunstoneMechanism3D} class for the AdvantageScope model.
      *
      * @return The {@link Rotation2d} of the turret base.
      */

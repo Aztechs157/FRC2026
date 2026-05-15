@@ -25,7 +25,7 @@ import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.commands.DriveCommands;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.LEDs;
-import org.team157.robot.subsystems.SunstoneV2Mechanism3D;
+import org.team157.robot.subsystems.SunstoneMechanism3D;
 import org.team157.robot.subsystems.drive.Drive;
 import org.team157.robot.subsystems.drive.GyroIO;
 import org.team157.robot.subsystems.drive.GyroIOPigeon2;
@@ -77,7 +77,7 @@ public class RobotContainer {
     // Subsystems
     public static Vision vision;
     public static Drive drive;
-    public static SunstoneV2Mechanism3D mechanism3D;
+    public static SunstoneMechanism3D mechanism3D;
     public static final Turret turret = new Turret();
     public static final Flywheel flywheel = new Flywheel();
     public static final Hood hood = new Hood();
@@ -100,7 +100,7 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, IO devices, and commands. */
     public RobotContainer() {
 
-        mechanism3D = new SunstoneV2Mechanism3D(turret, hood, slapdown);
+        mechanism3D = new SunstoneMechanism3D(turret, hood, slapdown);
 
         switch (Constants.currentMode) {
             case REAL:
