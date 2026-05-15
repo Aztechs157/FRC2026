@@ -4,7 +4,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.littletonrobotics.junction.AutoLog;
-import org.team157.robot.subsystems.hood.HoodIO;
 
 /**
  * Defines the input data to be logged by AdvantageKit, along with methods and {@link Command}s
