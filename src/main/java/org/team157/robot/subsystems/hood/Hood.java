@@ -4,14 +4,11 @@
 
 package org.team157.robot.subsystems.hood;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
-import org.team157.robot.Constants.ModelConstants;
 import org.team157.robot.subsystems.drive.Drive;
 import org.team157.robot.subsystems.flywheel.Flywheel;
 import org.team157.utilities.PosUtils;
@@ -115,13 +112,5 @@ public class Hood extends SubsystemBase {
     public void simulationPeriodic() {
         // This method will be called once per scheduler run during simulation
         io.simIterate();
-    }
-
-    // TODO: make a Mechanism3d class distinct from each subsystem and RobotContainer for storing
-    // poses for the model
-    public Pose3d getHoodPose() {
-        return new Pose3d(
-                ModelConstants.ORIGIN_TO_HOOD_PIVOT_POINT_OFFSET,
-                new Rotation3d(0, -(inputs.angleDegrees), 0));
     }
 }

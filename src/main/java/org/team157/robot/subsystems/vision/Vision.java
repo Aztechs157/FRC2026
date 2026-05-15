@@ -28,7 +28,7 @@ import org.ejml.simple.SimpleMatrix;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonUtils;
 import org.team157.robot.Constants.FieldConstants;
-import org.team157.robot.Constants.ModelConstants;
+import org.team157.robot.subsystems.SunstoneMechanism3D.Mechanism3DConstants;
 import org.team157.robot.subsystems.drive.Drive;
 import org.team157.robot.subsystems.flywheel.Flywheel;
 import org.team157.robot.subsystems.turret.Turret;
@@ -127,15 +127,15 @@ public class Vision extends SubsystemBase {
         // beginning vector math for momentum shooting
         double turretToRobotTheta =
                 Math.atan(
-                        ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY()
-                                / ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX());
+                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY()
+                                / Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX());
         SimpleMatrix turretToRobotThetaMatrix =
                 new SimpleMatrix(
                         2, 1, true, -Math.sin(turretToRobotTheta), Math.cos(turretToRobotTheta));
         double dOffsetRobot =
                 Math.hypot(
-                        ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX(),
-                        ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY());
+                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX(),
+                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY());
 
         SimpleMatrix vRotationRobot =
                 turretToRobotThetaMatrix.scale(driveRotationalVelocity * dOffsetRobot);
@@ -183,13 +183,14 @@ public class Vision extends SubsystemBase {
         distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, adjustedTargetPose);
         distanceToTargetFromTurret =
                 PhotonUtils.getDistanceToPose(
-                        robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                        robotPose.plus(Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
                         adjustedTargetPose);
 
         angleToTarget = PhotonUtils.getYawToPose(robotPose, adjustedTargetPose).getDegrees();
         angleToTargetFromTurret =
                 PhotonUtils.getYawToPose(
-                                robotPose.plus(ModelConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                                robotPose.plus(
+                                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
                                 adjustedTargetPose)
                         .getDegrees();
 

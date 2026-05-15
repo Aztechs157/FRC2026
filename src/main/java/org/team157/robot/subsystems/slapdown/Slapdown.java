@@ -1,14 +1,11 @@
 package org.team157.robot.subsystems.slapdown;
 
-import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
-import org.team157.robot.Constants.ModelConstants;
 import org.team157.utilities.PosUtils;
 
 /**
@@ -120,22 +117,8 @@ public class Slapdown extends SubsystemBase {
         io.simIterate();
     }
 
-    public double getHopperWallsPosition() {
-        return PosUtils.mapRange(
-                inputs.angleFromEncoderDegrees,
-                SlapdownConstants.MIN_ANGLE,
-                SlapdownConstants.MAX_ANGLE,
-                0.3048,
-                0);
-    }
-
-    public Pose3d getHopperWallsPose() {
-        return new Pose3d(getHopperWallsPosition(), 0, 0, new Rotation3d());
-    }
-
-    public Pose3d getIntakePivotPose() {
-        return new Pose3d(
-                ModelConstants.ORIGIN_TO_INTAKE_PIVOT_POINT_OFFSET,
-                new Rotation3d(0, -Math.toRadians(inputs.angleDegrees), 0));
+    /** Gets the angle of the pivot to pose the slapdown and hopper walls in the Mechanism3D */
+    public Angle getSlapdownAngle() {
+        return Radians.of(inputs.angleFromEncoderDegrees);
     }
 }

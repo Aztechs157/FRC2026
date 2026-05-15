@@ -12,8 +12,6 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 import org.team157.robot.parsing.PositionDetails;
@@ -85,20 +83,5 @@ public final class Constants {
                         new Rotation2d(Degrees.of(180)));
 
         public static final PositionDetails positionDetails = new PositionDetails();
-    }
-
-    public static class ModelConstants {
-        // 3D offsets from the robot's origin (center of rotation) to various key points
-        // on the robot, used for mechanism visualization on the AdvantageScope model.
-        public static final Translation3d ORIGIN_TO_TURRET_BASE_OFFSET =
-                new Translation3d(-0.12192, -0.11557, 0.396535);
-        public static final Translation3d ORIGIN_TO_HOOD_PIVOT_POINT_OFFSET =
-                new Translation3d(-0.0465, 0, 0.530);
-        public static final Translation3d ORIGIN_TO_INTAKE_PIVOT_POINT_OFFSET =
-                new Translation3d(0.146050, 0, 0.197803);
-        // 2D offset from the robot's origin to the turret base, used in position-based
-        // dynamic shooting calculations.
-        public static final Transform2d XY_ORIGIN_TO_TURRET_BASE_OFFSET =
-                new Transform2d(-0.12192, -0.11557, new Rotation2d());
     }
 }
