@@ -20,7 +20,7 @@ import org.team157.utilities.PosUtils;
  * Contains 3D mechanism offset constants for Sunstone V2 and methods to animate the AdvantageScope
  * CAD model.
  */
-public class SunstoneV2Mechanism3D extends SubsystemBase {
+public class SunstoneMechanism3D extends SubsystemBase {
 
     private Turret turret;
     private Hood hood;
@@ -30,7 +30,7 @@ public class SunstoneV2Mechanism3D extends SubsystemBase {
      * Initializes the 3D mechanisms for SunstoneV2, and specifies the mechanisms to extract poses
      * from.
      */
-    public SunstoneV2Mechanism3D(Turret turret, Hood hood, Slapdown slapdown) {
+    public SunstoneMechanism3D(Turret turret, Hood hood, Slapdown slapdown) {
         this.turret = turret;
         this.hood = hood;
         this.slapdown = slapdown;
