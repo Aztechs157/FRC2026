@@ -111,6 +111,7 @@ public class Robot extends LoggedRobot {
         Logger.recordOutput("Misc/Manual Override Active?", RobotContainer.manualOverride);
         // Gets the match time from the FMS to display for the driver.
         Logger.recordOutput("Misc/Match Time", Timer.getMatchTime());
+        Logger.recordOutput("Misc/Match Time 2", DriverStation.getMatchTime());
         // Gets hub activity status to display on the dashboard.
         Logger.recordOutput("Misc/Hub Active?", m_robotContainer.isHubActive());
         Logger.recordOutput("Misc/Under Trench?", RobotContainer.drive.isUnderTrench());
