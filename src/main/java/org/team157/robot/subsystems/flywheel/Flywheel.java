@@ -4,11 +4,13 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.Logger;
 import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.RobotContainer;
@@ -26,6 +28,21 @@ public class Flywheel extends SubsystemBase {
 
     // Inputs from the motors and mechanism, to be updated periodically and logged.
     private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
+
+    // SysId routine for characterizing kS / kV / kA. Uses default ramp (1 V/s quasistatic) and step
+    // (7 V dynamic). State changes are logged to AdvantageKit so AdvantageScope's SysId tab can
+    // analyze the run alongside the existing `Flywheel/MechanismVelocityRPM` and
+    // `Flywheel/AppliedVolts` inputs.
+    private final SysIdRoutine sysId =
+            new SysIdRoutine(
+                    new SysIdRoutine.Config(
+                            null,
+                            null,
+                            null,
+                            (state) ->
+                                    Logger.recordOutput("Flywheel/SysIdState", state.toString())),
+                    new SysIdRoutine.Mechanism(
+                            (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
 
     /** The calculated ball velocity in meters per second required for the current shot. */
     public static double ballVelocity = 0;
@@ -89,6 +106,25 @@ public class Flywheel extends SubsystemBase {
      */
     public Command setDynamicVelocity() {
         return io.setVelocity(this::getDesiredFlywheelVelocity);
+    }
+
+    ////////////////////////////
+    /// SYSID CHARACTERIZATION ///
+    ////////////////////////////
+
+    /** Applies an open-loop voltage directly to the flywheel master motor. */
+    public void runCharacterization(double volts) {
+        io.setVoltage(volts);
+    }
+
+    /** Returns a command to run a quasistatic SysId test in the specified direction. */
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return sysId.quasistatic(direction);
+    }
+
+    /** Returns a command to run a dynamic SysId test in the specified direction. */
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return sysId.dynamic(direction);
     }
 
     ////////////////////////

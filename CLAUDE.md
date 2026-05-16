@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ./gradlew deploy         # Build and deploy to RoboRIO over USB or network
 ./gradlew spotlessApply  # Format code (Google Java Format via Spotless)
 ./gradlew spotlessCheck  # Check formatting without modifying
-./gradlew test           # Run JUnit 5 tests
+./gradlew test           # JUnit 5 is configured but no tests exist yet (no src/test/java)
 ./gradlew replayWatch    # AdvantageKit log replay for debugging
 ```
 
@@ -20,7 +20,7 @@ The CI runs `./gradlew build` on every push/PR via `.github/workflows/build.yml`
 
 ## Architecture Overview
 
-This is a **WPILib command-based** robot using **AdvantageKit** for structured logging and replay and **Yet Another Mechanism System** for mechanism/motor control abstraction & simulation. The three runtime modes are selected in `Robot.java`:
+This is a **WPILib command-based** robot using **AdvantageKit** for structured logging and replay, and **YAMS (Yet Another Mechanism System)** for gearing definitions and mechanism simulation (`yams.gearing.GearBox`, `yams.gearing.MechanismGearing` are used in the per-mechanism `*Constants.java` files). The three runtime modes are selected in `Robot.java`:
 - `REAL` — hardware with real sensors
 - `SIM` — physics simulation (run on desktop)
 - `REPLAY` — replay from an AdvantageKit `.wpilog` file
@@ -36,7 +36,9 @@ Every mechanism follows this pattern (example: Intake):
 | `IntakeIOTalonFX.java` | Hardware impl — uses Phoenix 6 TalonFX / CTRE devices |
 | `IntakeConstants.java` | CAN IDs, gear ratios, PID gains, physical constants |
 
-The subsystem never talks to hardware directly — it only calls `io.*` methods. This enables REAL/SIM/REPLAY switching at construction time in `RobotContainer`.
+The subsystem never talks to hardware directly — it only calls `io.*` methods. This enables REAL/SIM/REPLAY switching at construction time in `RobotContainer`. Most TalonFX IO layers internally switch between real-hardware and sim implementations based on `Constants.currentMode`, so `RobotContainer` only constructs the TalonFX impls (see [RobotContainer.java:195-204](src/main/java/org/team157/robot/RobotContainer.java#L195-L204)).
+
+Two subsystems are not in their own subdirectory: [LEDs.java](src/main/java/org/team157/robot/subsystems/LEDs.java) and [SunstoneMechanism3D.java](src/main/java/org/team157/robot/subsystems/SunstoneMechanism3D.java) live directly under `subsystems/`. `SunstoneMechanism3D` publishes 3D pose data for AdvantageScope visualization of the robot's mechanisms (recently renamed from `SunstoneV2`).
 
 ### Subsystems
 
@@ -55,9 +57,12 @@ The subsystem never talks to hardware directly — it only calls `io.*` methods.
 
 ### Key Central Files
 
-- **`RobotContainer.java`** — instantiates all subsystems, wires default commands, registers PathPlanner named commands (`DeployIntake`, `RunIntake`, `RunHopper`, `ShootBalls`, `Wiggle`), and configures both Xbox controller button bindings.
+- **`RobotContainer.java`** — instantiates all subsystems, wires default commands, registers PathPlanner named commands (`DeployIntake`, `RunIntake`, `RunHopper`, `ShootBalls`, `Wiggle`, `WiggleCubed`), and configures both Xbox controller button bindings.
 - **`Constants.java`** — global constants (field dimensions, CAN bus names: `"rio"` and `"canivore"`).
-- **`commands/DriveCommands.java`** — factory methods for field-relative teleop drive, SysId characterization routines, and wheel radius measurement.
+- **`commands/DriveCommands.java`** — factory methods for field-relative teleop drive (`joystickDrive`, `joystickDriveAtAngle`), `feedforwardCharacterization()`, and `wheelRadiusCharacterization()`.
+- **`parsing/PositionDetails.java`** — parses [src/main/deploy/positionDetails.json](src/main/deploy/positionDetails.json) for field-relative target locations used by turret/vision tracking.
+- **`util/`** — `LocalADStarAK.java` (PathPlanner A* wrapped for AdvantageKit replay) and `PhoenixUtil.java` (CTRE retry helpers).
+- **`utilities/`** — `PosUtils.java` and `PriorityMap.java` (used by LED patterns and pose math); note this package lives at `org.team157.utilities`, outside the `org.team157.robot` tree.
 
 ### Motor & Sensor Hardware
 
@@ -70,7 +75,7 @@ The subsystem never talks to hardware directly — it only calls `io.*` methods.
 
 ### Vision
 
-Three PhotonVision cameras (`camera0`, `camera1`, `camera2`). `VisionIO` interface has `VisionIOPhotonVision` (real), `VisionIOPhotonVisionSim` (simulation), and `VisionIOLimelight` (alternative). Pose estimates are fed into `Drive`'s `SwerveDrivePoseEstimator`.
+Three PhotonVision cameras configured in [VisionConstants.java](src/main/java/org/team157/robot/subsystems/vision/VisionConstants.java): `frontLeftCam`, `frontRightCam`, `backCam` (the variables are still named `camera0Name`/`camera1Name`/`camera2Name`). `VisionIO` has two implementations: `VisionIOPhotonVision` (real) and `VisionIOPhotonVisionSim` (simulation). Pose estimates are fed into `Drive`'s `SwerveDrivePoseEstimator`.
 
 ### Autonomous
 
@@ -78,4 +83,8 @@ PathPlanner v2026 manages paths. Named commands are registered in `RobotContaine
 
 ### Logging
 
-AdvantageKit `Logger` records all `@AutoLog`-annotated inputs each loop. On the robot, logs write to a USB stick. Metadata (Git SHA, branch, build date) is logged at startup from `BuildConstants`.
+AdvantageKit `Logger` records all `@AutoLog`-annotated inputs each loop. On the robot (`REAL`), logs are written via `WPILOGWriter` (defaults to `/U/logs` USB stick) and republished to NT via `NT4Publisher`; in `SIM`, logs go only to NT. Metadata (Git SHA, branch, build date) is logged at startup from `BuildConstants`.
+
+### Dashboards
+
+An Elastic dashboard layout is checked into [src/main/deploy/ElasticLayout/elastic-layout.json](src/main/deploy/ElasticLayout/elastic-layout.json) and deployed with the robot code.
