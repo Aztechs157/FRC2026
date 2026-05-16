@@ -88,7 +88,7 @@ public class Flywheel extends SubsystemBase {
      * @return {@link Command} continuously updating the flywheel velocity.
      */
     public Command setDynamicVelocity() {
-        return io.setVelocity(this::getDesiredFlywheelVelocity);
+        return io.setVelocity(() -> getDesiredFlywheelVelocity());
     }
 
     ////////////////////////
@@ -188,9 +188,10 @@ public class Flywheel extends SubsystemBase {
     }
 
     /**
-     * Gets the desired flywheel velocity for the current shot, recalculating shot parameters each
-     * time it is called.
-     *
+     * Gets the desired flywheel velocity for the current shot, 
+     * recalculating shot parameters each time it is called.
+     * The result of this calculation is multiplied by a modifier controlled by the operator.
+     * 
      * @return The desired angular velocity of the flywheel.
      */
     public AngularVelocity getDesiredFlywheelVelocity() {
@@ -206,7 +207,8 @@ public class Flywheel extends SubsystemBase {
         double desiredRPM =
                 (ballVelocity * 60)
                         / (Math.PI * flywheelDiameterMeters)
-                        * FlywheelConstants.SPEED_FACTOR;
+                        * FlywheelConstants.SPEED_FACTOR
+                        * RobotContainer.ballisticSpeedModifier;
         return RPM.of(Math.max(2800, desiredRPM));
     }
 

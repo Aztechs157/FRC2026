@@ -74,6 +74,11 @@ public class RobotContainer {
             RotationsPerSecond.of(0.75)
                     .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
+    /**
+     * Speed factor used in flywheel ballistic equations, to be manually adjusted by the operator
+     */
+    public static double ballisticSpeedModifier = 1;
+
     // Subsystems
     public static Vision vision;
     public static Drive drive;
@@ -260,9 +265,9 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> -driverController.getLeftY(),
-                        () -> -driverController.getLeftX(),
-                        () -> -driverController.getRightX()));
+                        () -> modifySpeed(-driverController.getLeftY()),
+                        () -> modifySpeed(-driverController.getLeftX()),
+                        () -> modifySpeed(-driverController.getRightX())));
         // Update the pose estimation and turret tracking angle while no other vision commands are
         // running.
         vision.setDefaultCommand(vision.setDefault(drive, turret));
@@ -306,27 +311,21 @@ public class RobotContainer {
         /////////////////////
         // Enables dynamic control of the flywheel and hood.
         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
-        driverController.a().toggleOnTrue(hood.setDynamicHoodAngle());
 
         ////////////////////////////
         /// INTAKE UPTAKE HOPPER ///
         ////////////////////////////
-        // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's preference.
-        if (ModifierConstants.MAYA_MODE) {
-            // Shooting on left trigger, intake on right trigger
-            driverController.leftTrigger().whileTrue(uptake.set(1));
-            driverController.rightTrigger().whileTrue(intake.runIntake());
-            driverController.leftTrigger().whileTrue(hopper.set(1));
-        } else {
-            // Shooting on right trigger, intake on left trigger
-            driverController.rightTrigger().whileTrue(uptake.set(1));
-            driverController.leftTrigger().whileTrue(intake.runIntake());
-            driverController.rightTrigger().whileTrue(hopper.set(1));
-        }
+        driverController.rightTrigger().whileTrue(uptake.set(1));
+        driverController.leftTrigger().whileTrue(intake.runIntake());
+        driverController.rightTrigger().whileTrue(hopper.set(1));
+
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
         driverController.y().whileTrue(forceOuttake());
         // Wiggles the intake up and down to free up stuck balls
         driverController.x().toggleOnTrue(slapdown.wiggleIntake());
+
+        // (in/de)creases the ballistic modifier
+        operatorController.x().or(operatorController.b()).onTrue(setModifier());
         //////////////////////////////////////////////////
         ///             OPERATOR COMMANDS              ///
         //////////////////////////////////////////////////
@@ -341,7 +340,9 @@ public class RobotContainer {
         // allowing the operator to control the turret without interference from vision tracking.
         turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
         turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
-        turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());
+        turretTrackingTrigger()
+                .and(driverController.rightTrigger())
+                .whileTrue(hood.setDynamicHoodAngle());
 
         ///////////////////////
         /// MANUAL FLYWHEEL ///
@@ -389,13 +390,32 @@ public class RobotContainer {
                 .toggleOnTrue(slapdown.retractIntake());
     }
 
-    // If the right bumper is held, apply the precision modifier of 0.5x speed.
+    /**
+     * Apply a speed modifier when the right bumper (dedicated toggle) or shooting trigger are held,
+     * or the robot is under the trench.
+     */
     public double modifySpeed(final double speed) {
-        if (driverController.rightBumper().getAsBoolean() || drive.isUnderTrench()) {
+        if (driverController.rightBumper().getAsBoolean()
+                || driverController.rightTrigger().getAsBoolean()) {
             return speed * ModifierConstants.PRECISION_DRIVE_MODIFIER;
+        } else if (drive.isUnderTrench()) {
+            return speed * ModifierConstants.TRENCH_DRIVE_MODIFIER;
         } else {
             return speed;
         }
+    }
+
+    /** Update the ballistic equation modifier based on the operator's button presses */
+    public void setBallisticSpeedModifier() {
+        if (operatorController.x().getAsBoolean()) {
+            ballisticSpeedModifier = ballisticSpeedModifier + 0.05;
+        } else if (operatorController.b().getAsBoolean()) {
+            ballisticSpeedModifier = ballisticSpeedModifier - 0.05;
+        }
+    }
+
+    public InstantCommand setModifier() {
+        return new InstantCommand(() -> setBallisticSpeedModifier());
     }
 
     public boolean isHubActive() {

@@ -1,5 +1,6 @@
 package org.team157.robot.subsystems.intake;
 
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.littletonrobotics.junction.AutoLog;
@@ -34,6 +35,16 @@ public interface IntakeIO {
 
     /** Updates the values for the simulated version of the intake roller mechanism. */
     default void simIterate() {}
+
+    /**
+     * Sets the intake to a fixed target angular velocity.
+     *
+     * @param velocity The target angular velocity.
+     * @return a {@link Command} setting the intake to the specified velocity.
+     */
+    default Command setVelocity(AngularVelocity velocity) {
+        return Commands.none();
+    }
 
     /**
      * Stops the intake roller.
