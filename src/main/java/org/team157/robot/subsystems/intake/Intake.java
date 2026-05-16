@@ -64,6 +64,7 @@ public class Intake extends SubsystemBase {
      * @return a {@link Command} running the intake motors at 100% duty cycle
      */
     public Command runIntake() {
+        // Arbitrary untuned value
         return setVelocity(RPM.of(3000));
     }
 

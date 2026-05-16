@@ -188,9 +188,10 @@ public class Flywheel extends SubsystemBase {
     }
 
     /**
-     * Gets the desired flywheel velocity for the current shot, recalculating shot parameters each
-     * time it is called.
-     *
+     * Gets the desired flywheel velocity for the current shot, 
+     * recalculating shot parameters each time it is called.
+     * The result of this calculation is multiplied by a modifier controlled by the operator.
+     * 
      * @return The desired angular velocity of the flywheel.
      */
     public AngularVelocity getDesiredFlywheelVelocity() {

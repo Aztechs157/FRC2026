@@ -311,7 +311,6 @@ public class RobotContainer {
         /////////////////////
         // Enables dynamic control of the flywheel and hood.
         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
-        // driverController.a().toggleOnTrue(hood.setDynamicHoodAngle());
 
         ////////////////////////////
         /// INTAKE UPTAKE HOPPER ///
@@ -409,9 +408,9 @@ public class RobotContainer {
     /** Update the ballistic equation modifier based on the operator's button presses */
     public void setBallisticSpeedModifier() {
         if (operatorController.x().getAsBoolean()) {
-            ballisticSpeedModifier = ballisticSpeedModifier + 0.1;
+            ballisticSpeedModifier = ballisticSpeedModifier + 0.05;
         } else if (operatorController.b().getAsBoolean()) {
-            ballisticSpeedModifier = ballisticSpeedModifier - 0.1;
+            ballisticSpeedModifier = ballisticSpeedModifier - 0.05;
         }
     }
 
