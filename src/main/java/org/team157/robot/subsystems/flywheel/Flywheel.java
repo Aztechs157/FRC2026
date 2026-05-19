@@ -108,9 +108,9 @@ public class Flywheel extends SubsystemBase {
         return io.setVelocity(this::getDesiredFlywheelVelocity);
     }
 
-    ////////////////////////////
+    ///////////////////////////////
     /// SYSID CHARACTERIZATION ///
-    ////////////////////////////
+    /////////////////////////////
 
     /** Applies an open-loop voltage directly to the flywheel master motor. */
     public void runCharacterization(double volts) {

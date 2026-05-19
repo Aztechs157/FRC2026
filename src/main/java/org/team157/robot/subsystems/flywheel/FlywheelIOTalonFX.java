@@ -30,8 +30,10 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
     private final FlyWheel flywheel;
     private final SmartMotorController motor;
+    // motor object for sysID voltage control
     private final TalonFX masterTalonFX;
-    private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(true);
+    // initial voltage for sysID voltage control
+    private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(false);
 
     public FlywheelIOTalonFX(SubsystemBase subsystem) {
         TalonFX talonFX = new TalonFX(FlywheelConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
