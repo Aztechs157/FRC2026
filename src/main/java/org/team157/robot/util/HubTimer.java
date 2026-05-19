@@ -7,8 +7,8 @@ package org.team157.robot.util;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
 // TODO: consider extending SubsystemBase to automatically update the hub status on each
@@ -121,8 +121,15 @@ public class HubTimer extends SubsystemBase {
         }
     }
 
+    public boolean isShiftAboutToEnd(double threshold) {
+        return timeUntilSwap > 0 && timeUntilSwap < threshold;
+    }
+
     @Override
-    public void periodic(){
-        
+    public void periodic() {
+        updateHubStatus();
+        Logger.recordOutput("Misc/Time Until Next Swap", timeUntilSwap);
+        Logger.recordOutput("Misc/Hub Active?", hubActive);
+        Logger.recordOutput("Misc/Current Shift", currentShift.name());
     }
 }

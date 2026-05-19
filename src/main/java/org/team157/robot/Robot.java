@@ -107,16 +107,9 @@ public class Robot extends LoggedRobot {
 
         // Return to non-RT thread priority (do not modify the first argument)
         // Threads.setCurrentThreadPriority(false, 10);
-
-        RobotContainer.hubStatus.updateHubStatus();
         Logger.recordOutput("Misc/Manual Override Active?", RobotContainer.manualOverride);
         // Gets the match time from the FMS to display for the driver.
         Logger.recordOutput("Misc/Match Time", Timer.getMatchTime());
-        Logger.recordOutput("Misc/Match Time 2", DriverStation.getMatchTime());
-        Logger.recordOutput("Misc/Time Until Next Swap", RobotContainer.hubStatus.timeUntilSwap);
-        // Gets hub activity status to display on the dashboard.
-        Logger.recordOutput("Misc/Hub Active?", RobotContainer.hubStatus.hubActive);
-        Logger.recordOutput("Misc/Current Shift", RobotContainer.hubStatus.currentShift.name());
         Logger.recordOutput("Misc/Under Trench?", RobotContainer.drive.isUnderTrench());
         m_field.setRobotPose(RobotContainer.drive.getPose());
     }
