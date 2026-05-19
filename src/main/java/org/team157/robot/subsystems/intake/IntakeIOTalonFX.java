@@ -14,6 +14,7 @@ import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team157.robot.Constants;
@@ -40,7 +41,13 @@ public class IntakeIOTalonFX implements IntakeIO {
 
         SmartMotorControllerConfig intakeMotorConfig =
                 new SmartMotorControllerConfig(subsystem)
-                        .withControlMode(ControlMode.OPEN_LOOP)
+                        .withControlMode(ControlMode.CLOSED_LOOP)
+                        .withClosedLoopController(
+                                IntakeConstants.KP,
+                                IntakeConstants.KI,
+                                IntakeConstants.KD,
+                                IntakeConstants.ANGULAR_VELOCITY,
+                                IntakeConstants.ANGULAR_ACCELERATION)
                         .withGearing(1)
                         .withMotorInverted(false)
                         .withIdleMode(MotorMode.COAST)
@@ -81,6 +88,11 @@ public class IntakeIOTalonFX implements IntakeIO {
     @Override
     public Command set(double dutycycle) {
         return intake.set(dutycycle);
+    }
+
+    @Override
+    public Command setVelocity(AngularVelocity velocity) {
+        return intake.setSpeed(velocity);
     }
 
     @Override
