@@ -22,6 +22,10 @@ public class LEDs extends SubsystemBase {
 
     AddressableLED prettyLights;
     AddressableLEDBuffer prettyLightsBuffer;
+
+    public LEDPattern active = LEDPattern.rainbow(255, 255);
+    public LEDPattern inactive = LEDPattern.solid(Color.kBlack);
+
     /** Creates a new LEDs. */
     public LEDs() {
 

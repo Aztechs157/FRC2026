@@ -58,6 +58,7 @@ import org.team157.robot.subsystems.vision.VisionConstants;
 import org.team157.robot.subsystems.vision.VisionIO;
 import org.team157.robot.subsystems.vision.VisionIOPhotonVision;
 import org.team157.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import org.team157.robot.util.HubTimer;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -93,6 +94,7 @@ public class RobotContainer {
 
     // Dashboard inputs (auto chooser)
     private final LoggedDashboardChooser<Command> autoChooser;
+    public static final HubTimer hubStatus = new HubTimer();
 
     // Manual Override Status
     public static boolean manualOverride = false;
