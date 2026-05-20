@@ -31,15 +31,14 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     private final FlyWheel flywheel;
     private final SmartMotorController motor;
     // motor object for sysID voltage control
-    private final TalonFX masterTalonFX;
+    private final TalonFX talonFX;
     // initial voltage for sysID voltage control
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(false);
 
     public FlywheelIOTalonFX(SubsystemBase subsystem) {
-        TalonFX talonFX = new TalonFX(FlywheelConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
+        this.talonFX = new TalonFX(FlywheelConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
         TalonFX followerTalonFX =
                 new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_ID, Constants.RIO_CAN_BUS);
-        this.masterTalonFX = talonFX;
 
         SmartMotorControllerConfig flywheelMotorConfig =
                 new SmartMotorControllerConfig(subsystem)
@@ -105,7 +104,7 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
     @Override
     public void setVoltage(double volts) {
-        masterTalonFX.setControl(voltageRequest.withOutput(volts));
+        talonFX.setControl(voltageRequest.withOutput(volts));
     }
 
     @Override
