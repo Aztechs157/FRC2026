@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.team157.robot.RobotContainer;
 import org.team157.utilities.PriorityMap;
 
 public class LEDs extends SubsystemBase {
@@ -23,8 +24,9 @@ public class LEDs extends SubsystemBase {
     AddressableLED prettyLights;
     AddressableLEDBuffer prettyLightsBuffer;
 
-    public LEDPattern active = LEDPattern.rainbow(255, 255);
+    public LEDPattern active = LEDPattern.rainbow(255, 255).scrollAtRelativeSpeed(Hertz.of(0.5));
     public LEDPattern inactive = LEDPattern.solid(Color.kBlack);
+    public LEDPattern crunchTime = LEDPattern.solid(Color.kWhite).blink(Seconds.of(0.5));
 
     /** Creates a new LEDs. */
     public LEDs() {
@@ -86,6 +88,16 @@ public class LEDs extends SubsystemBase {
 
     // }
 
+    public LEDPattern getDesiredPattern() {
+
+        if (RobotContainer.hubStatus.isShiftAboutToEnd(2)) {
+            return crunchTime;
+        } else if (RobotContainer.hubStatus.hubActive) {
+            return active;
+        } else {
+            return inactive;
+        }
+    }
     // full
     public void addPattern(String name, int priority, LEDPattern pattern) {
         fullPatterns.put(name, priority, pattern);
@@ -101,7 +113,7 @@ public class LEDs extends SubsystemBase {
 
     @Override
     public void periodic() {
-
+        fullPatterns.put("Desired Pattern", 5, getDesiredPattern());
         fullPatterns.firstValue().applyTo(prettyLightsBuffer);
         prettyLights.setData(prettyLightsBuffer);
     }

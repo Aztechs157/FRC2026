@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.team157.robot.util;
+package org.team157.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -11,8 +11,6 @@ import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
-// TODO: consider extending SubsystemBase to automatically update the hub status on each
-// CommandScheduler run independent from Robot.
 public class HubTimer extends SubsystemBase {
 
     public enum Shift {
