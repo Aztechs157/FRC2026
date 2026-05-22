@@ -43,6 +43,7 @@ public class Vision extends SubsystemBase {
     private boolean isBlueAlliance = true;
 
     public double angleToTarget = 0;
+    public static double rawAngleToTarget = 0;
     public double distanceToTarget = 0;
     public static double distanceToTargetFromTurret = 0;
     public static double angleToTargetFromTurret = 0;
@@ -186,6 +187,7 @@ public class Vision extends SubsystemBase {
                         robotPose.plus(Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
                         adjustedTargetPose);
 
+        rawAngleToTarget = PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();
         angleToTarget = PhotonUtils.getYawToPose(robotPose, adjustedTargetPose).getDegrees();
         angleToTargetFromTurret =
                 PhotonUtils.getYawToPose(
