@@ -38,7 +38,7 @@ Every mechanism follows this pattern (example: Intake):
 
 The subsystem never talks to hardware directly — it only calls `io.*` methods. This enables REAL/SIM/REPLAY switching at construction time in `RobotContainer`. Most TalonFX IO layers internally switch between real-hardware and sim implementations based on `Constants.currentMode`, so `RobotContainer` only constructs the TalonFX impls (see [RobotContainer.java:195-204](src/main/java/org/team157/robot/RobotContainer.java#L195-L204)).
 
-Two subsystems are not in their own subdirectory: [LEDs.java](src/main/java/org/team157/robot/subsystems/LEDs.java) and [SunstoneMechanism3D.java](src/main/java/org/team157/robot/subsystems/SunstoneMechanism3D.java) live directly under `subsystems/`. `SunstoneMechanism3D` publishes 3D pose data for AdvantageScope visualization of the robot's mechanisms (recently renamed from `SunstoneV2`).
+Two subsystems are not in their own subdirectory: [LEDs.java](src/main/java/org/team157/robot/subsystems/LEDs.java) and [SunstoneMechanism3D.java](src/main/java/org/team157/robot/subsystems/SunstoneMechanism3D.java) live directly under `subsystems/`. `SunstoneMechanism3D` publishes 3D pose data for AdvantageScope visualization of the robot's mechanisms.
 
 ### Subsystems
 
@@ -80,6 +80,18 @@ Three PhotonVision cameras configured in [VisionConstants.java](src/main/java/or
 ### Autonomous
 
 PathPlanner v2026 manages paths. Named commands are registered in `RobotContainer` via `NamedCommands.registerCommand(...)`. Path files live in `src/main/deploy/pathplanner/`.
+
+### SysId Tuning
+
+`Drive` and `Flywheel` expose SysId characterization routines (Quasistatic/Dynamic × Forward/Reverse) wired into the auto chooser. They are gated behind `!DriverStation.isFMSAttached()` so they don't appear at competition (see [RobotContainer.java](src/main/java/org/team157/robot/RobotContainer.java#L223-L255)).
+
+The flywheel routine writes voltage directly to the master TalonFX via `FlywheelIO.setVoltage()`; the follower mirrors automatically because YAMS' `.withFollowers(...)` configures Phoenix 6's persistent `Follower` request at construction. State transitions are logged to `Flywheel/SysIdState`. To run: pick a SysId entry in the auto chooser, enable autonomous, disable when the wheel saturates (quasistatic ~8–12 s) or shortly after the step response (dynamic ~2–3 s). Repeat for all four directions/types.
+
+Analyze the resulting `.wpilog` in the WPILib **`sysid` tool** (`C:\Users\Public\wpilib\2026\tools\sysid.exe`, or via VS Code → "WPILib: Start Tool" → SysId — AdvantageScope itself has no SysId tab). Map Voltage → `Flywheel/AppliedVolts`, Velocity → `Flywheel/MechanismVelocityRPM`, State → `Flywheel/SysIdState`. Set Analysis Type to "Simple".
+
+**Unit gotcha:** sysid treats the velocity field as rotations-per-second when units-per-rotation is left at the default `1`. Because `MechanismVelocityRPM` is rotations per *minute*, the raw `kV`, `kA`, and `kP` outputs come out 60× too small for what YAMS' `SimpleMotorFeedforward` expects (it feeds velocity in rotations per second internally). Multiply `kV`, `kA`, and `kP` by 60 — `kS` is unaffected (pure volts). Alternative: export a `MechanismVelocityRPS = RPM / 60` channel from AdvantageScope and load that instead, but inline multiplication is the path of least resistance.
+
+**Inline-multiplier convention:** constants in [FlywheelConstants.java](src/main/java/org/team157/robot/subsystems/flywheel/FlywheelConstants.java) sourced from external tools (SysId, Reca.lc) keep their raw tool-output value as the first literal and chain corrections as inline multipliers — e.g., `KV = 0.00197327 * 60 * 0.975` (raw sysid output × unit fix × empirical 2.5% trim). Preserves provenance when re-tuning later.
 
 ### Logging
 

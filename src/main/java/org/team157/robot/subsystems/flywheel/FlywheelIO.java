@@ -43,6 +43,14 @@ public interface FlywheelIO {
     default void stop() {}
 
     /**
+     * Applies an open-loop voltage to the flywheel master motor. Used by the SysId routine to
+     * characterize feedforward constants ({@code kS}, {@code kV}, {@code kA}).
+     *
+     * @param volts Voltage to apply, clamped to the battery bus.
+     */
+    default void setVoltage(double volts) {}
+
+    /**
      * Directly sets the output duty cycle of the flywheel motor.
      *
      * @param dutyCycle The duty cycle to apply to the motor, between -1 and 1.
