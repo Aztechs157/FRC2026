@@ -28,6 +28,7 @@ import org.ejml.simple.SimpleMatrix;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonUtils;
 import org.team157.robot.Constants.FieldConstants;
+import org.team157.robot.RobotContainer;
 import org.team157.robot.subsystems.SunstoneMechanism3D.Mechanism3DConstants;
 import org.team157.robot.subsystems.drive.Drive;
 import org.team157.robot.subsystems.flywheel.Flywheel;
@@ -44,6 +45,7 @@ public class Vision extends SubsystemBase {
 
     public double angleToTarget = 0;
     public static double rawAngleToTarget = 0;
+    public static double driveAlignAngle = 0;
     public double distanceToTarget = 0;
     public static double distanceToTargetFromTurret = 0;
     public static double angleToTargetFromTurret = 0;
@@ -201,6 +203,15 @@ public class Vision extends SubsystemBase {
         Logger.recordOutput("Targeting/Angle to Target", angleToTarget);
         Logger.recordOutput("Targeting/Distance to Target from Turret", distanceToTargetFromTurret);
         Logger.recordOutput("Targeting/Angle to Target from Turret", angleToTargetFromTurret);
+    }
+
+    /**
+     * Gets the setpoint angle for the drivebase to face the hub
+     * @return
+     */
+    public Rotation2d getAngleToFaceHub() {
+        return Rotation2d.fromDegrees(rawAngleToTarget + 180)
+                .plus(RobotContainer.drive.getRotation());
     }
 
     @Override

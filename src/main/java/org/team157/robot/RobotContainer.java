@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -20,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.Optional;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.team157.robot.Constants.Mode;
 import org.team157.robot.Constants.ModifierConstants;
@@ -288,12 +286,13 @@ public class RobotContainer {
         // Lock to 0° when A button is held
         driverController
                 .a()
+                .and(turretTrackingTrigger().negate())
                 .whileTrue(
                         DriveCommands.joystickDriveAtAngle(
                                 drive,
                                 () -> -driverController.getLeftY(),
                                 () -> -driverController.getLeftX(),
-                                this::driveAlignSetpoint));
+                                vision::getAngleToFaceHub));
 
         // Reset gyro to 0° when start and back buttons are pressed
         driverController
@@ -508,23 +507,6 @@ public class RobotContainer {
     // TODO: remove from RobotContainer and into eventual Superstructure subsystem once it exists.
     private Command forceOuttake() {
         return uptake.set(-0.5).alongWith(hopper.set(-0.5)).alongWith(intake.set(-0.5));
-    }
-
-    /**
-     * Returns the drive heading setpoint that brings {@code rawAngleToTarget} to 0° or 180°
-     * (whichever requires less rotation), so the robot's front or back faces the hub.
-     */
-    private Rotation2d driveAlignSetpoint() {
-        double raw = Vision.rawAngleToTarget;
-        double heading = drive.getRotation().getDegrees();
-        double setpointFront = raw; // hub directly ahead
-        double setpointBack = raw + 180.0; // hub directly behind
-        double diffFront = MathUtil.inputModulus(setpointFront - heading, -180.0, 180.0);
-        double diffBack = MathUtil.inputModulus(setpointBack - heading, -180.0, 180.0);
-        double newSetpoint =
-                Math.abs(diffFront) <= Math.abs(diffBack) ? setpointFront : setpointBack;
-        Logger.recordOutput("Targeting/Drive Setpoint", newSetpoint);
-        return Rotation2d.fromDegrees(raw + 180).plus(drive.getRotation());
     }
 
     /**
