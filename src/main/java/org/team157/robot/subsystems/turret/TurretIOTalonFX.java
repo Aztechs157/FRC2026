@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
@@ -36,9 +37,13 @@ public class TurretIOTalonFX implements TurretIO {
     private final Pivot turret;
     private final SmartMotorController motor;
     private final DutyCycleEncoder encoder;
+    // motor object for sysID voltage control
+    private final TalonFX talonFX;
+    // initial voltage for sysID voltage control
+    private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(false);
 
     public TurretIOTalonFX(SubsystemBase subsystem) {
-        TalonFX talonFX = new TalonFX(TurretConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
+        this.talonFX = new TalonFX(TurretConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
         this.encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
 
         SmartMotorControllerConfig turretMotorConfig =
@@ -83,12 +88,20 @@ public class TurretIOTalonFX implements TurretIO {
         this.turret = new Pivot(turretConfig);
         this.motor = turret.getMotor();
 
+        // Refresh-mutate-apply: read whatever YAMS configured during construction, flip only the
+        // enable/wrap flags we care about, then write back. Calling apply() on a fresh builder
+        // would overwrite thresholds with the default zero and brick the mechanism.
         var configurator = talonFX.getConfigurator();
-        configurator.refresh(
-                new SoftwareLimitSwitchConfigs()
-                        .withForwardSoftLimitEnable(true)
-                        .withReverseSoftLimitEnable(true));
-        configurator.refresh(new ClosedLoopGeneralConfigs().withContinuousWrap(false));
+        var softLimits = new SoftwareLimitSwitchConfigs();
+        configurator.refresh(softLimits);
+        softLimits.ForwardSoftLimitEnable = true;
+        softLimits.ReverseSoftLimitEnable = true;
+        configurator.apply(softLimits);
+
+        var closedLoopGeneral = new ClosedLoopGeneralConfigs();
+        configurator.refresh(closedLoopGeneral);
+        closedLoopGeneral.ContinuousWrap = false;
+        configurator.apply(closedLoopGeneral);
     }
 
     /** Helper that maps the encoder position to an angle in degrees using PosUtils. */
@@ -120,6 +133,22 @@ public class TurretIOTalonFX implements TurretIO {
     @Override
     public void stop() {
         turret.setDutyCycleSetpoint(0);
+    }
+
+    // Margin in degrees to leave between the current angle and the soft limit before clamping the
+    // SysId voltage to zero. Sized to absorb one scheduler tick of motion plus braking distance.
+    private static final double SYSID_LIMIT_MARGIN_DEGREES = 5.0;
+
+    @Override
+    public void setVoltage(double volts) {
+        double angleDegrees = turret.getAngle().in(Degrees);
+        double lowerLimit = TurretConstants.LOWER_SOFT_LIMIT.in(Degrees);
+        double upperLimit = TurretConstants.UPPER_SOFT_LIMIT.in(Degrees);
+        if ((volts > 0 && angleDegrees >= upperLimit - SYSID_LIMIT_MARGIN_DEGREES)
+                || (volts < 0 && angleDegrees <= lowerLimit + SYSID_LIMIT_MARGIN_DEGREES)) {
+            volts = 0;
+        }
+        talonFX.setControl(voltageRequest.withOutput(volts));
     }
 
     @Override

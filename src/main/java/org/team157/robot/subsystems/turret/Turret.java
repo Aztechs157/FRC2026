@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.Logger;
 import org.team157.robot.Robot;
 import org.team157.robot.subsystems.vision.Vision;
@@ -22,6 +23,22 @@ public class Turret extends SubsystemBase {
 
     // Inputs from the motor, encoder, and mechanism, to be updated periodically and logged.
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+
+    // SysId routine for characterizing kS / kV / kA. Uses conservative ramp (0.5 V/s) and step
+    // (2 V) with a 2 s timeout because the turret only has ~349° of travel. A software soft-limit
+    // guard in TurretIOTalonFX.setVoltage() clamps voltage to zero before reaching either soft
+    // limit, so the routine is bounded even if the operator doesn't disable in time. Operator
+    // should still start the forward test near the lower soft limit and the reverse test near
+    // the upper soft limit to maximize the amount of usable travel per run.
+    private final SysIdRoutine sysId =
+            new SysIdRoutine(
+                    new SysIdRoutine.Config(
+                            Volts.per(Second).of(0.5),
+                            Volts.of(2),
+                            Seconds.of(2),
+                            (state) -> Logger.recordOutput("Turret/SysIdState", state.toString())),
+                    new SysIdRoutine.Mechanism(
+                            (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
 
     // The current angle the turret is tracking towards.
     public static Angle trackingAngle = Degrees.of(0);
@@ -80,6 +97,25 @@ public class Turret extends SubsystemBase {
      */
     public Command trackTagGlobalRelative() {
         return io.setTargetAngle(Turret::getTrackingAngle);
+    }
+
+    ///////////////////////////////
+    /// SYSID CHARACTERIZATION ///
+    /////////////////////////////
+
+    /** Applies an open-loop voltage directly to the turret motor. */
+    public void runCharacterization(double volts) {
+        io.setVoltage(volts);
+    }
+
+    /** Returns a command to run a quasistatic SysId test in the specified direction. */
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return sysId.quasistatic(direction);
+    }
+
+    /** Returns a command to run a dynamic SysId test in the specified direction. */
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return sysId.dynamic(direction);
     }
 
     /**
