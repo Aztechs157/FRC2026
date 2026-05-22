@@ -25,8 +25,15 @@ public final class FlywheelConstants {
     // IDs of both motors powering the flywheel.
     public static final int MOTOR_ID = 22, FOLLOWER_MOTOR_ID = 23;
     // Closed-loop control values for the flywheel.
-    public static final double KP = 2, KI = 0, KD = 0;
-    public static final double KS = 0.0, KV = 0.0, KA = 0.0;
+    /**
+     * Tuned values using sysID. Multiples of 60 are used due to unit conversion from sysID outputs
+     * Further multiples are added to refine tuning through observation of
+     * Flywheel/MechanismVelocityRPM and comparing to Flywheel/TargetVelocityRPM in AdvantageScope
+     * and running at variable RPM setpoints
+     */
+    public static final double KP = 0.00066882 * 60 * 4, KI = 0, KD = 0.02;
+
+    public static final double KS = 0.05094, KV = 0.00197327 * 60 * 0.975, KA = 0.00013465 * 60;
     public static final double SIM_KP = 1.57, SIM_KI = 0, SIM_KD = 0.157;
     public static final double SIM_KS = 0.0,
             SIM_KV = 0.37,

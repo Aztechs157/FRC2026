@@ -4,6 +4,9 @@
 
 package org.team157.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.RPM;
+
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
@@ -46,12 +49,23 @@ public class Intake extends SubsystemBase {
     }
 
     /**
+     * Set the intake to a fixed target angular velocity.
+     *
+     * @param speed The target angular velocity.
+     * @return {@link Command} setting the intake to the specified velocity.
+     */
+    public Command setVelocity(AngularVelocity speed) {
+        return io.setVelocity(speed);
+    }
+
+    /**
      * Run the intake at a set speed. Used for autonomous and button bindings.
      *
      * @return a {@link Command} running the intake motors at 100% duty cycle
      */
     public Command runIntake() {
-        return set(1);
+        // Arbitrary untuned value
+        return setVelocity(RPM.of(3000));
     }
 
     @Override

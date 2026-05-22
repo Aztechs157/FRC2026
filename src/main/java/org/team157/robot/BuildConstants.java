@@ -11,6 +11,7 @@ public final class BuildConstants {
     public static final String GIT_BRANCH = "feature/better-leds";
     public static final String BUILD_DATE = "2026-05-22 08:33:19 EDT";
     public static final long BUILD_UNIX_TIME = 1779453199963L;
+
     public static final int DIRTY = 1;
 
     private BuildConstants() {}

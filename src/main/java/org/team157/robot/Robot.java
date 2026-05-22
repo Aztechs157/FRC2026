@@ -111,6 +111,7 @@ public class Robot extends LoggedRobot {
         // Gets the match time from the FMS to display for the driver.
         Logger.recordOutput("Misc/Match Time", Timer.getMatchTime());
         Logger.recordOutput("Misc/Under Trench?", RobotContainer.drive.isUnderTrench());
+        Logger.recordOutput("Flywheel Modifier", RobotContainer.ballisticSpeedModifier);
         m_field.setRobotPose(RobotContainer.drive.getPose());
     }
 
