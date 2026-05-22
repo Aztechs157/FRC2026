@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,8 +26,16 @@ public class LEDs extends SubsystemBase {
     AddressableLEDBuffer prettyLightsBuffer;
 
     public LEDPattern active = LEDPattern.rainbow(255, 255).scrollAtRelativeSpeed(Hertz.of(0.5));
-    public LEDPattern inactive = LEDPattern.solid(Color.kBlack);
-    public LEDPattern crunchTime = LEDPattern.solid(Color.kWhite).blink(Seconds.of(0.5));
+    public LEDPattern inactive = LEDPattern.solid(Color.kWhite);
+    public LEDPattern crunchTime = LEDPattern.solid(Color.kWhite).blink(Seconds.of(0.33));
+
+    public LEDPattern baseRainbow = LEDPattern.rainbow(255, 255);
+    public LEDPattern shiftEnd = crunchTime.overlayOn(baseRainbow);
+
+    public LEDPattern idle =
+            LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kGold, Color.kBlue)
+                    .scrollAtRelativeSpeed(Percent.per(Second).of(25));
+    // .atBrightness(Percent.of(20));
 
     /** Creates a new LEDs. */
     public LEDs() {
@@ -51,11 +60,8 @@ public class LEDs extends SubsystemBase {
     public void isFMS() {
         // runs the idle pattern without lowering the brightness, only when connected to
         // an FMS.
-        LEDPattern assabet =
-                LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kGold, Color.kBlue);
-        LEDPattern assabetScroll = assabet.scrollAtRelativeSpeed(Percent.per(Second).of(25));
-
-        fullPatterns.replace("Assabet Scroll", assabetScroll);
+        LEDPattern fmsIdle = idle.atBrightness(Percent.of(100));
+        fullPatterns.replace("Assabet Scroll", fmsIdle);
     }
 
     /*
@@ -76,28 +82,22 @@ public class LEDs extends SubsystemBase {
         addPattern("unpleasant", 1, unpleasant);
     }
 
-    //   public void batteryLow(boolean isLow) {
-    //     // this pattern is run when the battery drops below a certain voltage
-    //     LEDPattern low = LEDPattern.solid(Color.kRed);
-    //     LEDPattern redFlash = low.blink(Seconds.of(0.5));
-    //     if (isLow) {
-    //       addBotPattern("Battery Low", 1, redFlash);
-    //     } else {
-    //       removeBotPattern("Battery Low");
-    //     }
-
-    // }
-
     public LEDPattern getDesiredPattern() {
 
-        if (RobotContainer.hubStatus.isShiftAboutToEnd(2)) {
+        if (!DriverStation.isEnabled()) {
+            return idle;
+        } else if (RobotContainer.hubStatus.isShiftAboutToEnd(5)
+                && RobotContainer.hubStatus.isHubActive()) {
+            return shiftEnd;
+        } else if (RobotContainer.hubStatus.isShiftAboutToEnd(5)) {
             return crunchTime;
-        } else if (RobotContainer.hubStatus.hubActive) {
+        } else if (RobotContainer.hubStatus.isHubActive()) {
             return active;
         } else {
             return inactive;
         }
     }
+
     // full
     public void addPattern(String name, int priority, LEDPattern pattern) {
         fullPatterns.put(name, priority, pattern);

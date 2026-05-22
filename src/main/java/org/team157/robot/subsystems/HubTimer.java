@@ -24,9 +24,11 @@ public class HubTimer extends SubsystemBase {
         ENDGAME;
     }
 
-    public Shift currentShift = Shift.INACTIVE;
-    public boolean hubActive = true;
-    public double timeUntilSwap = 0.0;
+    private Shift currentShift = Shift.INACTIVE;
+    private boolean hubActive = true;
+    private double timeUntilSwap = 0.0;
+    private boolean redInactiveFirst = false;
+    private boolean shift1Active = false;
 
     public void updateHubStatus() {
         Optional<Alliance> alliance = DriverStation.getAlliance();
@@ -52,8 +54,6 @@ public class HubTimer extends SubsystemBase {
         double matchTime = DriverStation.getMatchTime();
         String gameData = DriverStation.getGameSpecificMessage();
 
-        boolean redInactiveFirst = false;
-
         // If we have no game data, we cannot compute, assume hub is active, as its
         // likely early in teleop.
         if (gameData.isEmpty()) {
@@ -70,10 +70,11 @@ public class HubTimer extends SubsystemBase {
         }
 
         // Shift was is active for blue if red won auto, or red if blue won auto.
-        boolean shift1Active =
+        shift1Active =
                 switch (alliance.get()) {
                     case Red -> !redInactiveFirst;
                     case Blue -> redInactiveFirst;
+                    default -> !redInactiveFirst;
                 };
 
         if (matchTime > 130) {
@@ -120,14 +121,24 @@ public class HubTimer extends SubsystemBase {
     }
 
     public boolean isShiftAboutToEnd(double threshold) {
-        return timeUntilSwap > 0 && timeUntilSwap < threshold;
+        // If we're between 2 active shifts, our shooting time is not about to end.
+        if ((currentShift == Shift.SHIFT4 && !shift1Active)
+                || (currentShift == Shift.TRANSITION && shift1Active)) {
+            return false;
+        } else {
+            return timeUntilSwap > 0 && timeUntilSwap < threshold;
+        }
+    }
+
+    public boolean isHubActive() {
+        return hubActive;
     }
 
     @Override
     public void periodic() {
         updateHubStatus();
-        Logger.recordOutput("Misc/Time Until Next Swap", timeUntilSwap);
-        Logger.recordOutput("Misc/Hub Active?", hubActive);
-        Logger.recordOutput("Misc/Current Shift", currentShift.name());
+        Logger.recordOutput("Shift/Time Until Next Swap", timeUntilSwap);
+        Logger.recordOutput("Shift/Hub Active?", hubActive);
+        Logger.recordOutput("Shift/Current Shift", currentShift.name());
     }
 }
