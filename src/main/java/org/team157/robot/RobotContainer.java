@@ -285,7 +285,7 @@ public class RobotContainer {
         //////////////////////////////////////////////
         // Lock to 0° when A button is held
         driverController
-                .a()
+                .rightTrigger()
                 .and(turretTrackingTrigger().negate())
                 .whileTrue(
                         DriveCommands.joystickDriveAtAngle(

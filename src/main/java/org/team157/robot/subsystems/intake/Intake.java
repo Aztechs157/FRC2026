@@ -65,7 +65,7 @@ public class Intake extends SubsystemBase {
      */
     public Command runIntake() {
         // Arbitrary untuned value
-        return setVelocity(RPM.of(3000));
+        return setVelocity(RPM.of(5000));
     }
 
     @Override

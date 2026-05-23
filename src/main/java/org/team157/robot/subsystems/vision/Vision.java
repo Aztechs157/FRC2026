@@ -207,6 +207,7 @@ public class Vision extends SubsystemBase {
 
     /**
      * Gets the setpoint angle for the drivebase to face the hub
+     *
      * @return
      */
     public Rotation2d getAngleToFaceHub() {
