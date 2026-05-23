@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.Optional;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.Mode;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.commands.DriveCommands;
@@ -341,7 +342,11 @@ public class RobotContainer {
         driverController.x().toggleOnTrue(slapdown.wiggleIntake());
 
         // (in/de)creases the ballistic modifier
-        operatorController.x().or(operatorController.b()).onTrue(setModifier());
+        operatorController
+                .y()
+                .or(operatorController.a())
+                .and(operatorController.back().negate())
+                .onTrue(setModifier());
         //////////////////////////////////////////////////
         ///             OPERATOR COMMANDS              ///
         //////////////////////////////////////////////////
@@ -412,8 +417,14 @@ public class RobotContainer {
      */
     public double modifySpeed(final double speed) {
         if (driverController.rightBumper().getAsBoolean()
-                || driverController.rightTrigger().getAsBoolean()) {
+                || driverController.rightTrigger().getAsBoolean()
+                        && FieldConstants.positionDetails.isInAllianceZone(
+                                drive.getPose(), DriverStation.getAlliance())) {
             return speed * ModifierConstants.PRECISION_DRIVE_MODIFIER;
+        } else if (driverController.rightTrigger().getAsBoolean()
+                && !FieldConstants.positionDetails.isInAllianceZone(
+                        drive.getPose(), DriverStation.getAlliance())) {
+            return speed * ModifierConstants.NEUTRAL_DRIVE_MODIFIER;
         } else if (drive.isUnderTrench()) {
             return speed * ModifierConstants.TRENCH_DRIVE_MODIFIER;
         } else {
@@ -423,9 +434,9 @@ public class RobotContainer {
 
     /** Update the ballistic equation modifier based on the operator's button presses */
     public void setBallisticSpeedModifier() {
-        if (operatorController.x().getAsBoolean()) {
+        if (operatorController.y().getAsBoolean()) {
             ballisticSpeedModifier = ballisticSpeedModifier + 0.05;
-        } else if (operatorController.b().getAsBoolean()) {
+        } else if (operatorController.a().getAsBoolean()) {
             ballisticSpeedModifier = ballisticSpeedModifier - 0.05;
         }
     }
