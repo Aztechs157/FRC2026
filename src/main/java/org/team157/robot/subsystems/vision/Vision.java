@@ -43,10 +43,11 @@ public class Vision extends SubsystemBase {
 
     private boolean isBlueAlliance = true;
 
+    // TODO: these two values are never used, consider removing them.
     public double angleToTarget = 0;
-    public static double rawAngleToTarget = 0;
-    public static double driveAlignAngle = 0;
     public double distanceToTarget = 0;
+    private double rawAngleToTarget = 0;
+    // TODO: should these be private with getter methods?
     public static double distanceToTargetFromTurret = 0;
     public static double angleToTargetFromTurret = 0;
 
@@ -199,18 +200,20 @@ public class Vision extends SubsystemBase {
                         .getDegrees();
 
         Logger.recordOutput("Targeting/Adjusted Target Pose", adjustedTargetPose);
-        Logger.recordOutput("Targeting/Distance to Target", distanceToTarget);
-        Logger.recordOutput("Targeting/Angle to Target", angleToTarget);
         Logger.recordOutput("Targeting/Distance to Target from Turret", distanceToTargetFromTurret);
         Logger.recordOutput("Targeting/Angle to Target from Turret", angleToTargetFromTurret);
+        // TODO: remove these two values, as they are unused and irrelevant?
+        Logger.recordOutput("Targeting/Distance to Target", distanceToTarget);
+        Logger.recordOutput("Targeting/Angle to Target", angleToTarget);
     }
 
     /**
-     * Gets the setpoint angle for the drivebase to face the hub
+     * Gets the setpoint angle for the drivebase to face the hub.
      *
-     * @return
+     * @return the {@link Rotation2d} of the yaw difference from the robot's rear to the hub.
      */
     public Rotation2d getAngleToFaceHub() {
+        // Adds 180, as we want the intake facing away while shooting, dumper-style.
         return Rotation2d.fromDegrees(rawAngleToTarget + 180)
                 .plus(RobotContainer.drive.getRotation());
     }
