@@ -3,8 +3,8 @@
     {
       "x": 0,
       "y": 0,
-      "width": 1680,
-      "height": 1392,
+      "width": 1536,
+      "height": 912,
       "state": {
         "sidebar": {
           "width": 300,
@@ -25,18 +25,20 @@
             "/RealOutputs/PhotonAlerts",
             "/RealOutputs/PathPlanner",
             "/RealOutputs/FinalComponentPoses",
-            "/RealOutputs/Odometry/Robot"
+            "/RealOutputs/Odometry/Robot",
+            "/Hopper",
+            "/Intake"
           ]
         },
         "tabs": {
-          "selected": 1,
+          "selected": 6,
           "tabs": [
             {
               "type": 0,
               "title": "",
               "controller": null,
               "controllerUUID": "grimvlgu9aluj8btvwotco2wpj0pto2h",
-              "renderer": "#/tab-reference/3d-field/",
+              "renderer": "",
               "controlsHeight": 0
             },
             {
@@ -50,7 +52,7 @@
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
-                      "model": "Sunstone"
+                      "model": "2026 KitBot"
                     }
                   },
                   {
@@ -68,9 +70,9 @@
                 "cameraIndex": -2,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -3.586021715481055,
+                  -3.5860217154810576,
                   1.551108570148385,
-                  4.338915082761331
+                  4.338915082761329
                 ],
                 "cameraTarget": [
                   0.1951088968028726,
@@ -238,7 +240,17 @@
                     }
                   }
                 ],
-                "discreteSources": [],
+                "discreteSources": [
+                  {
+                    "type": "stripes",
+                    "logKey": "/Hopper/HopperRunning",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437"
+                    }
+                  }
+                ],
                 "leftLockedRange": null,
                 "rightLockedRange": null,
                 "leftUnitConversion": {
@@ -260,7 +272,18 @@
               "type": 1,
               "title": "Intake",
               "controller": {
-                "leftSources": [],
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "/Intake/MechanismVelocityDegreesPerSecond",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437",
+                      "size": "normal"
+                    }
+                  }
+                ],
                 "rightSources": [
                   {
                     "type": "stepped",
