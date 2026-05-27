@@ -561,10 +561,18 @@ public class RobotContainer {
                                 && !manualOverride);
     }
 
+    /** Returns the current state of Dumper Mode.
+     * 
+     * @return a {@link Trigger} with the current state of Dumper Mode
+     */
     private Trigger dumperModeTrigger() {
         return new Trigger(() -> (dumperMode));
     }
 
+    /** Returns the current state of Manual Override.
+     * 
+     * @return a {@link Trigger} with the current state of Dumper Mode
+     */
     private Trigger manualOverrideTrigger() {
         return new Trigger(() -> (manualOverride));
     }
