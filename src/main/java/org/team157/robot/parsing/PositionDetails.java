@@ -10,9 +10,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * The PositionDetails class is responsible for parsing a JSON file containing the coordinates of
@@ -290,5 +292,17 @@ public class PositionDetails {
                 || blueTrenchHigh.contains(currentPose.getTranslation())
                 || redTrenchLow.contains(currentPose.getTranslation())
                 || redTrenchHigh.contains(currentPose.getTranslation());
+    }
+
+    public boolean isInAllianceZone(Pose2d currentPose, Optional<Alliance> alliance) {
+
+        switch (alliance.get()) {
+            case Red:
+                return redAllianceZone.contains(currentPose.getTranslation());
+            case Blue:
+                return blueAllianceZone.contains(currentPose.getTranslation());
+            default:
+                return false;
+        }
     }
 }
