@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew tasks *)",
+      "Bash(./gradlew compileJava)",
+      "Bash(ls \"/c/Users/Public/wpilib/\" 2>&1 | head -5; echo \"---\"; find /c -maxdepth 4 -name \"jdk\" -path \"*wpilib*\" 2>/dev/null | head -5)",
+      "Read(//c/Users/Public/wpilib//**)"
+    ]
+  }
+}

@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -29,9 +30,13 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
     private final FlyWheel flywheel;
     private final SmartMotorController motor;
+    // motor object for sysID voltage control
+    private final TalonFX talonFX;
+    // initial voltage for sysID voltage control
+    private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(false);
 
     public FlywheelIOTalonFX(SubsystemBase subsystem) {
-        TalonFX talonFX = new TalonFX(FlywheelConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
+        this.talonFX = new TalonFX(FlywheelConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
         TalonFX followerTalonFX =
                 new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_ID, Constants.RIO_CAN_BUS);
 
@@ -95,6 +100,11 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     @Override
     public void stop() {
         flywheel.setDutyCycleSetpoint(0);
+    }
+
+    @Override
+    public void setVoltage(double volts) {
+        talonFX.setControl(voltageRequest.withOutput(volts));
     }
 
     @Override
