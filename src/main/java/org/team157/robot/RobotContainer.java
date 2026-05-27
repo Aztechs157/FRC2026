@@ -344,7 +344,7 @@ public class RobotContainer {
 
         // Disables automatic turret tracking when manual override is enabled,
         // allowing the operator to control the turret without interference from vision tracking.
-        turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
+        turretTrackingTrigger().and(dumperModeTrigger().negate()).whileTrue(turret.trackTagGlobalRelative());
         turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
         turretTrackingTrigger()
                 .and(driverController.rightTrigger())
@@ -369,12 +369,12 @@ public class RobotContainer {
         // operatorController.povDownRight().toggleOnTrue(turret.setAngle(Degrees.of(85)));
         operatorController
                 .povDown()
-                .and(manualOverrideTrigger())
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
                 .toggleOnTrue(turret.setAngle(Degrees.of(-12.5)));
         // operatorController.povDownLeft().toggleOnTrue(turret.setAngle(Degrees.of(175)));
         operatorController
                 .povLeft()
-                .and(manualOverrideTrigger())
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
                 .toggleOnTrue(turret.setAngle(Degrees.of(-102.5)));
         // operatorController.povUpLeft().toggleOnTrue(turret.setAngle(Degrees.of(265)));
 
@@ -385,11 +385,11 @@ public class RobotContainer {
         // controller.
         operatorController
                 .rightTrigger()
-                .and(manualOverrideTrigger())
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
                 .toggleOnTrue(flywheel.setVelocity(RPM.of(4800)));
         operatorController
                 .rightBumper()
-                .and(manualOverrideTrigger())
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
                 .toggleOnTrue(flywheel.setVelocity(RPM.of(2800)));
 
         ///////////////////
@@ -400,11 +400,11 @@ public class RobotContainer {
         // Operator controller.
         operatorController
                 .leftTrigger()
-                .and(manualOverrideTrigger())
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
                 .toggleOnTrue(hood.setAngle(Degrees.of(45)));
         operatorController
                 .leftBumper()
-                .and(manualOverrideTrigger())
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
                 .toggleOnTrue(hood.setAngle(Degrees.of(65)));
 
         ///////////////////////
