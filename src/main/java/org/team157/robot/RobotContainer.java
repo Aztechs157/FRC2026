@@ -195,7 +195,7 @@ public class RobotContainer {
             slapdown.setIO(new SlapdownIO() {});
             hopper.setIO(new HopperIO() {});
             uptake.setIO(new UptakeIO() {});
-            flywheel.setIO(new FlywheelIO() {});
+            flywheel.setIO(new FlywheelIO() {}, vision);
             turret.setIO(new TurretIO() {}, vision);
         } else {
             // Use TalonFX IO implementations on REAL or SIM robot.
@@ -207,7 +207,7 @@ public class RobotContainer {
             slapdown.setIO(new SlapdownIOTalonFX(slapdown));
             hopper.setIO(new HopperIOTalonFX(hopper));
             uptake.setIO(new UptakeIOTalonFX(uptake));
-            flywheel.setIO(new FlywheelIOTalonFX(flywheel));
+            flywheel.setIO(new FlywheelIOTalonFX(flywheel), vision);
             turret.setIO(new TurretIOTalonFX(turret), vision);
         }
 
@@ -308,7 +308,7 @@ public class RobotContainer {
                                 drive,
                                 () -> -driverController.getLeftY(),
                                 () -> -driverController.getLeftX(),
-                                vision::getAngleToFaceHub));
+                                vision::getDriveAngleToFaceHub));
 
         // Reset gyro to 0° when start and back buttons are pressed
         driverController
@@ -358,7 +358,9 @@ public class RobotContainer {
 
         // Disables automatic turret tracking when manual override is enabled,
         // allowing the operator to control the turret without interference from vision tracking.
-        turretTrackingTrigger().and(dumperModeTrigger().negate()).whileTrue(turret.trackTagGlobalRelative());
+        turretTrackingTrigger()
+                .and(dumperModeTrigger().negate())
+                .whileTrue(turret.trackTagGlobalRelative());
         turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
         turretTrackingTrigger()
                 .and(driverController.rightTrigger())
@@ -438,8 +440,8 @@ public class RobotContainer {
 
         // Enable Dumper Mode (align with drivebase rather than turret)
         operatorController.start().and(operatorController.back()).onTrue(toggleDumperMode());
-        operatorController.x().and(turretTrackingTrigger()).onTrue(turret.set(0.1));
-        operatorController.b().and(turretTrackingTrigger()).onTrue(turret.set(-0.1));
+        operatorController.x().and(manualOverrideTrigger()).onTrue(turret.set(0.1));
+        operatorController.b().and(manualOverrideTrigger()).onTrue(turret.set(-0.1));
     }
 
     /**
@@ -575,16 +577,18 @@ public class RobotContainer {
                                 && !manualOverride);
     }
 
-    /** Returns the current state of Dumper Mode.
-     * 
+    /**
+     * Returns the current state of Dumper Mode.
+     *
      * @return a {@link Trigger} with the current state of Dumper Mode
      */
     private Trigger dumperModeTrigger() {
         return new Trigger(() -> (dumperMode));
     }
 
-    /** Returns the current state of Manual Override.
-     * 
+    /**
+     * Returns the current state of Manual Override.
+     *
      * @return a {@link Trigger} with the current state of Dumper Mode
      */
     private Trigger manualOverrideTrigger() {

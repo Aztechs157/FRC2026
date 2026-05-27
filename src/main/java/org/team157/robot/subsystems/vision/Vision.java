@@ -43,13 +43,9 @@ public class Vision extends SubsystemBase {
 
     private boolean isBlueAlliance = true;
 
-    // TODO: these two values are never used, consider removing them.
-    public double angleToTarget = 0;
-    public double distanceToTarget = 0;
-    private double rawAngleToTarget = 0;
-    // TODO: should these be private with getter methods?
-    public static double distanceToTargetFromTurret = 0;
-    public static double angleToTargetFromTurret = 0;
+    private double angleToUnadjustedTargetFromDrive = 0;
+    private static double distanceToTargetFromTurret = 0;
+    private static double angleToTargetFromTurret = 0;
 
     private double driveLinearVelocityX;
     private double driveLinearVelocityY;
@@ -184,14 +180,13 @@ public class Vision extends SubsystemBase {
                             targetPose.getTranslation(),
                             new Rotation2d(Math.PI - driveFieldRotation));
         }
-        distanceToTarget = PhotonUtils.getDistanceToPose(robotPose, adjustedTargetPose);
+
+        // Distance and Angle from the turret to the adjusted target
         distanceToTargetFromTurret =
                 PhotonUtils.getDistanceToPose(
                         robotPose.plus(Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
                         adjustedTargetPose);
 
-        rawAngleToTarget = PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();
-        angleToTarget = PhotonUtils.getYawToPose(robotPose, adjustedTargetPose).getDegrees();
         angleToTargetFromTurret =
                 PhotonUtils.getYawToPose(
                                 robotPose.plus(
@@ -199,12 +194,14 @@ public class Vision extends SubsystemBase {
                                 adjustedTargetPose)
                         .getDegrees();
 
+        // Angle from the drivebase to the non-adjusted target.
+        angleToUnadjustedTargetFromDrive =
+                PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();
+
+        // Logger outputs
         Logger.recordOutput("Targeting/Adjusted Target Pose", adjustedTargetPose);
         Logger.recordOutput("Targeting/Distance to Target from Turret", distanceToTargetFromTurret);
         Logger.recordOutput("Targeting/Angle to Target from Turret", angleToTargetFromTurret);
-        // TODO: remove these two values, as they are unused and irrelevant?
-        Logger.recordOutput("Targeting/Distance to Target", distanceToTarget);
-        Logger.recordOutput("Targeting/Angle to Target", angleToTarget);
     }
 
     /**
@@ -212,10 +209,28 @@ public class Vision extends SubsystemBase {
      *
      * @return the {@link Rotation2d} of the yaw difference from the robot's rear to the hub.
      */
-    public Rotation2d getAngleToFaceHub() {
+    public Rotation2d getDriveAngleToFaceHub() {
         // Adds 180, as we want the intake facing away while shooting, dumper-style.
-        return Rotation2d.fromDegrees(rawAngleToTarget + 180)
+        return Rotation2d.fromDegrees(angleToUnadjustedTargetFromDrive + 180)
                 .plus(RobotContainer.drive.getRotation());
+    }
+
+    /**
+     * Gets the desired angle for the turret based on the adjusted target pose.
+     *
+     * @return The setpoint angle for the turret, in degrees.
+     */
+    public double getTurretAngle() {
+        return angleToTargetFromTurret;
+    }
+
+    /**
+     * Gets the distance from the turret to the virtual target.
+     *
+     * @return The distance from the turret's center to the virtual target, in meters.
+     */
+    public double getDistanceToTargetFromTurret() {
+        return distanceToTargetFromTurret;
     }
 
     @Override

@@ -26,6 +26,8 @@ public class Flywheel extends SubsystemBase {
     // The IO interface for interacting with the flywheel's motors.
     private FlywheelIO io;
 
+    private Vision vision;
+
     // Inputs from the motors and mechanism, to be updated periodically and logged.
     private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
@@ -60,8 +62,9 @@ public class Flywheel extends SubsystemBase {
      *
      * @param io An implementation of the Flywheel's IO layer, i.e. FlywheelIOTalonFX
      */
-    public void setIO(FlywheelIO io) {
+    public void setIO(FlywheelIO io, Vision vision) {
         this.io = io;
+        this.vision = vision;
     }
 
     /////////////////////////
@@ -232,7 +235,7 @@ public class Flywheel extends SubsystemBase {
      */
     public AngularVelocity getDesiredFlywheelVelocity() {
         double heightMeters = FieldConstants.positionDetails.getTargetHeight();
-        double distanceMeters = Vision.distanceToTargetFromTurret;
+        double distanceMeters = vision.getDistanceToTargetFromTurret();
 
         setShotParams(heightMeters, distanceMeters);
 
