@@ -6,6 +6,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController;
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.Mode;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.commands.DriveCommands;
@@ -72,6 +74,11 @@ public class RobotContainer {
     private double MaxAngularRate =
             RotationsPerSecond.of(0.75)
                     .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+
+    /**
+     * Speed factor used in flywheel ballistic equations, to be manually adjusted by the operator
+     */
+    public static double ballisticSpeedModifier = 1;
 
     // Subsystems
     public static Vision vision;
@@ -220,25 +227,39 @@ public class RobotContainer {
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-        // Set up SysId routines
-        autoChooser.addOption(
-                "Drive Wheel Radius Characterization",
-                DriveCommands.wheelRadiusCharacterization(drive));
-        autoChooser.addOption(
-                "Drive Simple FF Characterization",
-                DriveCommands.feedforwardCharacterization(drive));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Forward)",
-                drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Reverse)",
-                drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-        autoChooser.addOption(
-                "Drive SysId (Dynamic Forward)",
-                drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption(
-                "Drive SysId (Dynamic Reverse)",
-                drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        if (!DriverStation.isFMSAttached()) {
+            // Set up SysId routines only when not connected to FMS
+            autoChooser.addOption(
+                    "Drive Wheel Radius Characterization",
+                    DriveCommands.wheelRadiusCharacterization(drive));
+            autoChooser.addOption(
+                    "Drive Simple FF Characterization",
+                    DriveCommands.feedforwardCharacterization(drive));
+            autoChooser.addOption(
+                    "Drive SysId (Quasistatic Forward)",
+                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+            autoChooser.addOption(
+                    "Drive SysId (Quasistatic Reverse)",
+                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+            autoChooser.addOption(
+                    "Drive SysId (Dynamic Forward)",
+                    drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+            autoChooser.addOption(
+                    "Drive SysId (Dynamic Reverse)",
+                    drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+            autoChooser.addOption(
+                    "Flywheel SysId (Quasistatic Forward)",
+                    flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+            autoChooser.addOption(
+                    "Flywheel SysId (Quasistatic Reverse)",
+                    flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+            autoChooser.addOption(
+                    "Flywheel SysId (Dynamic Forward)",
+                    flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
+            autoChooser.addOption(
+                    "Flywheel SysId (Dynamic Reverse)",
+                    flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        }
 
         // Configure the button bindings
         configureBindings();
@@ -260,9 +281,9 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> -driverController.getLeftY(),
-                        () -> -driverController.getLeftX(),
-                        () -> -driverController.getRightX()));
+                        () -> modifySpeed(-driverController.getLeftY()),
+                        () -> modifySpeed(-driverController.getLeftX()),
+                        () -> modifySpeed(-driverController.getRightX())));
         // Update the pose estimation and turret tracking angle while no other vision commands are
         // running.
         vision.setDefaultCommand(vision.setDefault(drive, turret));
@@ -306,27 +327,25 @@ public class RobotContainer {
         /////////////////////
         // Enables dynamic control of the flywheel and hood.
         driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
-        driverController.a().toggleOnTrue(hood.setDynamicHoodAngle());
 
         ////////////////////////////
         /// INTAKE UPTAKE HOPPER ///
         ////////////////////////////
-        // Swaps the intake and shooting triggers if Maya mode is enabled, per Maya's preference.
-        if (ModifierConstants.MAYA_MODE) {
-            // Shooting on left trigger, intake on right trigger
-            driverController.leftTrigger().whileTrue(uptake.set(1));
-            driverController.rightTrigger().whileTrue(intake.runIntake());
-            driverController.leftTrigger().whileTrue(hopper.set(1));
-        } else {
-            // Shooting on right trigger, intake on left trigger
-            driverController.rightTrigger().whileTrue(uptake.set(1));
-            driverController.leftTrigger().whileTrue(intake.runIntake());
-            driverController.rightTrigger().whileTrue(hopper.set(1));
-        }
+        driverController.rightTrigger().whileTrue(uptake.set(1));
+        driverController.leftTrigger().whileTrue(intake.runIntake());
+        driverController.rightTrigger().whileTrue(hopper.set(1));
+
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
         driverController.y().whileTrue(forceOuttake());
         // Wiggles the intake up and down to free up stuck balls
         driverController.x().toggleOnTrue(slapdown.wiggleIntake());
+
+        // (in/de)creases the ballistic modifier
+        operatorController
+                .y()
+                .or(operatorController.a())
+                .and(operatorController.back().negate())
+                .onTrue(setModifier());
         //////////////////////////////////////////////////
         ///             OPERATOR COMMANDS              ///
         //////////////////////////////////////////////////
@@ -341,7 +360,9 @@ public class RobotContainer {
         // allowing the operator to control the turret without interference from vision tracking.
         turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
         turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
-        turretTrackingTrigger().whileTrue(hood.setDynamicHoodAngle());
+        turretTrackingTrigger()
+                .and(driverController.rightTrigger())
+                .whileTrue(hood.setDynamicHoodAngle());
 
         ///////////////////////
         /// MANUAL FLYWHEEL ///
@@ -389,10 +410,22 @@ public class RobotContainer {
                 .toggleOnTrue(slapdown.retractIntake());
     }
 
-    // If the right bumper is held, apply the precision modifier of 0.5x speed.
+    /**
+     * Apply a speed modifier when the right bumper (dedicated toggle) or shooting trigger are held,
+     * or the robot is under the trench.
+     */
     public double modifySpeed(final double speed) {
-        if (driverController.rightBumper().getAsBoolean() || drive.isUnderTrench()) {
+        if (driverController.rightBumper().getAsBoolean()
+                || driverController.rightTrigger().getAsBoolean()
+                        && FieldConstants.positionDetails.isInAllianceZone(
+                                drive.getPose(), DriverStation.getAlliance())) {
             return speed * ModifierConstants.PRECISION_DRIVE_MODIFIER;
+        } else if (driverController.rightTrigger().getAsBoolean()
+                && !FieldConstants.positionDetails.isInAllianceZone(
+                        drive.getPose(), DriverStation.getAlliance())) {
+            return speed * ModifierConstants.NEUTRAL_DRIVE_MODIFIER;
+        } else if (drive.isUnderTrench()) {
+            return speed * ModifierConstants.TRENCH_DRIVE_MODIFIER;
         } else {
             return speed;
         }
@@ -405,12 +438,25 @@ public class RobotContainer {
             driverController.setRumble(RumbleType.kRightRumble, 1);
             operatorController.setRumble(RumbleType.kLeftRumble, 1);
             operatorController.setRumble(RumbleType.kRightRumble, 1);
-        } else {
+      } else {
             driverController.setRumble(RumbleType.kLeftRumble, 0);
             driverController.setRumble(RumbleType.kRightRumble, 0);
             operatorController.setRumble(RumbleType.kLeftRumble, 0);
             operatorController.setRumble(RumbleType.kRightRumble, 0);
         }
+    }
+    
+    /** Update the ballistic equation modifier based on the operator's button presses */
+    public void setBallisticSpeedModifier() {
+        if (operatorController.y().getAsBoolean()) {
+            ballisticSpeedModifier = ballisticSpeedModifier + 0.05;
+        } else if (operatorController.a().getAsBoolean()) {
+            ballisticSpeedModifier = ballisticSpeedModifier - 0.05;
+        }
+    }
+
+    public InstantCommand setModifier() {
+        return new InstantCommand(() -> setBallisticSpeedModifier());
     }
 
     /**
