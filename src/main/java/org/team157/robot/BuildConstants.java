@@ -12,6 +12,6 @@ public final class BuildConstants {
     public static final String BUILD_DATE = "2026-05-27 14:50:22 EDT";
     public static final long BUILD_UNIX_TIME = 1779907822774L;
     public static final int DIRTY = 0;
-
+  
     private BuildConstants() {}
 }
