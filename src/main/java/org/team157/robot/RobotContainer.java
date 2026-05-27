@@ -440,8 +440,9 @@ public class RobotContainer {
 
         // Enable Dumper Mode (align with drivebase rather than turret)
         operatorController.start().and(operatorController.back()).onTrue(toggleDumperMode());
-        operatorController.x().and(manualOverrideTrigger()).onTrue(turret.set(0.1));
-        operatorController.b().and(manualOverrideTrigger()).onTrue(turret.set(-0.1));
+        // Manual operator turret control in dumper/manual modes.
+        operatorController.x().and(manualOverrideTrigger().or(dumperModeTrigger())).whileTrue(turret.set(0.05));
+        operatorController.b().and(manualOverrideTrigger().or(dumperModeTrigger())).whileTrue(turret.set(-0.05));
     }
 
     /**
