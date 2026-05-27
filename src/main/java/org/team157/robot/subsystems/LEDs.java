@@ -15,7 +15,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team157.robot.RobotContainer;
 import org.team157.utilities.PriorityMap;
 
-/** The LEDs subsystem controls our LED strip to display various patterns based on the hub's state and provide visual feedback to the driver. */
+/**
+ * The LEDs subsystem controls our LED strip to display various patterns based on the hub's state
+ * and provide visual feedback to the driver.
+ */
 public class LEDs extends SubsystemBase {
 
     /// CONSTANTS ///
@@ -28,7 +31,7 @@ public class LEDs extends SubsystemBase {
     public static final int DENSITY = 60;
 
     /// LED STRIP CONTROL SETUP ///
-    
+
     /**
      * Priority map for pattern stacking, mapping each LED pattern to a name (string) and priority
      * level. Patterns of higher priority (lower number) will display over those of lower priority.
@@ -40,7 +43,7 @@ public class LEDs extends SubsystemBase {
     AddressableLEDBuffer prettyLightsBuffer;
 
     /// PATTERNS ///
-    
+
     /** Idle pattern, a scrolling gradient in our team colors. */
     public LEDPattern idle =
             LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kGold, Color.kBlue)
@@ -49,9 +52,9 @@ public class LEDs extends SubsystemBase {
     public LEDPattern active = LEDPattern.rainbow(255, 255).scrollAtRelativeSpeed(Hertz.of(0.5));
     /** Inactive pattern, solid white. */
     public LEDPattern inactive = LEDPattern.solid(Color.kWhite);
+
     public LEDPattern crunchTime = LEDPattern.solid(Color.kWhite).blink(Seconds.of(0.33));
     public LEDPattern shiftEnd = crunchTime.overlayOn(active);
-
 
     /** Creates the LEDs subsystem. */
     public LEDs() {
@@ -67,16 +70,16 @@ public class LEDs extends SubsystemBase {
         addPattern("Idle", 157, idle);
     }
 
-    /** Determines the current desired LED pattern based on the hub timer status.
-     * 
+    /**
+     * Determines the current desired LED pattern based on the hub timer status.
+     *
      * @param hubTimer the hub timer to derive shift information from.
      * @return the desired LED pattern based on the current hub state.
      */
     public LEDPattern getDesiredPattern(HubTimer hubTimer) {
         if (!DriverStation.isEnabled()) {
             return idle;
-        } else if (hubTimer.isShiftAboutToEnd(5)
-                && hubTimer.isHubActive()) {
+        } else if (hubTimer.isShiftAboutToEnd(5) && hubTimer.isHubActive()) {
             return shiftEnd;
         } else if (hubTimer.isShiftAboutToEnd(5)) {
             return crunchTime;
@@ -97,7 +100,9 @@ public class LEDs extends SubsystemBase {
         return fullPatterns.remove(name);
     }
 
-    /** @return true if the collection contains a pattern with the specified name, false otherwise. */
+    /**
+     * @return true if the collection contains a pattern with the specified name, false otherwise.
+     */
     public boolean hasPattern(String name) {
         return fullPatterns.containsKey(name);
     }

@@ -113,7 +113,6 @@ public class Robot extends LoggedRobot {
         Logger.recordOutput("Misc/Under Trench?", RobotContainer.drive.isUnderTrench());
         Logger.recordOutput("Flywheel Modifier", RobotContainer.ballisticSpeedModifier);
         m_field.setRobotPose(RobotContainer.drive.getPose());
-        
     }
 
     /** This function is called once when the robot is disabled. */

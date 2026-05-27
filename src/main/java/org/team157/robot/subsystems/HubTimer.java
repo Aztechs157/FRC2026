@@ -7,12 +7,14 @@ package org.team157.robot.subsystems;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import java.util.Optional;
-
 import org.littletonrobotics.junction.Logger;
 
-/** The HubTimer class keeps track of the current state of the hub based on the match time and our current alliance, and provides utilities for determining what our current shift is, how much time remains in that shift, and whether that shift is about to end. */
+/**
+ * The HubTimer class keeps track of the current state of the hub based on the match time and our
+ * current alliance, and provides utilities for determining what our current shift is, how much time
+ * remains in that shift, and whether that shift is about to end.
+ */
 public class HubTimer extends SubsystemBase {
 
     /** Represents the possible shift states which the hub can possess. */
@@ -27,21 +29,23 @@ public class HubTimer extends SubsystemBase {
         ENDGAME;
     }
 
-
     /** The current state of the hub. */
     private Shift currentShift = Shift.INACTIVE;
     /** The current activity status of the hub. */
     private boolean hubActive = true;
     /** The time remaining until the next shift, in seconds. */
     private double timeUntilSwap = 0.0;
-    /** Whether the Red alliance is inactive first, based on the game data from the {@link DriverStation}. */
+    /**
+     * Whether the Red alliance is inactive first, based on the game data from the {@link
+     * DriverStation}.
+     */
     private boolean redInactiveFirst = false;
     /** Whether the first shift is active, based on whether or not our alliance won auto. */
     private boolean shift1Active = false;
 
     /**
-     * Updates the status of the hub based on the current match time and game data.
-     * <br> Taken almost directly from the WPILib documentation, with the addition of our Shift states.
+     * Updates the status of the hub based on the current match time and game data. <br>
+     * Taken almost directly from the WPILib documentation, with the addition of our Shift states.
      */
     public void updateHubStatus() {
         Optional<Alliance> alliance = DriverStation.getAlliance();
@@ -138,7 +142,6 @@ public class HubTimer extends SubsystemBase {
         Logger.recordOutput("Shift/Current Shift", currentShift.name());
     }
 
-
     /**
      * Determines if the current shift is about to end based on the remaining match time.
      *
@@ -155,18 +158,24 @@ public class HubTimer extends SubsystemBase {
         }
     }
 
-    /** @return true if the hub is currently active, false otherwise. */
+    /**
+     * @return true if the hub is currently active, false otherwise.
+     */
     public boolean isHubActive() {
         return hubActive;
     }
 
-    /** @return the time remaining until the next shift change, in seconds. */
+    /**
+     * @return the time remaining until the next shift change, in seconds.
+     */
     public double getTimeUntilSwap() {
         return timeUntilSwap;
     }
 
-    /** @return the current {@link Shift} state of the hub. */
-    public Shift getHubState(){
+    /**
+     * @return the current {@link Shift} state of the hub.
+     */
+    public Shift getHubState() {
         return currentShift;
     }
 

@@ -438,14 +438,14 @@ public class RobotContainer {
             driverController.setRumble(RumbleType.kRightRumble, 1);
             operatorController.setRumble(RumbleType.kLeftRumble, 1);
             operatorController.setRumble(RumbleType.kRightRumble, 1);
-      } else {
+        } else {
             driverController.setRumble(RumbleType.kLeftRumble, 0);
             driverController.setRumble(RumbleType.kRightRumble, 0);
             operatorController.setRumble(RumbleType.kLeftRumble, 0);
             operatorController.setRumble(RumbleType.kRightRumble, 0);
         }
     }
-    
+
     /** Update the ballistic equation modifier based on the operator's button presses */
     public void setBallisticSpeedModifier() {
         if (operatorController.y().getAsBoolean()) {
