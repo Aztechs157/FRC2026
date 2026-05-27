@@ -15,105 +15,96 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team157.robot.RobotContainer;
 import org.team157.utilities.PriorityMap;
 
+/** The LEDs subsystem controls our LED strip to display various patterns based on the hub's state and provide visual feedback to the driver. */
 public class LEDs extends SubsystemBase {
 
-    public static final int PMW_PORT = 9;
+    /// CONSTANTS ///
+
+    /** PWM port for the LED strip */
+    public static final int PWM_PORT = 9;
+    /** Amount of LEDs in the strip */
     public static final int STRIP_LENGTH = 38;
+    /** LEDs per meter */
+    public static final int DENSITY = 60;
 
+    /// LED STRIP CONTROL SETUP ///
+    
+    /**
+     * Priority map for pattern stacking, mapping each LED pattern to a name (string) and priority
+     * level. Patterns of higher priority (lower number) will display over those of lower priority.
+     */
     private PriorityMap<String, LEDPattern> fullPatterns = new PriorityMap<String, LEDPattern>();
-
+    /** LED strip controller */
     AddressableLED prettyLights;
+    /** Pattern buffer for the LED strip */
     AddressableLEDBuffer prettyLightsBuffer;
 
-    public LEDPattern active = LEDPattern.rainbow(255, 255).scrollAtRelativeSpeed(Hertz.of(0.5));
-    public LEDPattern inactive = LEDPattern.solid(Color.kWhite);
-    public LEDPattern crunchTime = LEDPattern.solid(Color.kWhite).blink(Seconds.of(0.33));
-
-    public LEDPattern baseRainbow = LEDPattern.rainbow(255, 255);
-    public LEDPattern shiftEnd = crunchTime.overlayOn(baseRainbow);
-
+    /// PATTERNS ///
+    
+    /** Idle pattern, a scrolling gradient in our team colors. */
     public LEDPattern idle =
             LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kGold, Color.kBlue)
-                    .scrollAtRelativeSpeed(Percent.per(Second).of(25));
-    // .atBrightness(Percent.of(20));
+                    .scrollAtRelativeSpeed(Hertz.of(0.25));
+    /** Active pattern, a scrolling rainbow. */
+    public LEDPattern active = LEDPattern.rainbow(255, 255).scrollAtRelativeSpeed(Hertz.of(0.5));
+    /** Inactive pattern, solid white. */
+    public LEDPattern inactive = LEDPattern.solid(Color.kWhite);
+    public LEDPattern crunchTime = LEDPattern.solid(Color.kWhite).blink(Seconds.of(0.33));
+    public LEDPattern shiftEnd = crunchTime.overlayOn(active);
 
-    /** Creates a new LEDs. */
+
+    /** Creates the LEDs subsystem. */
     public LEDs() {
 
-        prettyLights = new AddressableLED(PMW_PORT);
+        prettyLights = new AddressableLED(PWM_PORT);
         prettyLights.setLength(STRIP_LENGTH);
 
         prettyLightsBuffer = new AddressableLEDBuffer(STRIP_LENGTH);
 
         prettyLights.start();
 
-        // fun assabet-y pattern
-        LEDPattern assabet =
-                LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kGold, Color.kBlue);
-        // the same one but scrolling
-        LEDPattern assabetScroll =
-                assabet.scrollAtRelativeSpeed(Percent.per(Second).of(25))
-                        .atBrightness(Percent.of(20));
-        addPattern("Assabet Scroll", 157, assabetScroll);
+        // Adds the idle pattern to the buffer.
+        addPattern("Idle", 157, idle);
     }
 
-    public void isFMS() {
-        // runs the idle pattern without lowering the brightness, only when connected to
-        // an FMS.
-        LEDPattern fmsIdle = idle.atBrightness(Percent.of(100));
-        fullPatterns.replace("Assabet Scroll", fmsIdle);
-    }
-
-    /*
-     * for now, im using the same method as the fms checker,
-     * but i would like to know why we're making a method
-     * instead of just using DriverStation's isFMSAttached directly.
+    /** Determines the current desired LED pattern based on the hub timer status.
+     * 
+     * @param hubTimer the hub timer to derive shift information from.
+     * @return the desired LED pattern based on the current hub state.
      */
-    public void isEStop() {
-        // make this pattern less pleasant
-        LEDPattern unpleasant =
-                LEDPattern.gradient(
-                        LEDPattern.GradientType.kDiscontinuous,
-                        Color.kSpringGreen,
-                        Color.kMagenta,
-                        Color.kSaddleBrown);
-        // runs the pattern in place of the default scrolly pattern upon being
-        // e-stopped.
-        addPattern("unpleasant", 1, unpleasant);
-    }
-
-    public LEDPattern getDesiredPattern() {
-
+    public LEDPattern getDesiredPattern(HubTimer hubTimer) {
         if (!DriverStation.isEnabled()) {
             return idle;
-        } else if (RobotContainer.hubStatus.isShiftAboutToEnd(5)
-                && RobotContainer.hubStatus.isHubActive()) {
+        } else if (hubTimer.isShiftAboutToEnd(5)
+                && hubTimer.isHubActive()) {
             return shiftEnd;
-        } else if (RobotContainer.hubStatus.isShiftAboutToEnd(5)) {
+        } else if (hubTimer.isShiftAboutToEnd(5)) {
             return crunchTime;
-        } else if (RobotContainer.hubStatus.isHubActive()) {
+        } else if (hubTimer.isHubActive()) {
             return active;
         } else {
             return inactive;
         }
     }
 
-    // full
+    /** Adds an LED pattern to the collection. */
     public void addPattern(String name, int priority, LEDPattern pattern) {
         fullPatterns.put(name, priority, pattern);
     }
 
+    /** Removes an LED pattern from the collection. */
     public LEDPattern removePattern(String name) {
         return fullPatterns.remove(name);
     }
 
+    /** @return true if the collection contains a pattern with the specified name, false otherwise. */
     public boolean hasPattern(String name) {
         return fullPatterns.containsKey(name);
     }
 
     @Override
     public void periodic() {
-        fullPatterns.put("Desired Pattern", 5, getDesiredPattern());
+        fullPatterns.put("Desired Pattern", 5, getDesiredPattern(RobotContainer.hubStatus));
         fullPatterns.firstValue().applyTo(prettyLightsBuffer);
         prettyLights.setData(prettyLightsBuffer);
     }

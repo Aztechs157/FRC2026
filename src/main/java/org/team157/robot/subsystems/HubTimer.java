@@ -7,12 +7,15 @@ package org.team157.robot.subsystems;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import java.util.Optional;
+
 import org.littletonrobotics.junction.Logger;
 
-/** Add your docs here. */
+/** The HubTimer class keeps track of the current state of the hub based on the match time and our current alliance, and provides utilities for determining what our current shift is, how much time remains in that shift, and whether that shift is about to end. */
 public class HubTimer extends SubsystemBase {
 
+    /** Represents the possible shift states which the hub can possess. */
     public enum Shift {
         INACTIVE,
         AUTO,
@@ -24,12 +27,22 @@ public class HubTimer extends SubsystemBase {
         ENDGAME;
     }
 
+
+    /** The current state of the hub. */
     private Shift currentShift = Shift.INACTIVE;
+    /** The current activity status of the hub. */
     private boolean hubActive = true;
+    /** The time remaining until the next shift, in seconds. */
     private double timeUntilSwap = 0.0;
+    /** Whether the Red alliance is inactive first, based on the game data from the {@link DriverStation}. */
     private boolean redInactiveFirst = false;
+    /** Whether the first shift is active, based on whether or not our alliance won auto. */
     private boolean shift1Active = false;
 
+    /**
+     * Updates the status of the hub based on the current match time and game data.
+     * <br> Taken almost directly from the WPILib documentation, with the addition of our Shift states.
+     */
     public void updateHubStatus() {
         Optional<Alliance> alliance = DriverStation.getAlliance();
         // If we have no alliance, we cannot be enabled, therefore no hub.
@@ -118,8 +131,20 @@ public class HubTimer extends SubsystemBase {
             currentShift = Shift.INACTIVE;
             timeUntilSwap = -1.0;
         }
+
+        // Logger outputs
+        Logger.recordOutput("Shift/Time Until Next Swap", timeUntilSwap);
+        Logger.recordOutput("Shift/Hub Active?", hubActive);
+        Logger.recordOutput("Shift/Current Shift", currentShift.name());
     }
 
+
+    /**
+     * Determines if the current shift is about to end based on the remaining match time.
+     *
+     * @param threshold The amount of time, in seconds, remaining in the match to trigger the event
+     * @return true if the shift is about to end, false otherwise
+     */
     public boolean isShiftAboutToEnd(double threshold) {
         // If we're between 2 active shifts, our shooting time is not about to end.
         if ((currentShift == Shift.SHIFT4 && !shift1Active)
@@ -130,15 +155,23 @@ public class HubTimer extends SubsystemBase {
         }
     }
 
+    /** @return true if the hub is currently active, false otherwise. */
     public boolean isHubActive() {
         return hubActive;
+    }
+
+    /** @return the time remaining until the next shift change, in seconds. */
+    public double getTimeUntilSwap() {
+        return timeUntilSwap;
+    }
+
+    /** @return the current {@link Shift} state of the hub. */
+    public Shift getHubState(){
+        return currentShift;
     }
 
     @Override
     public void periodic() {
         updateHubStatus();
-        Logger.recordOutput("Shift/Time Until Next Swap", timeUntilSwap);
-        Logger.recordOutput("Shift/Hub Active?", hubActive);
-        Logger.recordOutput("Shift/Current Shift", currentShift.name());
     }
 }
