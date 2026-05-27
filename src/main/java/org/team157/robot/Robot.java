@@ -107,13 +107,10 @@ public class Robot extends LoggedRobot {
 
         // Return to non-RT thread priority (do not modify the first argument)
         // Threads.setCurrentThreadPriority(false, 10);
-
         Logger.recordOutput("Misc/Manual Override Active?", RobotContainer.manualOverride);
         Logger.recordOutput("Misc/Dumper Mode?", RobotContainer.dumperMode);
         // Gets the match time from the FMS to display for the driver.
         Logger.recordOutput("Misc/Match Time", Timer.getMatchTime());
-        // Gets hub activity status to display on the dashboard.
-        Logger.recordOutput("Misc/Hub Active?", m_robotContainer.isHubActive());
         Logger.recordOutput("Misc/Under Trench?", RobotContainer.drive.isUnderTrench());
         Logger.recordOutput("Flywheel Modifier", RobotContainer.ballisticSpeedModifier);
         m_field.setRobotPose(RobotContainer.drive.getPose());
@@ -193,7 +190,9 @@ public class Robot extends LoggedRobot {
 
     /** This function is called periodically during operator control. */
     @Override
-    public void teleopPeriodic() {}
+    public void teleopPeriodic() {
+        m_robotContainer.setRumble();
+    }
 
     /** This function is called once when test mode is enabled. */
     @Override

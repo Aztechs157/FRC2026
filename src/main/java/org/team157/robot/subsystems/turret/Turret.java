@@ -122,7 +122,11 @@ public class Turret extends SubsystemBase {
      * @return The {@link Rotation2d} of the turret base.
      */
     public Angle getTurretRotation() {
-        return Radians.of(Math.toRadians(inputs.angleDegrees));
+        if (Robot.isReal()) {
+            return Radians.of(Math.toRadians(-inputs.angleDegrees));
+        } else {
+            return Radians.of(Math.toRadians(inputs.angleDegrees));
+        }
     }
 
     @Override

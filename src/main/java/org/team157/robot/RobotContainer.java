@@ -7,8 +7,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -18,12 +18,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import java.util.Optional;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.Mode;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.commands.DriveCommands;
 import org.team157.robot.generated.TunerConstants;
+import org.team157.robot.subsystems.HubTimer;
 import org.team157.robot.subsystems.LEDs;
 import org.team157.robot.subsystems.SunstoneMechanism3D;
 import org.team157.robot.subsystems.drive.Drive;
@@ -98,6 +99,7 @@ public class RobotContainer {
 
     // Dashboard inputs (auto chooser)
     private final LoggedDashboardChooser<Command> autoChooser;
+    public static final HubTimer hubStatus = new HubTimer();
 
     // Manual Override Status
     public static boolean manualOverride = false;
@@ -344,8 +346,11 @@ public class RobotContainer {
         operatorController.x().toggleOnTrue(slapdown.wiggleIntake());
 
         // (in/de)creases the ballistic modifier
-        operatorController.x().or(operatorController.b()).onTrue(setModifier());
-
+        operatorController
+                .y()
+                .or(operatorController.a())
+                .and(operatorController.back().negate())
+                .onTrue(setModifier());
         //////////////////////////////////////////////////
         ///             OPERATOR COMMANDS              ///
         //////////////////////////////////////////////////
@@ -451,8 +456,14 @@ public class RobotContainer {
      */
     public double modifySpeed(final double speed) {
         if (driverController.rightBumper().getAsBoolean()
-                || driverController.rightTrigger().getAsBoolean()) {
+                || driverController.rightTrigger().getAsBoolean()
+                        && FieldConstants.positionDetails.isInAllianceZone(
+                                drive.getPose(), DriverStation.getAlliance())) {
             return speed * ModifierConstants.PRECISION_DRIVE_MODIFIER;
+        } else if (driverController.rightTrigger().getAsBoolean()
+                && !FieldConstants.positionDetails.isInAllianceZone(
+                        drive.getPose(), DriverStation.getAlliance())) {
+            return speed * ModifierConstants.NEUTRAL_DRIVE_MODIFIER;
         } else if (drive.isUnderTrench()) {
             return speed * ModifierConstants.TRENCH_DRIVE_MODIFIER;
         } else {
@@ -460,78 +471,32 @@ public class RobotContainer {
         }
     }
 
+    /** Enables controller rumble when 2 seconds remain in the current shift. */
+    public void setRumble() {
+        if (hubStatus.isShiftAboutToEnd(2)) {
+            driverController.setRumble(RumbleType.kLeftRumble, 1);
+            driverController.setRumble(RumbleType.kRightRumble, 1);
+            operatorController.setRumble(RumbleType.kLeftRumble, 1);
+            operatorController.setRumble(RumbleType.kRightRumble, 1);
+        } else {
+            driverController.setRumble(RumbleType.kLeftRumble, 0);
+            driverController.setRumble(RumbleType.kRightRumble, 0);
+            operatorController.setRumble(RumbleType.kLeftRumble, 0);
+            operatorController.setRumble(RumbleType.kRightRumble, 0);
+        }
+    }
+
     /** Update the ballistic equation modifier based on the operator's button presses */
     public void setBallisticSpeedModifier() {
-        if (operatorController.x().getAsBoolean()) {
+        if (operatorController.y().getAsBoolean()) {
             ballisticSpeedModifier = ballisticSpeedModifier + 0.05;
-        } else if (operatorController.b().getAsBoolean()) {
+        } else if (operatorController.a().getAsBoolean()) {
             ballisticSpeedModifier = ballisticSpeedModifier - 0.05;
         }
     }
 
     public InstantCommand setModifier() {
         return new InstantCommand(() -> setBallisticSpeedModifier());
-    }
-
-    public boolean isHubActive() {
-        Optional<Alliance> alliance = DriverStation.getAlliance();
-        // If we have no alliance, we cannot be enabled, therefore no hub.
-        if (alliance.isEmpty()) {
-            return false;
-        }
-        // Hub is always enabled in autonomous.
-        if (DriverStation.isAutonomousEnabled()) {
-            return true;
-        }
-        // At this point, if we're not teleop enabled, there is no hub.
-        if (!DriverStation.isTeleopEnabled()) {
-            return false;
-        }
-
-        // We're teleop enabled, compute.
-        double matchTime = DriverStation.getMatchTime();
-        String gameData = DriverStation.getGameSpecificMessage();
-        // If we have no game data, we cannot compute, assume hub is active, as its
-        // likely early in teleop.
-        if (gameData.isEmpty()) {
-            return true;
-        }
-        boolean redInactiveFirst = false;
-        switch (gameData.charAt(0)) {
-            case 'R' -> redInactiveFirst = true;
-            case 'B' -> redInactiveFirst = false;
-            default -> {
-                // If we have invalid game data, assume hub is active.
-                return true;
-            }
-        }
-
-        // Shift was is active for blue if red won auto, or red if blue won auto.
-        boolean shift1Active =
-                switch (alliance.get()) {
-                    case Red -> !redInactiveFirst;
-                    case Blue -> redInactiveFirst;
-                };
-
-        if (matchTime > 130) {
-            // Transition shift, hub is active.
-            return true;
-        } else if (matchTime > 105) {
-            // Shift 1
-            return shift1Active;
-        } else if (matchTime > 80) {
-            // Shift 2
-            return !shift1Active;
-        } else if (matchTime > 55) {
-            // Shift 3
-            return shift1Active;
-        } else if (matchTime > 30) {
-            // Shift 4
-            return !shift1Active;
-        } else {
-            // End game, hub always active.
-            return true;
-        }
     }
 
     /**
