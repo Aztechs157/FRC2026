@@ -108,6 +108,7 @@ public class Robot extends LoggedRobot {
         // Return to non-RT thread priority (do not modify the first argument)
         // Threads.setCurrentThreadPriority(false, 10);
         Logger.recordOutput("Misc/Manual Override Active?", RobotContainer.manualOverride);
+        Logger.recordOutput("Misc/Dumper Mode?", RobotContainer.dumperMode);
         // Gets the match time from the FMS to display for the driver.
         Logger.recordOutput("Misc/Match Time", Timer.getMatchTime());
         Logger.recordOutput("Misc/Under Trench?", RobotContainer.drive.isUnderTrench());
@@ -117,7 +118,9 @@ public class Robot extends LoggedRobot {
 
     /** This function is called once when the robot is disabled. */
     @Override
-    public void disabledInit() {}
+    public void disabledInit() {
+        m_robotContainer.cancelRumble();
+    }
 
     /** This function is called periodically when disabled. */
     @Override

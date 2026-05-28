@@ -100,7 +100,7 @@ public class Turret extends SubsystemBase {
     public void updateRelativeAngleToTarget(Pose2d targetPose, Pose2d robotPose) {
         vision.setTargetParams(targetPose, robotPose);
         double turretToRobotAngleOffset =
-                Vision.angleToTargetFromTurret + TurretConstants.TURRET_ANGLE_OFFSET;
+                vision.getTurretAngle() + TurretConstants.TURRET_ANGLE_OFFSET;
         if (Robot.isReal()) {
             if (turretToRobotAngleOffset > 180) {
                 turretToRobotAngleOffset -= 360;
@@ -111,7 +111,7 @@ public class Turret extends SubsystemBase {
             trackingAngle = Degrees.of(turretToRobotAngleOffset);
         } else {
             // Disable turret offset in simulation, as simulated 0 is forward.
-            trackingAngle = Degrees.of(Vision.angleToTargetFromTurret);
+            trackingAngle = Degrees.of(vision.getTurretAngle());
         }
     }
 

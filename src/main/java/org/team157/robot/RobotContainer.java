@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -103,6 +104,8 @@ public class RobotContainer {
 
     // Manual Override Status
     public static boolean manualOverride = false;
+    // Turret Override (Dumper Mode) status
+    public static boolean dumperMode = false;
 
     /** The container for the robot. Contains subsystems, IO devices, and commands. */
     public RobotContainer() {
@@ -195,7 +198,7 @@ public class RobotContainer {
             slapdown.setIO(new SlapdownIO() {});
             hopper.setIO(new HopperIO() {});
             uptake.setIO(new UptakeIO() {});
-            flywheel.setIO(new FlywheelIO() {});
+            flywheel.setIO(new FlywheelIO() {}, vision);
             turret.setIO(new TurretIO() {}, vision);
         } else {
             // Use TalonFX IO implementations on REAL or SIM robot.
@@ -207,7 +210,7 @@ public class RobotContainer {
             slapdown.setIO(new SlapdownIOTalonFX(slapdown));
             hopper.setIO(new HopperIOTalonFX(hopper));
             uptake.setIO(new UptakeIOTalonFX(uptake));
-            flywheel.setIO(new FlywheelIOTalonFX(flywheel));
+            flywheel.setIO(new FlywheelIOTalonFX(flywheel), vision);
             turret.setIO(new TurretIOTalonFX(turret), vision);
         }
 
@@ -263,6 +266,8 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureBindings();
+
+        RobotController.setBrownoutVoltage(6.0);
     }
 
     /**
@@ -299,15 +304,16 @@ public class RobotContainer {
         //////////////////////////////////////////////
         ///             DRIVER COMMANDS            ///
         //////////////////////////////////////////////
-        // Lock to 0° when A button is held
-        // driverController
-        //     .a()
-        //     .whileTrue(
-        //         DriveCommands.joystickDriveAtAngle(
-        //             drive,
-        //             () -> -driverController.getLeftY(),
-        //             () -> -driverController.getLeftX(),
-        //             () -> Rotation2d.kZero));
+        // Face hub when Dumper Mode (toggled by operator LT + RT)
+        driverController
+                .rightTrigger()
+                .and(dumperModeTrigger())
+                .whileTrue(
+                        DriveCommands.joystickDriveAtAngle(
+                                drive,
+                                () -> -driverController.getLeftY(),
+                                () -> -driverController.getLeftX(),
+                                vision::getDriveAngleToFaceHub));
 
         // Reset gyro to 0° when start and back buttons are pressed
         driverController
@@ -331,14 +337,16 @@ public class RobotContainer {
         ////////////////////////////
         /// INTAKE UPTAKE HOPPER ///
         ////////////////////////////
+
         driverController.rightTrigger().whileTrue(uptake.set(1));
-        driverController.leftTrigger().whileTrue(intake.runIntake());
         driverController.rightTrigger().whileTrue(hopper.set(1));
+
+        driverController.leftTrigger().whileTrue(intake.runIntake());
 
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
         driverController.y().whileTrue(forceOuttake());
         // Wiggles the intake up and down to free up stuck balls
-        driverController.x().toggleOnTrue(slapdown.wiggleIntake());
+        operatorController.x().toggleOnTrue(slapdown.wiggleIntake());
 
         // (in/de)creases the ballistic modifier
         operatorController
@@ -358,7 +366,9 @@ public class RobotContainer {
 
         // Disables automatic turret tracking when manual override is enabled,
         // allowing the operator to control the turret without interference from vision tracking.
-        turretTrackingTrigger().whileTrue(turret.trackTagGlobalRelative());
+        turretTrackingTrigger()
+                .and(dumperModeTrigger().negate())
+                .whileTrue(turret.trackTagGlobalRelative());
         turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
         turretTrackingTrigger()
                 .and(driverController.rightTrigger())
@@ -371,13 +381,25 @@ public class RobotContainer {
         // Only enable manual control of turret, hood and flywheel when manual override is enabled
         // Set the turret to preset robot-relative angles based on the D-Pad input of the Operator
         // controller.
-        operatorController.povUp().toggleOnTrue(turret.setAngle(Degrees.of(168.5)));
+        operatorController
+                .povUp()
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
+                .toggleOnTrue(turret.setAngle(Degrees.of(168.5)));
         // operatorController.povUpRight().toggleOnTrue(turret.setAngle(Degrees.of(-5)));
-        operatorController.povRight().toggleOnTrue(turret.setAngle(Degrees.of(78.5)));
+        operatorController
+                .povRight()
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
+                .toggleOnTrue(turret.setAngle(Degrees.of(78.5)));
         // operatorController.povDownRight().toggleOnTrue(turret.setAngle(Degrees.of(85)));
-        operatorController.povDown().toggleOnTrue(turret.setAngle(Degrees.of(-12.5)));
+        operatorController
+                .povDown()
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
+                .toggleOnTrue(turret.setAngle(Degrees.of(-12.5)));
         // operatorController.povDownLeft().toggleOnTrue(turret.setAngle(Degrees.of(175)));
-        operatorController.povLeft().toggleOnTrue(turret.setAngle(Degrees.of(-102.5)));
+        operatorController
+                .povLeft()
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
+                .toggleOnTrue(turret.setAngle(Degrees.of(-102.5)));
         // operatorController.povUpLeft().toggleOnTrue(turret.setAngle(Degrees.of(265)));
 
         ///////////////////////
@@ -385,8 +407,14 @@ public class RobotContainer {
         ///////////////////////
         // Set the flywheel to preset velocities based on the bumpers and triggers of the Operator
         // controller.
-        operatorController.rightTrigger().toggleOnTrue(flywheel.setVelocity(RPM.of(4800)));
-        operatorController.rightBumper().toggleOnTrue(flywheel.setVelocity(RPM.of(2800)));
+        operatorController
+                .rightTrigger()
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
+                .toggleOnTrue(flywheel.setVelocity(RPM.of(4800)));
+        operatorController
+                .rightBumper()
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
+                .toggleOnTrue(flywheel.setVelocity(RPM.of(2800)));
 
         ///////////////////
         /// MANUAL HOOD ///
@@ -394,8 +422,14 @@ public class RobotContainer {
 
         // Set the hood to preset angles based on the bumpers and triggers of the
         // Operator controller.
-        operatorController.leftTrigger().toggleOnTrue(hood.setAngle(Degrees.of(45)));
-        operatorController.leftBumper().toggleOnTrue(hood.setAngle(Degrees.of(65)));
+        operatorController
+                .leftTrigger()
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
+                .toggleOnTrue(hood.setAngle(Degrees.of(45)));
+        operatorController
+                .leftBumper()
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
+                .toggleOnTrue(hood.setAngle(Degrees.of(65)));
 
         ///////////////////////
         /// INTAKE COMMANDS ///
@@ -403,11 +437,26 @@ public class RobotContainer {
 
         // Deploy and retract the intake with the A and Y buttons, but only when the
         // back button is held to prevent accidental activation during teleop.
-        operatorController.a().and(operatorController.back()).toggleOnTrue(slapdown.deployIntake());
+        operatorController //
+                .a() //
+                .and(operatorController.back()) //
+                .toggleOnTrue(slapdown.deployIntake());
         operatorController
                 .y()
                 .and(operatorController.back())
                 .toggleOnTrue(slapdown.retractIntake());
+
+        // Enable Dumper Mode (align with drivebase rather than turret)
+        operatorController.start().and(operatorController.back()).onTrue(toggleDumperMode());
+        // Manual operator turret control in dumper/manual modes.
+        operatorController
+                .x()
+                .and(manualOverrideTrigger().or(dumperModeTrigger()))
+                .whileTrue(turret.set(0.05));
+        operatorController
+                .b()
+                .and(manualOverrideTrigger().or(dumperModeTrigger()))
+                .whileTrue(turret.set(-0.05));
     }
 
     /**
@@ -439,11 +488,15 @@ public class RobotContainer {
             operatorController.setRumble(RumbleType.kLeftRumble, 1);
             operatorController.setRumble(RumbleType.kRightRumble, 1);
         } else {
-            driverController.setRumble(RumbleType.kLeftRumble, 0);
-            driverController.setRumble(RumbleType.kRightRumble, 0);
-            operatorController.setRumble(RumbleType.kLeftRumble, 0);
-            operatorController.setRumble(RumbleType.kRightRumble, 0);
+            cancelRumble();
         }
+    }
+
+    public void cancelRumble() {
+        driverController.setRumble(RumbleType.kLeftRumble, 0);
+        driverController.setRumble(RumbleType.kRightRumble, 0);
+        operatorController.setRumble(RumbleType.kLeftRumble, 0);
+        operatorController.setRumble(RumbleType.kRightRumble, 0);
     }
 
     /** Update the ballistic equation modifier based on the operator's button presses */
@@ -501,5 +554,35 @@ public class RobotContainer {
                         (RobotModeTriggers.teleop().getAsBoolean()
                                         || RobotModeTriggers.autonomous().getAsBoolean())
                                 && !manualOverride);
+    }
+
+    /**
+     * Returns the current state of Dumper Mode.
+     *
+     * @return a {@link Trigger} with the current state of Dumper Mode
+     */
+    private Trigger dumperModeTrigger() {
+        return new Trigger(() -> (dumperMode));
+    }
+
+    /**
+     * Returns the current state of Manual Override.
+     *
+     * @return a {@link Trigger} with the current state of Dumper Mode
+     */
+    private Trigger manualOverrideTrigger() {
+        return new Trigger(() -> (manualOverride));
+    }
+
+    /**
+     * Inverts the state of dumper mode, allowing for drivebase-centric targeting when true.
+     *
+     * @return an {@link InstantCommand} toggling the value of dumperMode
+     */
+    private Command toggleDumperMode() {
+        return new InstantCommand(
+                () -> {
+                    dumperMode = !dumperMode;
+                });
     }
 }
