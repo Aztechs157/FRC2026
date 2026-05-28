@@ -13,7 +13,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team157.robot.Constants;
-import org.team157.robot.Constants.TelemetryConstants;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorController;
@@ -35,7 +34,6 @@ public class UptakeIOTalonFX implements UptakeIO {
         SmartMotorControllerConfig uptakeRollerMotorConfig =
                 new SmartMotorControllerConfig(subsystem)
                         .withControlMode(ControlMode.OPEN_LOOP)
-                        .withTelemetry("UptakeRollerMotor", TelemetryConstants.TELEMETRY_VERBOSITY)
                         .withMotorInverted(true)
                         .withIdleMode(MotorMode.COAST)
                         .withStatorCurrentLimit(UptakeConstants.CURRENT_LIMIT)
@@ -47,7 +45,6 @@ public class UptakeIOTalonFX implements UptakeIO {
 
         FlyWheelConfig uptakeRollerConfig =
                 new FlyWheelConfig(smartRollerMotor)
-                        .withTelemetry("Uptake", TelemetryConstants.TELEMETRY_VERBOSITY)
                         .withMass(Kilograms.of(0.5))
                         .withDiameter(Inches.of(2));
 

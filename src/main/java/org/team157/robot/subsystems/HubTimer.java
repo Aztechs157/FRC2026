@@ -53,87 +53,88 @@ public class HubTimer extends SubsystemBase {
         if (alliance.isEmpty()) {
             hubActive = false;
             currentShift = Shift.INACTIVE;
-        }
-
-        // At this point, if we're not teleop enabled, there is no hub.
-        if (!DriverStation.isTeleopEnabled()) {
-            hubActive = false;
-            currentShift = Shift.INACTIVE;
-        }
-
-        // Hub is always enabled in autonomous.
-        if (DriverStation.isAutonomousEnabled()) {
-            hubActive = true;
-            currentShift = Shift.AUTO;
-        }
-
-        // We're teleop enabled, compute.
-        double matchTime = DriverStation.getMatchTime();
-        String gameData = DriverStation.getGameSpecificMessage();
-
-        // If we have no game data, we cannot compute, assume hub is active, as its
-        // likely early in teleop.
-        if (gameData.isEmpty()) {
-            hubActive = true;
         } else {
-            switch (gameData.charAt(0)) {
-                case 'R' -> redInactiveFirst = true;
-                case 'B' -> redInactiveFirst = false;
-                default -> {
-                    // If we have invalid game data, assume hub is active.
-                    hubActive = true;
+
+            // At this point, if we're not teleop enabled, there is no hub.
+            if (!DriverStation.isTeleopEnabled()) {
+                hubActive = false;
+                currentShift = Shift.INACTIVE;
+            }
+
+            // Hub is always enabled in autonomous.
+            if (DriverStation.isAutonomousEnabled()) {
+                hubActive = true;
+                currentShift = Shift.AUTO;
+            }
+
+            // We're teleop enabled, compute.
+            double matchTime = DriverStation.getMatchTime();
+            String gameData = DriverStation.getGameSpecificMessage();
+
+            // If we have no game data, we cannot compute, assume hub is active, as its
+            // likely early in teleop.
+            if (gameData.isEmpty()) {
+                hubActive = true;
+            } else {
+                switch (gameData.charAt(0)) {
+                    case 'R' -> redInactiveFirst = true;
+                    case 'B' -> redInactiveFirst = false;
+                    default -> {
+                        // If we have invalid game data, assume hub is active.
+                        hubActive = true;
+                    }
                 }
             }
-        }
 
-        // Shift was is active for blue if red won auto, or red if blue won auto.
-        shift1Active =
-                switch (alliance.get()) {
-                    case Red -> !redInactiveFirst;
-                    case Blue -> redInactiveFirst;
-                    default -> !redInactiveFirst;
-                };
+            // Shift was is active for blue if red won auto, or red if blue won auto.
+            shift1Active =
+                    switch (alliance.get()) {
+                        case Red -> !redInactiveFirst;
+                        case Blue -> redInactiveFirst;
+                        default -> !redInactiveFirst;
+                    };
 
-        if (matchTime > 130) {
-            // Transition shift, hub is active.
-            hubActive = true;
-            currentShift = Shift.TRANSITION;
-            timeUntilSwap = matchTime - 130;
-        } else if (matchTime > 105) {
-            // Shift 1
-            hubActive = shift1Active;
-            currentShift = Shift.SHIFT1;
-            timeUntilSwap = matchTime - 105;
-        } else if (matchTime > 80) {
-            // Shift 2
-            hubActive = !shift1Active;
-            currentShift = Shift.SHIFT2;
-            timeUntilSwap = matchTime - 80;
-        } else if (matchTime > 55) {
-            // Shift 3
-            hubActive = shift1Active;
-            currentShift = Shift.SHIFT3;
-            timeUntilSwap = matchTime - 55;
-        } else if (matchTime > 30) {
-            // Shift 4
-            hubActive = !shift1Active;
-            currentShift = Shift.SHIFT4;
-            timeUntilSwap = matchTime - 30;
-        } else if (matchTime > 0 && !DriverStation.isAutonomous()) {
-            // End game, hub always active.
-            hubActive = true;
-            currentShift = Shift.ENDGAME;
-            timeUntilSwap = matchTime;
-        } else if (matchTime > 0 && DriverStation.isAutonomous()) {
-            // Hub is always active in autonomous.
-            hubActive = true;
-            currentShift = Shift.AUTO;
-            timeUntilSwap = matchTime;
-        } else {
-            // Match time is invalid, assume hub is active.
-            hubActive = true;
-            currentShift = Shift.INACTIVE;
-            timeUntilSwap = -1.0;
+            if (matchTime > 130) {
+                // Transition shift, hub is active.
+                hubActive = true;
+                currentShift = Shift.TRANSITION;
+                timeUntilSwap = matchTime - 130;
+            } else if (matchTime > 105) {
+                // Shift 1
+                hubActive = shift1Active;
+                currentShift = Shift.SHIFT1;
+                timeUntilSwap = matchTime - 105;
+            } else if (matchTime > 80) {
+                // Shift 2
+                hubActive = !shift1Active;
+                currentShift = Shift.SHIFT2;
+                timeUntilSwap = matchTime - 80;
+            } else if (matchTime > 55) {
+                // Shift 3
+                hubActive = shift1Active;
+                currentShift = Shift.SHIFT3;
+                timeUntilSwap = matchTime - 55;
+            } else if (matchTime > 30) {
+                // Shift 4
+                hubActive = !shift1Active;
+                currentShift = Shift.SHIFT4;
+                timeUntilSwap = matchTime - 30;
+            } else if (matchTime > 0 && !DriverStation.isAutonomous()) {
+                // End game, hub always active.
+                hubActive = true;
+                currentShift = Shift.ENDGAME;
+                timeUntilSwap = matchTime;
+            } else if (matchTime > 0 && DriverStation.isAutonomous()) {
+                // Hub is always active in autonomous.
+                hubActive = true;
+                currentShift = Shift.AUTO;
+                timeUntilSwap = matchTime;
+            } else {
+                // Match time is invalid, assume hub is active.
+                hubActive = true;
+                currentShift = Shift.INACTIVE;
+                timeUntilSwap = -1.0;
+            }
         }
 
         // Logger outputs
