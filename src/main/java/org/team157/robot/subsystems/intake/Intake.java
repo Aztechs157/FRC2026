@@ -4,8 +4,6 @@
 
 package org.team157.robot.subsystems.intake;
 
-import static edu.wpi.first.units.Units.RPM;
-
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -64,8 +62,7 @@ public class Intake extends SubsystemBase {
      * @return a {@link Command} running the intake motors at 100% duty cycle
      */
     public Command runIntake() {
-        // Arbitrary untuned value
-        return setVelocity(RPM.of(5000));
+        return set(1);
     }
 
     @Override

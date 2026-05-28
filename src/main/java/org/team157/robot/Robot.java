@@ -118,7 +118,9 @@ public class Robot extends LoggedRobot {
 
     /** This function is called once when the robot is disabled. */
     @Override
-    public void disabledInit() {}
+    public void disabledInit() {
+        m_robotContainer.cancelRumble();
+    }
 
     /** This function is called periodically when disabled. */
     @Override

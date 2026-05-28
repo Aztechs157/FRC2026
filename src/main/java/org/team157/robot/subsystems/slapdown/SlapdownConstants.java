@@ -30,7 +30,7 @@ public class SlapdownConstants {
     public static final AngularAcceleration ANGULAR_ACCELERATION =
             DegreesPerSecondPerSecond.of(540);
     /** Minimum and maximum positions for the pivot encoder */
-    public static final double MIN_ENCODER_POSITION = 0.0, MAX_ENCODER_POSITION = 0.9;
+    public static final double MIN_ENCODER_POSITION = 0.0, MAX_ENCODER_POSITION = 0.7;
     /** Minimum and maximum angles for the pivot */
     public static final double MIN_ANGLE = 0, MAX_ANGLE = 80;
     /** Soft limits for the pivot angle */
