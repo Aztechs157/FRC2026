@@ -383,12 +383,12 @@ public class RobotContainer {
         // controller.
         operatorController
                 .povUp()
-                .and(manualOverrideTrigger())
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
                 .toggleOnTrue(turret.setAngle(Degrees.of(168.5)));
         // operatorController.povUpRight().toggleOnTrue(turret.setAngle(Degrees.of(-5)));
         operatorController
                 .povRight()
-                .and(manualOverrideTrigger())
+                .and(manualOverrideTrigger().or(turretTrackingTrigger().negate()))
                 .toggleOnTrue(turret.setAngle(Degrees.of(78.5)));
         // operatorController.povDownRight().toggleOnTrue(turret.setAngle(Degrees.of(85)));
         operatorController
