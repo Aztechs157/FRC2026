@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -109,8 +108,6 @@ public class Robot extends LoggedRobot {
         // Threads.setCurrentThreadPriority(false, 10);
         Logger.recordOutput("Misc/Manual Override Active?", RobotContainer.manualOverride);
         Logger.recordOutput("Misc/Dumper Mode?", RobotContainer.dumperMode);
-        // Gets the match time from the FMS to display for the driver.
-        Logger.recordOutput("Misc/Match Time", Timer.getMatchTime());
         Logger.recordOutput("Misc/Under Trench?", RobotContainer.drive.isUnderTrench());
         Logger.recordOutput("Flywheel Modifier", RobotContainer.ballisticSpeedModifier);
         m_field.setRobotPose(RobotContainer.drive.getPose());

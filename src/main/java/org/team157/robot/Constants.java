@@ -60,8 +60,6 @@ public final class Constants {
         public static final double JOYSTICK_DEADBAND = 0.05;
     }
 
-
-
     public static class FieldConstants {
         public static final Distance FIELD_LENGTH = Meters.of(16.54175);
         public static final Distance FIELD_WIDTH = Meters.of(8.0137);
