@@ -24,6 +24,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.team157.robot.util.Elastic;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -159,6 +160,7 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void autonomousInit() {
+        Elastic.selectTab("Autonomous");
         RobotContainer.vision.updateAlliance();
 
         autonomousCommand = m_robotContainer.getAutonomousCommand();
@@ -176,6 +178,7 @@ public class Robot extends LoggedRobot {
     /** This function is called once when teleop is enabled. */
     @Override
     public void teleopInit() {
+        Elastic.selectTab("Teleoperated");
         // This makes sure that the autonomous stops running when
         // teleop starts running. If you want the autonomous to
         // continue until interrupted by another command, remove
