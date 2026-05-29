@@ -165,90 +165,11 @@
         "layouts": [],
         "containers": [
           {
-            "title": "Current Shift",
-            "x": 640.0,
+            "title": "Auto Preview",
+            "x": 768.0,
             "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Shift/Current Shift",
-              "period": 0.06,
-              "data_type": "string"
-            }
-          },
-          {
-            "title": "Hub Active?",
-            "x": 1280.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 640.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Shift/Hub Active?",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Hub Active?",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 640.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Shift/Hub Active?",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Match Time",
-            "x": 256.0,
-            "y": 0.0,
-            "width": 384.0,
-            "height": 256.0,
-            "type": "Match Time",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Misc/Match Time",
-              "period": 0.06,
-              "data_type": "double",
-              "time_display_mode": "Minutes and Seconds",
-              "red_start_time": 20,
-              "yellow_start_time": 30
-            }
-          },
-          {
-            "title": "Time Until Next Swap",
-            "x": 896.0,
-            "y": 0.0,
-            "width": 384.0,
-            "height": 256.0,
-            "type": "Match Time",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Shift/Time Until Next Swap",
-              "period": 0.06,
-              "data_type": "double",
-              "time_display_mode": "Minutes and Seconds",
-              "red_start_time": 20,
-              "yellow_start_time": 30
-            }
-          },
-          {
-            "title": "Field",
-            "x": 512.0,
-            "y": 256.0,
-            "width": 512.0,
-            "height": 256.0,
+            "width": 768.0,
+            "height": 384.0,
             "type": "Field",
             "properties": {
               "topic": "/SmartDashboard/Field",
@@ -266,9 +187,9 @@
           },
           {
             "title": "Auto Choices",
-            "x": 512.0,
-            "y": 512.0,
-            "width": 512.0,
+            "x": 768.0,
+            "y": 384.0,
+            "width": 768.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -278,33 +199,123 @@
             }
           },
           {
-            "title": "Flywheel Modifier",
-            "x": 256.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 384.0,
+            "title": "Match Time",
+            "x": 768.0,
+            "y": 512.0,
+            "width": 768.0,
+            "height": 128.0,
             "type": "Number Bar",
             "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Flywheel Modifier",
+              "topic": "/AdvantageKit/DriverStation/MatchTime",
               "period": 0.06,
               "data_type": "double",
-              "min_value": 0.75,
-              "max_value": 1.25,
+              "min_value": 0.0,
+              "max_value": 20.0,
               "divisions": 5,
               "inverted": false,
-              "orientation": "vertical"
+              "orientation": "horizontal"
             }
           },
           {
-            "title": "Alerts",
-            "x": 1024.0,
+            "title": "backCam-processed",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/backCam-processed",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "frontLeftCam-processed",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/frontLeftCam-processed",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "frontRightCam-processed",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/frontRightCam-processed",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "Hood Angle",
+            "x": 512.0,
             "y": 256.0,
             "width": 256.0,
-            "height": 384.0,
-            "type": "Alerts",
+            "height": 256.0,
+            "type": "Radial Gauge",
             "properties": {
-              "topic": "/SmartDashboard/Alerts",
-              "period": 0.06
+              "topic": "/AdvantageKit/Hood/AngleDegrees",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 40.0,
+              "max_value": 65.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
+            }
+          },
+          {
+            "title": "Slapdown Angle",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/AdvantageKit/Slapdown/AngleDegrees",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 0.0,
+              "max_value": 80.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
+            }
+          },
+          {
+            "title": "Turret Angle",
+            "x": 256.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/AdvantageKit/Turret/AngleDegrees",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -180.0,
+              "end_angle": 180.0,
+              "min_value": -180.0,
+              "max_value": 180.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
             }
           }
         ]
