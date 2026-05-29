@@ -15,7 +15,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 import org.team157.robot.parsing.PositionDetails;
-import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -59,10 +58,6 @@ public final class Constants {
         public static final int DRIVER_CONTROLLER_PORT = 0, OPERATOR_CONTROLLER_PORT = 1;
         // Joystick Deadband
         public static final double JOYSTICK_DEADBAND = 0.05;
-    }
-
-    public static class TelemetryConstants {
-        public static final TelemetryVerbosity TELEMETRY_VERBOSITY = TelemetryVerbosity.LOW;
     }
 
     public static class FieldConstants {

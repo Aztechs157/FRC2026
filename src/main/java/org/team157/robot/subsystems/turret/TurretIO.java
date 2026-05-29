@@ -28,6 +28,7 @@ public interface TurretIO {
         public double scaledEncoderPosition = 0.0;
         public double encoderPositionRotations = 0.0;
         public double mechanismVelocityDegreesPerSecond = 0.0;
+        public boolean isInStartingPosition = false;
     }
 
     /**

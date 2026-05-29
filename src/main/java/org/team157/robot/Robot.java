@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,6 +24,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.team157.robot.util.Elastic;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -109,8 +109,6 @@ public class Robot extends LoggedRobot {
         // Threads.setCurrentThreadPriority(false, 10);
         Logger.recordOutput("Misc/Manual Override Active?", RobotContainer.manualOverride);
         Logger.recordOutput("Misc/Dumper Mode?", RobotContainer.dumperMode);
-        // Gets the match time from the FMS to display for the driver.
-        Logger.recordOutput("Misc/Match Time", Timer.getMatchTime());
         Logger.recordOutput("Misc/Under Trench?", RobotContainer.drive.isUnderTrench());
         Logger.recordOutput("Flywheel Modifier", RobotContainer.ballisticSpeedModifier);
         m_field.setRobotPose(RobotContainer.drive.getPose());
@@ -162,6 +160,7 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void autonomousInit() {
+        Elastic.selectTab("Autonomous");
         RobotContainer.vision.updateAlliance();
 
         autonomousCommand = m_robotContainer.getAutonomousCommand();
@@ -179,6 +178,7 @@ public class Robot extends LoggedRobot {
     /** This function is called once when teleop is enabled. */
     @Override
     public void teleopInit() {
+        Elastic.selectTab("Teleoperated");
         // This makes sure that the autonomous stops running when
         // teleop starts running. If you want the autonomous to
         // continue until interrupted by another command, remove

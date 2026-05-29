@@ -64,7 +64,7 @@ public class SunstoneMechanism3D extends SubsystemBase {
     public Pose3d getTurretBasePose() {
         return new Pose3d(
                 Mechanism3DConstants.ORIGIN_TO_TURRET_BASE_OFFSET,
-                new Rotation3d(0, 0, -turret.getTurretRotation().in(Radians)));
+                new Rotation3d(0, 0, turret.getTurretRotation().in(Radians)));
     }
 
     /**

@@ -28,6 +28,7 @@ public interface SlapdownIO {
         public double scaledEncoderPosition = 0.0;
         public double angleFromEncoderDegrees = 0.0;
         public double mechanismVelocityDegreesPerSecond = 0.0;
+        public boolean isInStartingPosition = false;
     }
 
     /**

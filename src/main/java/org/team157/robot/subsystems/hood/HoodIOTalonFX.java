@@ -120,6 +120,7 @@ public class HoodIOTalonFX implements HoodIO {
         inputs.mechanismVelocityDegreesPerSecond =
                 motor.getMechanismVelocity().in(DegreesPerSecond);
         inputs.scaledEncoderPosition = mapHoodEncoder(0, 1);
+        inputs.isInStartingPosition = (inputs.angleDegrees > 62);
     }
 
     @Override

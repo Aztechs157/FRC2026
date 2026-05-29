@@ -217,7 +217,8 @@ public class RobotContainer {
         NamedCommands.registerCommand("DeployIntake", slapdown.deployIntake());
         NamedCommands.registerCommand("RunIntake", intake.runIntake());
         NamedCommands.registerCommand("RunHopper", hopper.set(0.5));
-        NamedCommands.registerCommand("ShootBalls", uptake.set(1));
+        NamedCommands.registerCommand(
+                "ShootBalls", uptake.set(1).alongWith(hood.setDynamicHoodAngle()));
         NamedCommands.registerCommand("Wiggle", slapdown.wiggleIntake());
         NamedCommands.registerCommand(
                 "WiggleCubed",
@@ -346,7 +347,10 @@ public class RobotContainer {
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
         driverController.y().whileTrue(forceOuttake());
         // Wiggles the intake up and down to free up stuck balls
-        operatorController.x().toggleOnTrue(slapdown.wiggleIntake());
+        operatorController
+                .x()
+                .and(operatorController.start())
+                .toggleOnTrue(slapdown.wiggleIntake());
 
         // (in/de)creases the ballistic modifier
         operatorController

@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.Supplier;
 import org.team157.robot.Constants;
-import org.team157.robot.Constants.TelemetryConstants;
 import org.team157.utilities.PosUtils;
 import yams.mechanisms.config.PivotConfig;
 import yams.mechanisms.positional.Pivot;
@@ -59,7 +58,6 @@ public class TurretIOTalonFX implements TurretIO {
                         .withIdleMode(MotorMode.BRAKE)
                         .withMotorInverted(true)
                         .withGearing(TurretConstants.GEARING)
-                        .withTelemetry("Turret Motor", TelemetryConstants.TELEMETRY_VERBOSITY)
                         .withStatorCurrentLimit(TurretConstants.CURRENT_LIMIT)
                         .withClosedLoopRampRate(TurretConstants.RAMP_RATE)
                         .withSoftLimit(
@@ -77,7 +75,6 @@ public class TurretIOTalonFX implements TurretIO {
                                                 TurretConstants.MAX_ANGLE)))
                         .withHardLimit(
                                 TurretConstants.LOWER_HARD_LIMIT, TurretConstants.UPPER_HARD_LIMIT)
-                        .withTelemetry("Turret", TelemetryConstants.TELEMETRY_VERBOSITY)
                         .withMOI(Meters.of(0.1), Kilograms.of(4));
 
         this.turret = new Pivot(turretConfig);
@@ -115,6 +112,9 @@ public class TurretIOTalonFX implements TurretIO {
                 mapEncoder(TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
         inputs.scaledEncoderPosition = mapEncoder(0, 1);
         inputs.targetAngleDegrees = Turret.trackingAngle.in(Degrees);
+        inputs.isInStartingPosition =
+                ((175 < inputs.angleDegrees && inputs.angleDegrees < 181)
+                        || ((-175) > inputs.angleDegrees && inputs.angleDegrees > (-180)));
     }
 
     @Override
