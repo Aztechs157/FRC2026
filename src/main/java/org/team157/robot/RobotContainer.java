@@ -217,7 +217,8 @@ public class RobotContainer {
         NamedCommands.registerCommand("DeployIntake", slapdown.deployIntake());
         NamedCommands.registerCommand("RunIntake", intake.runIntake());
         NamedCommands.registerCommand("RunHopper", hopper.set(0.5));
-        NamedCommands.registerCommand("ShootBalls", uptake.set(1).alongWith(hood.setDynamicHoodAngle()));
+        NamedCommands.registerCommand(
+                "ShootBalls", uptake.set(1).alongWith(hood.setDynamicHoodAngle()));
         NamedCommands.registerCommand("Wiggle", slapdown.wiggleIntake());
         NamedCommands.registerCommand(
                 "WiggleCubed",
