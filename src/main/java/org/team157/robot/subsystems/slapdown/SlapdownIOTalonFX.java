@@ -63,9 +63,7 @@ public class SlapdownIOTalonFX implements SlapdownIO {
                 new PivotConfig(smartIntakePivotMotor)
                         .withStartingPosition(
                                 Degrees.of(
-                                        mapEncoder(
-                                                SlapdownConstants.MIN_ANGLE,
-                                                SlapdownConstants.MAX_ANGLE)))
+                                        80))
                         .withHardLimit(
                                 SlapdownConstants.LOWER_HARD_LIMIT,
                                 SlapdownConstants.UPPER_HARD_LIMIT)
