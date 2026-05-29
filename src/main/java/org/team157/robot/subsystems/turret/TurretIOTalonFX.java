@@ -112,6 +112,9 @@ public class TurretIOTalonFX implements TurretIO {
                 mapEncoder(TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
         inputs.scaledEncoderPosition = mapEncoder(0, 1);
         inputs.targetAngleDegrees = Turret.trackingAngle.in(Degrees);
+        inputs.isInStartingPosition =
+                ((175 < inputs.angleDegrees && inputs.angleDegrees < 181)
+                        || ((-175) > inputs.angleDegrees && inputs.angleDegrees > (-180)));
     }
 
     @Override

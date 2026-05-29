@@ -112,6 +112,7 @@ public class SlapdownIOTalonFX implements SlapdownIO {
         inputs.mechanismVelocityDegreesPerSecond =
                 motor.getMechanismVelocity().in(DegreesPerSecond);
         inputs.scaledEncoderPosition = mapEncoder(0, 1);
+        inputs.isInStartingPosition = (inputs.angleDegrees > 60);
     }
 
     // TODO: Evaluate whether or not this method is necessary, as the Hood only needed it for

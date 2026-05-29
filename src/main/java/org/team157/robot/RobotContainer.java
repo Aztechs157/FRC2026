@@ -346,7 +346,7 @@ public class RobotContainer {
         // Runs the hopper, uptake, and intake backwards at a low speed to clear jams.
         driverController.y().whileTrue(forceOuttake());
         // Wiggles the intake up and down to free up stuck balls
-        operatorController.x().toggleOnTrue(slapdown.wiggleIntake());
+        operatorController.x().and(operatorController.start()).toggleOnTrue(slapdown.wiggleIntake());
 
         // (in/de)creases the ballistic modifier
         operatorController
