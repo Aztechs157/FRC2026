@@ -3,6 +3,7 @@ package org.team157.robot.subsystems.uptake;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
+import org.team157.robot.subsystems.turret.Turret;
 
 /**
  * Represents the Uptake subsystem, which feeds balls from the hopper up into the flywheel for
@@ -12,6 +13,7 @@ public class Uptake extends SubsystemBase {
 
     // The IO interface for interacting with the uptake's motor.
     private UptakeIO io;
+    private Turret turret;
 
     // Inputs from the motor and mechanism, to be updated periodically and logged.
     private final UptakeIOInputsAutoLogged inputs = new UptakeIOInputsAutoLogged();
@@ -24,8 +26,9 @@ public class Uptake extends SubsystemBase {
      *
      * @param io An implementation of the Uptake's IO layer, i.e. UptakeIOTalonFX
      */
-    public void setIO(UptakeIO io) {
+    public void setIO(UptakeIO io, Turret turret) {
         this.io = io;
+        this.turret = turret;
     }
 
     /**
@@ -46,6 +49,18 @@ public class Uptake extends SubsystemBase {
      */
     public Command set(double dutyCycle) {
         return io.set(dutyCycle);
+    }
+
+    public double getUptakeDutyCycleSetpoint() {
+        if (!turret.isWithinTolerance(15)) {
+            return -0.25;
+        } else {
+            return 1;
+        }
+    }
+
+    public Command runUptake() {
+        return io.set(() -> getUptakeDutyCycleSetpoint());
     }
 
     @Override

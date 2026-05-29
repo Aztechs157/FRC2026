@@ -115,18 +115,19 @@ public class Turret extends SubsystemBase {
         }
     }
 
-    /** 
-     * Determines whether the turret's current angle is within tolerance of its setpoint angle by a specified amount of degrees.
-     * 
+    /**
+     * Determines whether the turret's current angle is within tolerance of its setpoint angle by a
+     * specified amount of degrees.
+     *
      * @param thresholdDegrees The +- tolerance range to check, in degrees.
-     * @return true if the turret's angle is within the specified threshold in either direction, false otherwise.
-     * 
+     * @return true if the turret's angle is within the specified threshold in either direction,
+     *     false otherwise.
      */
     // TODO: examine how this handles angles around the wrapping point
     public boolean isWithinTolerance(double thresholdDegrees) {
-        if(vision.getTurretAngle() > inputs.angleDegrees) {
+        if (vision.getTurretAngle() > inputs.angleDegrees) {
             return vision.getTurretAngle() - inputs.angleDegrees < thresholdDegrees;
-        } else if(vision.getTurretAngle() < inputs.angleDegrees) {
+        } else if (vision.getTurretAngle() < inputs.angleDegrees) {
             return inputs.angleDegrees - vision.getTurretAngle() < thresholdDegrees;
         } else {
             return false;
