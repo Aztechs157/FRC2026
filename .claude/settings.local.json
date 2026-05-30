@@ -4,7 +4,27 @@
       "Bash(./gradlew tasks *)",
       "Bash(./gradlew compileJava)",
       "Bash(ls \"/c/Users/Public/wpilib/\" 2>&1 | head -5; echo \"---\"; find /c -maxdepth 4 -name \"jdk\" -path \"*wpilib*\" 2>/dev/null | head -5)",
-      "Read(//c/Users/Public/wpilib//**)"
+      "Read(//c/Users/Public/wpilib//**)",
+      "Bash(Get-ChildItem -Recurse -Path \"C:\\\\Users\\\\aztec\\\\Projects\\\\CompetitionRobotProjects\\\\copy of frc2026\\\\FRC2026\\\\src\\\\main\\\\java\\\\org\\\\team157\\\\robot\" -Directory)",
+      "Bash(Select-Object FullName)",
+      "Bash(ls -la \"/d/logs/akit_26-05-27_22-43-13.wpilog\" 2>&1 | head -3; echo \"---\"; ls \"/c/Users/Public/wpilib/2026/tools/\" 2>&1 | grep -iE \"datalog|log\" | head -10)",
+      "Read(//d/logs/**)",
+      "Bash(\"/c/Users/Public/wpilib/2026/tools/datalogtool.exe\" --help)",
+      "Bash(py --version)",
+      "Bash(pip show *)",
+      "Bash(taskkill //F //IM datalogtool.exe)",
+      "Bash(python analyze_log.py)",
+      "Bash(python -c ' *)",
+      "Bash(find ~/.gradle/caches -name \"FRCJavaArtifact*.class\" 2>/dev/null | head -3; echo \"---\"; find ~/.gradle/caches -path \"*gradlerio*\" -name \"*.groovy\" 2>/dev/null | head -10)",
+      "Read(//c/Users/aztec/.gradle/caches/**)",
+      "Bash(find /c/Users/aztec/.gradle -name \"*gradlerio*\" 2>/dev/null | head -20; echo \"---\"; find /c/Users/aztec/.gradle -name \"FRCJavaArtifact*\" 2>/dev/null | head -10)",
+      "Read(//c/Users/aztec/.gradle/**)",
+      "Bash(ls /c/Users/aztec/.gradle/caches/ 2>&1 | head -5; echo \"---\"; find /c/Users/aztec/.gradle -type d -name \"*gradlerio*\" 2>/dev/null; find /c/Users/aztec/ -maxdepth 5 -type d -name \"*gradlerio*\" 2>/dev/null | head -5)",
+      "Read(//c/Users/aztec//**)",
+      "Bash(unzip -l \"/c/Users/aztec/.gradle/caches/modules-2/files-2.1/edu.wpi.first/GradleRIO/2026.2.1/59f646bf750d83387c252de72092ab898edef5e/GradleRIO-2026.2.1.jar\")",
+      "Read(//tmp/**)",
+      "Bash(/c/Users/Public/wpilib/2026/jdk/bin/javap -p -c edu/wpi/first/gradlerio/deploy/roborio/FRCJavaArtifact.class)",
+      "Bash(python analyze_breakdown.py)"
     ]
   }
 }

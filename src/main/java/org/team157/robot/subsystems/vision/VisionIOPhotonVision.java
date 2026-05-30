@@ -22,6 +22,9 @@ import org.photonvision.PhotonCamera;
 public class VisionIOPhotonVision implements VisionIO {
     protected final PhotonCamera camera;
     protected final Transform3d robotToCamera;
+    // Cached inverse of robotToCamera. The transform is fixed at construction, so the inverse
+    // never changes — computing it once avoids a per-result matrix inversion in updateInputs().
+    protected final Transform3d cameraToRobot;
 
     /**
      * Creates a new VisionIOPhotonVision.
@@ -32,6 +35,7 @@ public class VisionIOPhotonVision implements VisionIO {
     public VisionIOPhotonVision(String name, Transform3d robotToCamera) {
         camera = new PhotonCamera(name);
         this.robotToCamera = robotToCamera;
+        this.cameraToRobot = robotToCamera.inverse();
     }
 
     @Override
@@ -59,7 +63,7 @@ public class VisionIOPhotonVision implements VisionIO {
 
                 // Calculate robot pose
                 Transform3d fieldToCamera = multitagResult.estimatedPose.best;
-                Transform3d fieldToRobot = fieldToCamera.plus(robotToCamera.inverse());
+                Transform3d fieldToRobot = fieldToCamera.plus(cameraToRobot);
                 Pose3d robotPose =
                         new Pose3d(fieldToRobot.getTranslation(), fieldToRobot.getRotation());
 
@@ -93,7 +97,7 @@ public class VisionIOPhotonVision implements VisionIO {
                                     tagPose.get().getTranslation(), tagPose.get().getRotation());
                     Transform3d cameraToTarget = target.bestCameraToTarget;
                     Transform3d fieldToCamera = fieldToTarget.plus(cameraToTarget.inverse());
-                    Transform3d fieldToRobot = fieldToCamera.plus(robotToCamera.inverse());
+                    Transform3d fieldToRobot = fieldToCamera.plus(cameraToRobot);
                     Pose3d robotPose =
                             new Pose3d(fieldToRobot.getTranslation(), fieldToRobot.getRotation());
 

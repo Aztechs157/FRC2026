@@ -52,6 +52,17 @@ public class Flywheel extends SubsystemBase {
     /** The calculated hood angle in radians required for the current shot. */
     public static Angle hoodAngle = Radians.of(0);
 
+    // Memoization for getDesiredFlywheelVelocity — the projectile-motion solver in setShotParams
+    // loops 50 iterations of trig/sqrt per call. Recomputing every loop when distance/height
+    // haven't meaningfully changed was a measurable contributor to scheduler overruns. NaN
+    // sentinels force a compute on the first call.
+    private double lastSolvedDistanceMeters = Double.NaN;
+    private double lastSolvedHeightMeters = Double.NaN;
+    private double lastSolvedModifier = Double.NaN;
+    private double cachedDesiredRPM = 2800;
+    private static final double DISTANCE_RESOLVE_THRESHOLD_METERS = 0.05;
+    private static final double HEIGHT_RESOLVE_THRESHOLD_METERS = 0.01;
+
     /** Creates a new Flywheel. */
     public Flywheel() {}
 
@@ -233,19 +244,34 @@ public class Flywheel extends SubsystemBase {
     public AngularVelocity getDesiredFlywheelVelocity() {
         double heightMeters = FieldConstants.positionDetails.getTargetHeight();
         double distanceMeters = Vision.distanceToTargetFromTurret;
+        double modifier = RobotContainer.ballisticSpeedModifier;
 
-        setShotParams(heightMeters, distanceMeters);
+        boolean distanceChanged =
+                Math.abs(distanceMeters - lastSolvedDistanceMeters)
+                        > DISTANCE_RESOLVE_THRESHOLD_METERS;
+        boolean heightChanged =
+                Math.abs(heightMeters - lastSolvedHeightMeters) > HEIGHT_RESOLVE_THRESHOLD_METERS;
+        boolean modifierChanged = modifier != lastSolvedModifier;
 
-        // Convert ball velocity (m/s) to flywheel RPM:
-        // flywheelRPM = (ballVelocity * 60) / (π * flywheel_diameter)
-        // divided by SPEED_FACTOR to account for air resistance and wheel slip
-        double flywheelDiameterMeters = FlywheelConstants.FLYWHEEL_DIAMETER.in(Meters);
-        double desiredRPM =
-                (ballVelocity * 60)
-                        / (Math.PI * flywheelDiameterMeters)
-                        * FlywheelConstants.SPEED_FACTOR
-                        * RobotContainer.ballisticSpeedModifier;
-        return RPM.of(Math.max(2800, desiredRPM));
+        if (distanceChanged || heightChanged || modifierChanged) {
+            setShotParams(heightMeters, distanceMeters);
+
+            // Convert ball velocity (m/s) to flywheel RPM:
+            // flywheelRPM = (ballVelocity * 60) / (π * flywheel_diameter)
+            // divided by SPEED_FACTOR to account for air resistance and wheel slip
+            double flywheelDiameterMeters = FlywheelConstants.FLYWHEEL_DIAMETER.in(Meters);
+            double desiredRPM =
+                    (ballVelocity * 60)
+                            / (Math.PI * flywheelDiameterMeters)
+                            * FlywheelConstants.SPEED_FACTOR
+                            * modifier;
+            cachedDesiredRPM = Math.max(2800, desiredRPM);
+
+            lastSolvedDistanceMeters = distanceMeters;
+            lastSolvedHeightMeters = heightMeters;
+            lastSolvedModifier = modifier;
+        }
+        return RPM.of(cachedDesiredRPM);
     }
 
     public static double getBallTimeOfFlight() {

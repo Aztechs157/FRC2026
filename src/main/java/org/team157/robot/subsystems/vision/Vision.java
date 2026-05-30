@@ -22,9 +22,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import org.ejml.simple.SimpleMatrix;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonUtils;
 import org.team157.robot.Constants.FieldConstants;
@@ -35,6 +34,21 @@ import org.team157.robot.subsystems.turret.Turret;
 import org.team157.robot.subsystems.vision.VisionIO.PoseObservationType;
 
 public class Vision extends SubsystemBase {
+    // Pre-computed turret-to-robot-center geometry. These depend only on
+    // Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET, so they're constant per match.
+    // Replaces the per-tick atan/sin/cos/hypot calls that used to happen inside
+    // setTargetParams() alongside the SimpleMatrix allocations.
+    private static final double TURRET_TO_ROBOT_THETA =
+            Math.atan(
+                    Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY()
+                            / Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX());
+    private static final double TURRET_TO_ROBOT_NEG_SIN_THETA = -Math.sin(TURRET_TO_ROBOT_THETA);
+    private static final double TURRET_TO_ROBOT_COS_THETA = Math.cos(TURRET_TO_ROBOT_THETA);
+    private static final double D_OFFSET_ROBOT =
+            Math.hypot(
+                    Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX(),
+                    Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY());
+
     private final VisionConsumer consumer;
     private final VisionIO[] io;
     private final VisionIOInputsAutoLogged[] inputs;
@@ -52,6 +66,17 @@ public class Vision extends SubsystemBase {
     private double driveRotationalVelocity;
     private double driveFieldRotation;
     private double ballTOF;
+
+    // Reusable scratch lists for periodic() — avoids 16 LinkedList allocations per loop tick
+    // (4 method-scope + 4 per-camera × 3 cameras). Cleared at the start of each scope.
+    private final List<Pose3d> allTagPoses = new ArrayList<>();
+    private final List<Pose3d> allRobotPoses = new ArrayList<>();
+    private final List<Pose3d> allRobotPosesAccepted = new ArrayList<>();
+    private final List<Pose3d> allRobotPosesRejected = new ArrayList<>();
+    private final List<Pose3d> cameraTagPoses = new ArrayList<>();
+    private final List<Pose3d> cameraRobotPoses = new ArrayList<>();
+    private final List<Pose3d> cameraRobotPosesAccepted = new ArrayList<>();
+    private final List<Pose3d> cameraRobotPosesRejected = new ArrayList<>();
 
     public Vision(VisionConsumer consumer, VisionIO... io) {
         this.consumer = consumer;
@@ -124,49 +149,30 @@ public class Vision extends SubsystemBase {
      */
     public void setTargetParams(Pose2d targetPose, Pose2d robotPose) {
 
-        // beginning vector math for momentum shooting
-        double turretToRobotTheta =
-                Math.atan(
-                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY()
-                                / Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX());
-        SimpleMatrix turretToRobotThetaMatrix =
-                new SimpleMatrix(
-                        2, 1, true, -Math.sin(turretToRobotTheta), Math.cos(turretToRobotTheta));
-        double dOffsetRobot =
-                Math.hypot(
-                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getX(),
-                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET.getY());
+        // Momentum-shooting math, expanded from the original SimpleMatrix formulation into
+        // primitive doubles. Each step below corresponds to one matrix operation in the old
+        // code — see git history for the original vector form.
 
-        SimpleMatrix vRotationRobot =
-                turretToRobotThetaMatrix.scale(driveRotationalVelocity * dOffsetRobot);
+        // Turret tangential velocity in robot frame, from chassis rotation about robot center.
+        double rotationalLinearSpeed = driveRotationalVelocity * D_OFFSET_ROBOT;
+        double vRotationRobotX = TURRET_TO_ROBOT_NEG_SIN_THETA * rotationalLinearSpeed;
+        double vRotationRobotY = TURRET_TO_ROBOT_COS_THETA * rotationalLinearSpeed;
 
-        SimpleMatrix robotRotationMatrix =
-                new SimpleMatrix(
-                        2,
-                        2,
-                        true,
-                        new double[] {
-                            Math.cos(driveFieldRotation),
-                            -Math.sin(driveFieldRotation),
-                            Math.sin(driveFieldRotation),
-                            Math.cos(driveFieldRotation)
-                        });
+        // Rotate that velocity into field frame using the robot heading.
+        double cosFieldRot = Math.cos(driveFieldRotation);
+        double sinFieldRot = Math.sin(driveFieldRotation);
+        double vRotationFieldX = cosFieldRot * vRotationRobotX - sinFieldRot * vRotationRobotY;
+        double vRotationFieldY = sinFieldRot * vRotationRobotX + cosFieldRot * vRotationRobotY;
 
-        SimpleMatrix vRotationField = robotRotationMatrix.mult(vRotationRobot);
+        // Total shooter velocity in field frame = rotational contribution + chassis linear.
+        double vShooterX = vRotationFieldX + driveLinearVelocityX;
+        double vShooterY = vRotationFieldY + driveLinearVelocityY;
 
-        SimpleMatrix vShooter =
-                vRotationField.plus(
-                        new SimpleMatrix(2, 1, true, driveLinearVelocityX, driveLinearVelocityY));
+        // Lead the target by ballTOF seconds: subtract shooter velocity × TOF from target.
+        double adjustedX = targetPose.getX() - vShooterX * ballTOF;
+        double adjustedY = targetPose.getY() - vShooterY * ballTOF;
 
-        SimpleMatrix adjustedTargetPoseMatrix =
-                new SimpleMatrix(2, 1, true, targetPose.getX(), targetPose.getY())
-                        .minus(vShooter.scale(ballTOF));
-
-        Pose2d adjustedTargetPose =
-                new Pose2d(
-                        adjustedTargetPoseMatrix.get(0, 0),
-                        adjustedTargetPoseMatrix.get(1, 0),
-                        targetPose.getRotation());
+        Pose2d adjustedTargetPose = new Pose2d(adjustedX, adjustedY, targetPose.getRotation());
 
         // If the hub is the target, rotate the target about the hub by the drive orientation
         if (Math.round(targetPose.getY())
@@ -208,28 +214,28 @@ public class Vision extends SubsystemBase {
             Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
         }
 
-        // Initialize logging values
-        List<Pose3d> allTagPoses = new LinkedList<>();
-        List<Pose3d> allRobotPoses = new LinkedList<>();
-        List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
-        List<Pose3d> allRobotPosesRejected = new LinkedList<>();
+        // Reset summary scratch lists for this loop
+        allTagPoses.clear();
+        allRobotPoses.clear();
+        allRobotPosesAccepted.clear();
+        allRobotPosesRejected.clear();
 
         // Loop over cameras
         for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
             // Update disconnected alert
             disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
-            // Initialize logging values
-            List<Pose3d> tagPoses = new LinkedList<>();
-            List<Pose3d> robotPoses = new LinkedList<>();
-            List<Pose3d> robotPosesAccepted = new LinkedList<>();
-            List<Pose3d> robotPosesRejected = new LinkedList<>();
+            // Reset per-camera scratch lists for this camera
+            cameraTagPoses.clear();
+            cameraRobotPoses.clear();
+            cameraRobotPosesAccepted.clear();
+            cameraRobotPosesRejected.clear();
 
             // Add tag poses
             for (int tagId : inputs[cameraIndex].tagIds) {
                 var tagPose = aprilTagLayout.getTagPose(tagId);
                 if (tagPose.isPresent()) {
-                    tagPoses.add(tagPose.get());
+                    cameraTagPoses.add(tagPose.get());
                 }
             }
 
@@ -251,11 +257,11 @@ public class Vision extends SubsystemBase {
                                 || observation.pose().getY() > aprilTagLayout.getFieldWidth();
 
                 // Add pose to log
-                robotPoses.add(observation.pose());
+                cameraRobotPoses.add(observation.pose());
                 if (rejectPose) {
-                    robotPosesRejected.add(observation.pose());
+                    cameraRobotPosesRejected.add(observation.pose());
                 } else {
-                    robotPosesAccepted.add(observation.pose());
+                    cameraRobotPosesAccepted.add(observation.pose());
                 }
 
                 // Skip if rejected
@@ -287,20 +293,20 @@ public class Vision extends SubsystemBase {
             // Log camera metadata
             Logger.recordOutput(
                     "Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
-                    tagPoses.toArray(new Pose3d[0]));
+                    cameraTagPoses.toArray(new Pose3d[0]));
             Logger.recordOutput(
                     "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPoses",
-                    robotPoses.toArray(new Pose3d[0]));
+                    cameraRobotPoses.toArray(new Pose3d[0]));
             Logger.recordOutput(
                     "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesAccepted",
-                    robotPosesAccepted.toArray(new Pose3d[0]));
+                    cameraRobotPosesAccepted.toArray(new Pose3d[0]));
             Logger.recordOutput(
                     "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesRejected",
-                    robotPosesRejected.toArray(new Pose3d[0]));
-            allTagPoses.addAll(tagPoses);
-            allRobotPoses.addAll(robotPoses);
-            allRobotPosesAccepted.addAll(robotPosesAccepted);
-            allRobotPosesRejected.addAll(robotPosesRejected);
+                    cameraRobotPosesRejected.toArray(new Pose3d[0]));
+            allTagPoses.addAll(cameraTagPoses);
+            allRobotPoses.addAll(cameraRobotPoses);
+            allRobotPosesAccepted.addAll(cameraRobotPosesAccepted);
+            allRobotPosesRejected.addAll(cameraRobotPosesRejected);
         }
 
         // Log summary data

@@ -97,6 +97,25 @@ Analyze the resulting `.wpilog` in the WPILib **`sysid` tool** (`C:\Users\Public
 
 AdvantageKit `Logger` records all `@AutoLog`-annotated inputs each loop. On the robot (`REAL`), logs are written via `WPILOGWriter` (defaults to `/U/logs` USB stick) and republished to NT via `NT4Publisher`; in `SIM`, logs go only to NT. Metadata (Git SHA, branch, build date) is logged at startup from `BuildConstants`.
 
+### Loop Overrun Investigation (in progress)
+
+Robot exhibits periodic loop spikes — steady-state loop time is ~14 ms (well under the 20 ms budget) but ~3% of frames exceed 50 ms and ~0.3% exceed 100 ms, with worst case 80–820 ms. Investigation analyzed a real `.wpilog` from a match run; the spike breakdown via AdvantageKit's built-in `LoggedRobot/UserCodeMS` and `LoggedRobot/GCTimeMS` channels showed:
+
+- **`UserCodeMS` dominates every spike** (~57 ms median during spikes vs ~11 ms during normal frames). User code is what runs inside `commandScheduler.run()` and `robotPeriodic()` — i.e., subsystem `periodic()` methods plus active commands.
+- **`GCTimeMS` contributes 5–15 ms** on most spikes — present but rarely the dominant cause.
+- **The 819 ms outlier at t≈15 s was 573 ms GC** — boot-time full collection during heap setup, won't recur in steady state.
+
+**Micro-optimizations applied** (small wins, ~500 µs aggregate — *not* the answer to the spikes, but worth keeping):
+- [Flywheel.java](src/main/java/org/team157/robot/subsystems/flywheel/Flywheel.java) — memoized `getDesiredFlywheelVelocity()`. The 50-iteration projectile solver in `setShotParams` only re-runs when distance changes ≥5 cm, height ≥1 cm, or `ballisticSpeedModifier` changes.
+- [VisionIOPhotonVision.java](src/main/java/org/team157/robot/subsystems/vision/VisionIOPhotonVision.java) — hoisted `robotToCamera.inverse()` to a final `cameraToRobot` field (was being recomputed per result × per camera × per loop tick).
+- [Vision.java](src/main/java/org/team157/robot/subsystems/vision/Vision.java) — replaced 16 `LinkedList` allocations per tick (4 method-scope + 4 per-camera × 3 cameras) with reusable `ArrayList` fields cleared each loop. Also rewrote `setTargetParams` from `SimpleMatrix` math to primitive doubles, with the constant turret-to-robot-center geometry pre-computed as `static final` fields.
+
+**G1GC switch attempted and reverted.** Tried `gcType = GarbageCollectorType.G1` in [build.gradle](build.gradle); spikes persisted at ~80 ms common / 120+ ms occasional, confirming GC wasn't the dominant cause. Reverted to the project's original `SerialGC` config. **Trap for future GC changes:** switching must be done through GradleRIO's `gcType` property on the `frcJava` artifact — *not* by adding `-XX:+UseG1GC` to `jvmArgs`. GradleRIO injects `-XX:+UseSerialGC` separately based on `gcType`, causing "Multiple garbage collectors selected" at JVM startup if both are set. Available enum values (from `edu.wpi.first.gradlerio.deploy.roborio.GarbageCollectorType`): `G1` (`UseG1GC` + `MaxGCPauseMillis=1` + `GCTimeRatio=1`), `G1_LongPause` (`MaxGCPauseMillis=5`), `G1_Base` (just `UseG1GC`), `Serial`, `Parallel`, `Serial_PauseGoal`, `Parallel_PauseGoal`, `Other`.
+
+**Next step — not yet implemented:** add a `LoopTimer` helper and wrap each subsystem's `periodic()` to log per-subsystem duration. AdvantageKit's breakdown stops at `UserCodeMS`; can't isolate which subsystem (or which scheduled command) is eating 100–150 ms during steady-state spikes without finer timing. Pattern: wrap each `periodic()` body so it calls `Logger.recordOutput("Timing/<Subsystem>MS", durationMs)`, then re-run a match and rank subsystems by p99.
+
+**Analyzer scripts** at project root (gitignored — see `.gitignore`): `analyze_log.py`, `analyze_spikes.py`, `analyze_breakdown.py`. Python parsers for `.wpilog` files built during this investigation. Useful for future analysis. Key parser detail that took a debug pass to get right: WPILOG record header byte is `[ts_len:4][size_len:2][entry_id_len:2]` bits (NOT 3-3-2); control records have `entry_id == 0` with control type at `payload[0]` (0 = Start with name/type/metadata, 1 = Finish, 2 = SetMetadata).
+
 ### Dashboards
 
 An Elastic dashboard layout is checked into [src/main/deploy/ElasticLayout/elastic-layout.json](src/main/deploy/ElasticLayout/elastic-layout.json) and deployed with the robot code.

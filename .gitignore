@@ -185,3 +185,8 @@ compile_commands.json
 
 # Version file
 src/main/java/frc/robot/BuildConstants.java
+
+# Loop-overrun diagnostic scripts (see CLAUDE.md "Loop Overrun Investigation")
+analyze_log.py
+analyze_spikes.py
+analyze_breakdown.py
