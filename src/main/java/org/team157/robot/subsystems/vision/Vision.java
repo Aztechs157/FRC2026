@@ -197,30 +197,30 @@ public class Vision extends SubsystemBase {
         angleToUnadjustedTargetFromDrive =
                 PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();
 
-        if(VisionConstants.USE_MOMENTUM){
+        if (VisionConstants.USE_MOMENTUM) {
             distanceToTargetFromTurret =
-                PhotonUtils.getDistanceToPose(
-                        robotPose.plus(Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
-                        adjustedTargetPose);
+                    PhotonUtils.getDistanceToPose(
+                            robotPose.plus(Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                            adjustedTargetPose);
 
             angleToTargetFromTurret =
-                PhotonUtils.getYawToPose(
-                                robotPose.plus(
-                                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
-                                adjustedTargetPose)
-                        .getDegrees();
+                    PhotonUtils.getYawToPose(
+                                    robotPose.plus(
+                                            Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                                    adjustedTargetPose)
+                            .getDegrees();
         } else {
             distanceToTargetFromTurret =
-                PhotonUtils.getDistanceToPose(
-                        robotPose.plus(Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
-                        targetPose);
+                    PhotonUtils.getDistanceToPose(
+                            robotPose.plus(Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                            targetPose);
 
             angleToTargetFromTurret =
-                PhotonUtils.getYawToPose(
-                                robotPose.plus(
-                                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
-                                targetPose)
-                        .getDegrees();
+                    PhotonUtils.getYawToPose(
+                                    robotPose.plus(
+                                            Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                                    targetPose)
+                            .getDegrees();
         }
 
         // Logger outputs
