@@ -329,6 +329,8 @@ public class RobotContainer {
                                                                 Rotation2d.kZero)),
                                         drive)
                                 .ignoringDisable(true));
+
+        driverController.b().onTrue(Commands.runOnce(drive::stopWithX, drive));
         /////////////////////
         /// FlYWHEEL HOOD ///
         /////////////////////
