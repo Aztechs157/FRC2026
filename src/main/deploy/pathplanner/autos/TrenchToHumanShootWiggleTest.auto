@@ -57,12 +57,7 @@
                   "name": "ShootBalls"
                 }
               },
-              {
-                "type": "named",
-                "data": {
-                  "name": "WiggleCubed"
-                }
-              }
+ 
             ]
           }
         }

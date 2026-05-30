@@ -55,12 +55,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "WiggleCubed"
-          }
-        },
-        {
           "type": "deadline",
           "data": {
             "commands": [
@@ -76,12 +70,7 @@
                   "name": "RunHopper"
                 }
               },
-              {
-                "type": "named",
-                "data": {
-                  "name": "WiggleCubed"
-                }
-              }
+ 
             ]
           }
         }

@@ -57,7 +57,7 @@ Two subsystems are not in their own subdirectory: [LEDs.java](src/main/java/org/
 
 ### Key Central Files
 
-- **`RobotContainer.java`** — instantiates all subsystems, wires default commands, registers PathPlanner named commands (`DeployIntake`, `RunIntake`, `RunHopper`, `ShootBalls`, `Wiggle`, `WiggleCubed`), and configures both Xbox controller button bindings.
+- **`RobotContainer.java`** — instantiates all subsystems, wires default commands, registers PathPlanner named commands (`DeployIntake`, `RunIntake`, `RunHopper`, `ShootBalls`), and configures both Xbox controller button bindings.
 - **`Constants.java`** — global constants (field dimensions, CAN bus names: `"rio"` and `"canivore"`).
 - **`commands/DriveCommands.java`** — factory methods for field-relative teleop drive (`joystickDrive`, `joystickDriveAtAngle`), `feedforwardCharacterization()`, and `wheelRadiusCharacterization()`.
 - **`parsing/PositionDetails.java`** — parses [src/main/deploy/positionDetails.json](src/main/deploy/positionDetails.json) for field-relative target locations used by turret/vision tracking.
