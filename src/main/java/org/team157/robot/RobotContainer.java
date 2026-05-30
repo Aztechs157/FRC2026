@@ -329,6 +329,8 @@ public class RobotContainer {
                                                                 Rotation2d.kZero)),
                                         drive)
                                 .ignoringDisable(true));
+
+        driverController.b().onTrue(Commands.runOnce(drive::stopWithX, drive));
         /////////////////////
         /// FlYWHEEL HOOD ///
         /////////////////////
@@ -486,7 +488,8 @@ public class RobotContainer {
 
     /** Enables controller rumble when 2 seconds remain in the current shift. */
     public void setRumble() {
-        if (hubStatus.isShiftAboutToEnd(2)) {
+        if (hubStatus.isShiftAboutToEnd(2)
+                || (hubStatus.isShiftAboutToEnd(7) && DriverStation.isTeleop())) {
             driverController.setRumble(RumbleType.kLeftRumble, 1);
             driverController.setRumble(RumbleType.kRightRumble, 1);
             operatorController.setRumble(RumbleType.kLeftRumble, 1);
