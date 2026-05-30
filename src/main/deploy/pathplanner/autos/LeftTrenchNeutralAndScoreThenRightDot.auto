@@ -59,15 +59,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
-                "data": {
-                  "name": "Stop Shooting"
-                }
-              },
-              {
                 "type": "wait",
                 "data": {
                   "waitTime": 0.001
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Stop Shooting"
                 }
               }
             ]
