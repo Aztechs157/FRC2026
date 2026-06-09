@@ -599,6 +599,6 @@ public class RobotContainer {
 
     private Command stopShooter() {
 
-        return uptake.set(0).alongWith(hood.setAngle(Degrees.of(63)));
+        return uptake.set(0).alongWith(hood.setAngle(Degrees.of(65)));
     }
 }
