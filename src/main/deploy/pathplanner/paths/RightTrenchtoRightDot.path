@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.7526390870185447,
+        "x": 2.3848068181818176,
         "y": 0.67
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.8157322191059764,
+        "x": 3.4478999502692496,
         "y": 0.6677671419238723
       },
       "isLocked": false,
-      "linkedName": "HPStation"
+      "linkedName": "RightTrenchReturn"
     },
     {
       "anchor": {

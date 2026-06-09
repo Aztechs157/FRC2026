@@ -88,7 +88,7 @@
         "y": 0.7194921406530023
       },
       "nextControl": null,
-      "isLocked": false,
+      "isLocked": true,
       "linkedName": "RightTrenchReturn"
     }
   ],
