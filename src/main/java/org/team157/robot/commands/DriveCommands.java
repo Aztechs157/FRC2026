@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.subsystems.drive.Drive;
 
 public class DriveCommands {
@@ -49,12 +50,41 @@ public class DriveCommands {
         Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
 
         // Square magnitude for more precise control
-        linearMagnitude = linearMagnitude * linearMagnitude;
+        linearMagnitude = modifyLinearMagnitude(linearMagnitude * linearMagnitude);
 
         // Return new linear velocity
         return new Pose2d(Translation2d.kZero, linearDirection)
                 .transformBy(new Transform2d(linearMagnitude, 0.0, Rotation2d.kZero))
                 .getTranslation();
+    }
+
+    /**
+     * Modifies the output velocity returned by getLinearVelocityFromJoysticks based on control mode
+     * modifier constants.
+     *
+     * @param speed The speed value to be modified
+     * @return the speed value, modified based on the current control mode defined in {@link
+     *     ModifierConstants}
+     */
+    private static double modifyLinearMagnitude(final double speed) {
+        double outputSpeed = speed;
+
+        // Modifies speed based on control mode
+        switch (ModifierConstants.currentControlMode) {
+            case ROOKIE:
+                outputSpeed *= ModifierConstants.ROOKIE_DRIVE_MODIFIER;
+                break;
+            case SUPER_ROOKIE:
+                outputSpeed *= ModifierConstants.DEMO_DRIVE_MODIFIER;
+                break;
+            case DEMO:
+                outputSpeed *= ModifierConstants.DEMO_DRIVE_MODIFIER;
+                break;
+            default:
+                // No modifiers applied to drive speed.
+        }
+
+        return outputSpeed;
     }
 
     /**
@@ -71,7 +101,7 @@ public class DriveCommands {
                     Translation2d linearVelocity =
                             getLinearVelocityFromJoysticks(
                                     xSupplier.getAsDouble(), ySupplier.getAsDouble());
-
+                                    
                     // Apply rotation deadband
                     double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 

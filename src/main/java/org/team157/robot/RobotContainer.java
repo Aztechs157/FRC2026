@@ -296,10 +296,7 @@ public class RobotContainer {
                 .and(dumperModeTrigger())
                 .whileTrue(
                         DriveCommands.joystickDriveAtAngle(
-                                drive,
-                                () -> -driverController.getLeftY(),
-                                () -> -driverController.getLeftX(),
-                                vision::getDriveAngleToFaceHub));
+                                drive, () -> 0, () -> 0, vision::getDriveAngleToFaceHub));
 
         // Reset gyro to 0° when start and back buttons are pressed
         driverController
@@ -451,27 +448,29 @@ public class RobotContainer {
     }
 
     /**
-     * Applies speed modifiers based on the current control mode and the robot's current position/state.
+     * Applies speed modifiers based on the current control mode and the robot's current
+     * position/state.
      */
     public double modifySpeed(final double speed) {
         double outputSpeed = speed;
 
-        // Modifies speed based on control mode
-        switch (ModifierConstants.currentControlMode) {
-            case ROOKIE:
-                outputSpeed *= ModifierConstants.ROOKIE_DRIVE_MODIFIER;
-                break;
-            case SUPER_ROOKIE:
-                outputSpeed *= ModifierConstants.DEMO_DRIVE_MODIFIER;
-                break;
-            case DEMO:
-                outputSpeed *= ModifierConstants.DEMO_DRIVE_MODIFIER;
-                break;
-            default:
-                // No modifiers applied to drive speed.
-        }
+        // // Modifies speed based on control mode
+        // switch (ModifierConstants.currentControlMode) {
+        //     case ROOKIE:
+        //         outputSpeed *= ModifierConstants.ROOKIE_DRIVE_MODIFIER;
+        //         break;
+        //     case SUPER_ROOKIE:
+        //         outputSpeed *= ModifierConstants.DEMO_DRIVE_MODIFIER;
+        //         break;
+        //     case DEMO:
+        //         outputSpeed *= ModifierConstants.DEMO_DRIVE_MODIFIER;
+        //         break;
+        //     default:
+        //         // No modifiers applied to drive speed.
+        // }
 
-        // Applies precision modifier if shooting from within alliance zone, or when right bumper is held.
+        // Applies precision modifier if shooting from within alliance zone, or when right bumper is
+        // held.
         if (driverController.rightBumper().getAsBoolean()
                 || driverController.rightTrigger().getAsBoolean()
                         && FieldConstants.positionDetails.isInAllianceZone(
@@ -484,7 +483,7 @@ public class RobotContainer {
             outputSpeed *= ModifierConstants.NEUTRAL_DRIVE_MODIFIER;
         } else if (drive.isUnderTrench()) {
             outputSpeed *= ModifierConstants.TRENCH_DRIVE_MODIFIER;
-        } 
+        }
 
         return outputSpeed;
     }

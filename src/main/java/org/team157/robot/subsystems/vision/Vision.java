@@ -229,6 +229,21 @@ public class Vision extends SubsystemBase {
         Logger.recordOutput("Targeting/Angle to Target from Turret", angleToTargetFromTurret);
     }
 
+    //TODO: make this an overload of the first method? have juggling enabled on a combination button press
+    public void setTargetParamsForJuggling(Pose2d robotPose) {
+        distanceToTargetFromTurret =
+                PhotonUtils.getDistanceToPose(
+                        robotPose.plus(Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                        robotPose);
+
+        angleToTargetFromTurret =
+                PhotonUtils.getYawToPose(
+                                robotPose.plus(
+                                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                                robotPose)
+                        .getDegrees();
+    }
+
     /**
      * Gets the setpoint angle for the drivebase to face the hub.
      *

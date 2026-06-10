@@ -41,30 +41,28 @@ public final class Constants {
     public static final CANBus DRIVE_CAN_BUS = new CANBus("canivore", "./logs/example2.hoot");
 
     public static class ModifierConstants {
-        public static final ControlMode currentControlMode = ControlMode.STANDARD;
+        public static final DriveControlMode currentControlMode = DriveControlMode.STANDARD;
 
-        public static enum ControlMode {
-            /** No demo mode active. */
+        public static enum DriveControlMode {
+            /** No unique mode active. */
             STANDARD,
 
-            /** Rookie mode. */
+            /** Rookie mode. Applies ~60% drive speed modifier. */
             ROOKIE,
 
-            /** Super Rookie mode. */
+            /** Super Rookie mode. Applies ~35% drive speed modifier. */
             SUPER_ROOKIE,
 
-            /** Demo mode. */
+            /** Demo mode. Applies ~35% drive speed modifier and enables demo commands. */
             DEMO
         }
 
-        // Reduces drive speed by this factor when precision mode is active.
+        // Drive speed reduction factors
         public static final double PRECISION_DRIVE_MODIFIER = 0.4;
         public static final double NEUTRAL_DRIVE_MODIFIER = 0.5687;
         public static final double TRENCH_DRIVE_MODIFIER = 0.8;
-        // When true, reduces drive speed by 50%.
-        public static final double ROOKIE_DRIVE_MODIFIER = 0.6;
-        // When true, reduces drive speed by 75%.
-        public static final double DEMO_DRIVE_MODIFIER = 0.3;
+        public static final double ROOKIE_DRIVE_MODIFIER = 0.5940;
+        public static final double DEMO_DRIVE_MODIFIER = 0.3467;
     }
 
     public static class ControllerConstants {
