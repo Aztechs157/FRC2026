@@ -17,13 +17,32 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LeftTrenchNeutralAndReturnEndDepot"
+                  "pathName": "RightTrenchToNeutralAndReturn"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "DeployIntake"
+                  "name": "RunIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "RightTrenchReturnToHP"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "RunIntake"
                 }
               }
             ]
@@ -36,7 +55,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 7.5
+                  "waitTime": 6.0
                 }
               },
               {
@@ -50,12 +69,6 @@
                 "data": {
                   "name": "ShootBalls"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "WiggleCubed"
-                }
               }
             ]
           }
@@ -67,25 +80,13 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 7.5
+                  "waitTime": 0.25
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "RunHopper"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ShootBalls"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "WiggleCubed"
+                  "name": "Stop Shooting"
                 }
               }
             ]
@@ -96,58 +97,9 @@
           "data": {
             "commands": [
               {
-                "type": "wait",
+                "type": "path",
                 "data": {
-                  "waitTime": 3.75
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "RunHopper"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ShootBalls"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "WiggleCubed"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 3.75
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "RunHopper"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ShootBalls"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "WiggleCubed"
+                  "pathName": "HPtoRightDot"
                 }
               }
             ]

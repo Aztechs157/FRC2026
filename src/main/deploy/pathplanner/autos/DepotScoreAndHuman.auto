@@ -111,12 +111,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Wiggle"
-          }
-        },
-        {
           "type": "deadline",
           "data": {
             "commands": [

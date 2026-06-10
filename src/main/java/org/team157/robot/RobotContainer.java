@@ -217,8 +217,8 @@ public class RobotContainer {
         NamedCommands.registerCommand("DeployIntake", slapdown.deployIntake());
         NamedCommands.registerCommand("RunIntake", intake.runIntake());
         NamedCommands.registerCommand("RunHopper", hopper.set(0.5));
-        NamedCommands.registerCommand(
-                "ShootBalls", uptake.set(1).alongWith(hood.setDynamicHoodAngle()));
+        NamedCommands.registerCommand("ShootBalls", shootBalls());
+        NamedCommands.registerCommand("Stop Shooting", stopShooter());
         NamedCommands.registerCommand("Wiggle", slapdown.wiggleIntake());
         NamedCommands.registerCommand(
                 "WiggleCubed",
@@ -329,6 +329,8 @@ public class RobotContainer {
                                                                 Rotation2d.kZero)),
                                         drive)
                                 .ignoringDisable(true));
+
+        driverController.b().onTrue(Commands.runOnce(drive::stopWithX, drive));
         /////////////////////
         /// FlYWHEEL HOOD ///
         /////////////////////
@@ -484,9 +486,13 @@ public class RobotContainer {
         }
     }
 
-    /** Enables controller rumble when 2 seconds remain in the current shift. */
+    /**
+     * Enables controller rumble when 2 seconds remain in the current shift, or when the match is 7
+     * seconds from ending (for BC dot).
+     */
     public void setRumble() {
-        if (hubStatus.isShiftAboutToEnd(2)) {
+        if (hubStatus.isShiftAboutToEnd(2)
+                || (hubStatus.isShiftAboutToEnd(7) && DriverStation.isTeleop())) {
             driverController.setRumble(RumbleType.kLeftRumble, 1);
             driverController.setRumble(RumbleType.kRightRumble, 1);
             operatorController.setRumble(RumbleType.kLeftRumble, 1);
@@ -588,5 +594,16 @@ public class RobotContainer {
                 () -> {
                     dumperMode = !dumperMode;
                 });
+    }
+
+    /** Enables the uptake and dynamic hood during auto to shoot balls. */
+    private Command shootBalls() {
+        return uptake.set(1).alongWith(hood.setDynamicHoodAngle().withTimeout(9)).withTimeout(9);
+    }
+
+    /** Stops the uptake and stows the hood during auto to ensure safe trench clearance. */
+    private Command stopShooter() {
+
+        return uptake.set(0).alongWith(hood.setAngle(Degrees.of(65)));
     }
 }
