@@ -1,49 +1,42 @@
 {
   "hubs": [
     {
-      "x": 0,
-      "y": 0,
-      "width": 1536,
-      "height": 912,
+      "x": 7,
+      "y": 48,
+      "width": 1347,
+      "height": 1000,
       "state": {
         "sidebar": {
           "width": 300,
           "expanded": [
             "/Drive",
-            "/RealOutputs/SwerveStates",
-            "/RealOutputs/SwerveChassisSpeeds",
-            "/RealOutputs/Odometry",
             "/Vision/Camera0",
             "/Vision/Camera1",
             "/Vision/Camera2",
-            "/Hood",
-            "/Slapdown",
             "/RealOutputs/Robot Field Pose",
             "/RealOutputs",
-            "/RealOutputs/LoggedRobot",
-            "/RealOutputs/Logger",
-            "/RealOutputs/PhotonAlerts",
-            "/RealOutputs/PathPlanner",
             "/RealOutputs/FinalComponentPoses",
             "/RealOutputs/Odometry/Robot",
-            "/Hopper",
-            "/Intake"
+            "/RealOutputs/SwerveStates",
+            "/RealOutputs/SwerveChassisSpeeds",
+            "/RealOutputs/Odometry",
+            "/PowerDistribution"
           ]
         },
         "tabs": {
-          "selected": 6,
+          "selected": 4,
           "tabs": [
             {
               "type": 0,
               "title": "",
               "controller": null,
               "controllerUUID": "grimvlgu9aluj8btvwotco2wpj0pto2h",
-              "renderer": "",
+              "renderer": "#/",
               "controlsHeight": 0
             },
             {
               "type": 3,
-              "title": "3D Field",
+              "title": "Field",
               "controller": {
                 "sources": [
                   {
@@ -52,7 +45,7 @@
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
-                      "model": "2026 KitBot"
+                      "model": "Sunstone"
                     }
                   },
                   {
@@ -70,9 +63,9 @@
                 "cameraIndex": -2,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -3.5860217154810576,
-                  1.551108570148385,
-                  4.338915082761329
+                  1.1016728184606646,
+                  2.6300353905409533,
+                  4.413966410298825
                 ],
                 "cameraTarget": [
                   0.1951088968028726,
@@ -91,6 +84,81 @@
               "controlsHeight": 85
             },
             {
+              "type": 8,
+              "title": "Controllers",
+              "controller": [
+                "Xbox Controller (Blue)",
+                "Xbox Controller (Blue)",
+                "None",
+                "None",
+                "None",
+                "None"
+              ],
+              "controllerUUID": "lkv2t9x4gs0fibtnieqw0k5vqkt60ms1",
+              "renderer": null,
+              "controlsHeight": 85
+            },
+            {
+              "type": 9,
+              "title": "Drivetrain",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "states",
+                    "logKey": "/RealOutputs/SwerveStates/Measured",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "states",
+                    "logKey": "/RealOutputs/SwerveStates/SetpointsOptimized",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ffff",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "chassisSpeeds",
+                    "logKey": "/RealOutputs/SwerveChassisSpeeds/Measured",
+                    "logType": "ChassisSpeeds",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000"
+                    }
+                  },
+                  {
+                    "type": "chassisSpeeds",
+                    "logKey": "/RealOutputs/SwerveChassisSpeeds/Setpoints",
+                    "logType": "ChassisSpeeds",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ffff"
+                    }
+                  },
+                  {
+                    "type": "rotation",
+                    "logKey": "/RealOutputs/Odometry/Robot/rotation",
+                    "logType": "Rotation2d",
+                    "visible": true,
+                    "options": {}
+                  }
+                ],
+                "maxSpeed": 5,
+                "sizeX": 0.69,
+                "sizeY": 0.7,
+                "orientation": 1
+              },
+              "controllerUUID": "f6zfcen6ntteihy2qv2mdbw1ys8lkwmj",
+              "renderer": null,
+              "controlsHeight": 287
+            },
+            {
               "type": 1,
               "title": "Flywheel",
               "controller": {
@@ -102,7 +170,7 @@
                     "visible": true,
                     "options": {
                       "color": "#2b66a2",
-                      "size": "normal"
+                      "size": "bold"
                     }
                   },
                   {
@@ -112,7 +180,7 @@
                     "visible": true,
                     "options": {
                       "color": "#e5b31b",
-                      "size": "normal"
+                      "size": "bold"
                     }
                   }
                 ],
@@ -640,7 +708,7 @@
               },
               "controllerUUID": "zu4vje2t5ampp1k7oqxsdb504sxmipnm",
               "renderer": null,
-              "controlsHeight": 200
+              "controlsHeight": 361
             }
           ]
         }
