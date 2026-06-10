@@ -2,8 +2,6 @@ package org.team157.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.lang.reflect.Modifier;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -70,13 +68,6 @@ import org.team157.robot.subsystems.vision.VisionIOPhotonVisionSim;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    private double MaxSpeed =
-            1.0
-                    * TunerConstants.kSpeedAt12Volts.in(
-                            MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate =
-            RotationsPerSecond.of(0.75)
-                    .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     /**
      * Speed factor used in flywheel ballistic equations, to be manually adjusted by the operator
@@ -181,21 +172,6 @@ public class RobotContainer {
                                 new VisionIO() {},
                                 new VisionIO() {},
                                 new VisionIO() {});
-                break;
-        }
-
-        // Adjusts drive speed based on if the robot is in rookie/demo mode.
-        switch (ModifierConstants.currentControlMode) {
-            case ROOKIE:
-                MaxSpeed = MaxSpeed * ModifierConstants.ROOKIE_DRIVE_MODIFIER;
-                MaxAngularRate = MaxAngularRate * ModifierConstants.ROOKIE_DRIVE_MODIFIER;
-                break;
-            case DEMO:
-                MaxSpeed = MaxSpeed * ModifierConstants.DEMO_DRIVE_MODIFIER;
-                MaxAngularRate = MaxAngularRate * ModifierConstants.DEMO_DRIVE_MODIFIER;
-                break;
-            default:
-                // No modifiers applied to drive speed.
                 break;
         }
 
@@ -475,24 +451,42 @@ public class RobotContainer {
     }
 
     /**
-     * Apply a speed modifier when the right bumper (dedicated toggle) or shooting trigger are held,
-     * or the robot is under the trench.
+     * Applies speed modifiers based on the current control mode and the robot's current position/state.
      */
     public double modifySpeed(final double speed) {
+        double outputSpeed = speed;
+
+        // Modifies speed based on control mode
+        switch (ModifierConstants.currentControlMode) {
+            case ROOKIE:
+                outputSpeed *= ModifierConstants.ROOKIE_DRIVE_MODIFIER;
+                break;
+            case SUPER_ROOKIE:
+                outputSpeed *= ModifierConstants.DEMO_DRIVE_MODIFIER;
+                break;
+            case DEMO:
+                outputSpeed *= ModifierConstants.DEMO_DRIVE_MODIFIER;
+                break;
+            default:
+                // No modifiers applied to drive speed.
+        }
+
+        // Applies precision modifier if shooting from within alliance zone, or when right bumper is held.
         if (driverController.rightBumper().getAsBoolean()
                 || driverController.rightTrigger().getAsBoolean()
                         && FieldConstants.positionDetails.isInAllianceZone(
                                 drive.getPose(), DriverStation.getAlliance())) {
-            return speed * ModifierConstants.PRECISION_DRIVE_MODIFIER;
+            outputSpeed *= ModifierConstants.PRECISION_DRIVE_MODIFIER;
         } else if (driverController.rightTrigger().getAsBoolean()
                 && !FieldConstants.positionDetails.isInAllianceZone(
                         drive.getPose(), DriverStation.getAlliance())) {
-            return speed * ModifierConstants.NEUTRAL_DRIVE_MODIFIER;
+            // Applies neutral modifier when shooting from outside of alliance zone
+            outputSpeed *= ModifierConstants.NEUTRAL_DRIVE_MODIFIER;
         } else if (drive.isUnderTrench()) {
-            return speed * ModifierConstants.TRENCH_DRIVE_MODIFIER;
-        } else {
-            return speed;
-        }
+            outputSpeed *= ModifierConstants.TRENCH_DRIVE_MODIFIER;
+        } 
+
+        return outputSpeed;
     }
 
     /**
