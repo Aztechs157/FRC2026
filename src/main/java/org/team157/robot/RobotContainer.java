@@ -2,6 +2,8 @@ package org.team157.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.lang.reflect.Modifier;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -183,11 +185,18 @@ public class RobotContainer {
         }
 
         // Adjusts drive speed based on if the robot is in rookie/demo mode.
-        if (ModifierConstants.DEMO_MODE) {
-            MaxSpeed = MaxSpeed * ModifierConstants.DEMO_DRIVE_MODIFIER;
-            MaxAngularRate = MaxAngularRate * ModifierConstants.DEMO_DRIVE_MODIFIER;
-        } else if (ModifierConstants.ROOKIE_MODE) {
-            MaxSpeed = MaxSpeed * ModifierConstants.ROOKIE_DRIVE_MODIFIER;
+        switch (ModifierConstants.currentControlMode) {
+            case ROOKIE:
+                MaxSpeed = MaxSpeed * ModifierConstants.ROOKIE_DRIVE_MODIFIER;
+                MaxAngularRate = MaxAngularRate * ModifierConstants.ROOKIE_DRIVE_MODIFIER;
+                break;
+            case DEMO:
+                MaxSpeed = MaxSpeed * ModifierConstants.DEMO_DRIVE_MODIFIER;
+                MaxAngularRate = MaxAngularRate * ModifierConstants.DEMO_DRIVE_MODIFIER;
+                break;
+            default:
+                // No modifiers applied to drive speed.
+                break;
         }
 
         // Specify the IO implementation to be used for each subsystem
