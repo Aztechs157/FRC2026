@@ -41,7 +41,7 @@ public final class Constants {
     public static final CANBus DRIVE_CAN_BUS = new CANBus("canivore", "./logs/example2.hoot");
 
     public static class ModifierConstants {
-        public static final DriveControlMode currentControlMode = DriveControlMode.STANDARD;
+        public static final DriveControlMode currentControlMode = DriveControlMode.ROOKIE;
 
         public static enum DriveControlMode {
             /** No unique mode active. */

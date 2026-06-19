@@ -229,7 +229,8 @@ public class Vision extends SubsystemBase {
         Logger.recordOutput("Targeting/Angle to Target from Turret", angleToTargetFromTurret);
     }
 
-    //TODO: make this an overload of the first method? have juggling enabled on a combination button press
+    // TODO: make this an overload of the first method? have juggling enabled on a combination
+    // button press
     public void setTargetParamsForJuggling(Pose2d robotPose) {
         distanceToTargetFromTurret =
                 PhotonUtils.getDistanceToPose(

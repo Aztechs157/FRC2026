@@ -23,6 +23,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.Mode;
 import org.team157.robot.Constants.ModifierConstants;
+import org.team157.robot.Constants.ModifierConstants.DriveControlMode;
 import org.team157.robot.commands.DriveCommands;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.HubTimer;
@@ -312,12 +313,18 @@ public class RobotContainer {
                                         drive)
                                 .ignoringDisable(true));
 
-        driverController.b().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        // driverController.b().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        driverController.b().toggleOnTrue(flywheel.setVelocity(RPM.of(800)));
         /////////////////////
         /// FlYWHEEL HOOD ///
         /////////////////////
         // Enables dynamic control of the flywheel and hood.
-        driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
+        if (ModifierConstants.currentControlMode == DriveControlMode.STANDARD) {
+            driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
+
+        } else {
+            driverController.a().toggleOnTrue(flywheel.setVelocity(RPM.of(2800)));
+        }
 
         ////////////////////////////
         /// INTAKE UPTAKE HOPPER ///
@@ -357,7 +364,12 @@ public class RobotContainer {
         turretTrackingTrigger()
                 .and(dumperModeTrigger().negate())
                 .whileTrue(turret.trackTagGlobalRelative());
-        turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
+
+        if (ModifierConstants.currentControlMode == DriveControlMode.STANDARD) {
+            turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
+        } else {
+            turretTrackingTrigger().whileTrue(flywheel.setVelocity(RPM.of(2800)));
+        }
         turretTrackingTrigger()
                 .and(driverController.rightTrigger())
                 .whileTrue(hood.setDynamicHoodAngle());
