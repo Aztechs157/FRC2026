@@ -273,9 +273,9 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> modifySpeed(-driverController.getLeftY()),
-                        () -> modifySpeed(-driverController.getLeftX()),
-                        () -> modifySpeed(-driverController.getRightX())));
+                        () -> joystickModifier(-driverController.getLeftY()),
+                        () -> joystickModifier(-driverController.getLeftX()),
+                        () -> joystickModifier(-driverController.getRightX())));
         // Update the pose estimation and turret tracking angle while no other vision commands are
         // running.
         vision.setDefaultCommand(vision.setDefault(drive, turret));
@@ -313,19 +313,22 @@ public class RobotContainer {
                                         drive)
                                 .ignoringDisable(true));
 
-        // driverController.b().onTrue(Commands.runOnce(drive::stopWithX, drive));
-        driverController.b().toggleOnTrue(flywheel.setVelocity(RPM.of(800)));
+
+        
         /////////////////////
         /// FlYWHEEL HOOD ///
         /////////////////////
         // Enables dynamic control of the flywheel and hood.
-        if (ModifierConstants.currentControlMode == DriveControlMode.STANDARD) {
-            driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
+        if (ModifierConstants.currentControlMode == DriveControlMode.DEMO) {
+            driverController.a().toggleOnTrue(flywheel.setVelocity(RPM.of(2800)));
+            driverController.b().toggleOnTrue(flywheel.setVelocity(RPM.of(800)));
 
         } else {
-            driverController.a().toggleOnTrue(flywheel.setVelocity(RPM.of(2800)));
+            driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
+            driverController.b().onTrue(Commands.runOnce(drive::stopWithX, drive));
         }
 
+        
         ////////////////////////////
         /// INTAKE UPTAKE HOPPER ///
         ////////////////////////////
@@ -463,23 +466,8 @@ public class RobotContainer {
      * Applies speed modifiers based on the current control mode and the robot's current
      * position/state.
      */
-    public double modifySpeed(final double speed) {
+    public double joystickModifier(final double speed) {
         double outputSpeed = speed;
-
-        // // Modifies speed based on control mode
-        // switch (ModifierConstants.currentControlMode) {
-        //     case ROOKIE:
-        //         outputSpeed *= ModifierConstants.ROOKIE_DRIVE_MODIFIER;
-        //         break;
-        //     case SUPER_ROOKIE:
-        //         outputSpeed *= ModifierConstants.DEMO_DRIVE_MODIFIER;
-        //         break;
-        //     case DEMO:
-        //         outputSpeed *= ModifierConstants.DEMO_DRIVE_MODIFIER;
-        //         break;
-        //     default:
-        //         // No modifiers applied to drive speed.
-        // }
 
         // Applies precision modifier if shooting from within alliance zone, or when right bumper is
         // held.
