@@ -249,6 +249,7 @@ public class Flywheel extends SubsystemBase {
                         * FlywheelConstants.SPEED_FACTOR
                         * RobotContainer.ballisticSpeedModifier;
         return RPM.of(Math.max(2800, desiredRPM));
+        // TODO: tune lower limit
     }
 
     public static double getBallTimeOfFlight() {

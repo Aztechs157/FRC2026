@@ -22,6 +22,7 @@ import org.team157.robot.parsing.PositionDetails;
  * (log replay from a file).
  */
 public final class Constants {
+
     public static final Mode simMode = Mode.SIM;
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
@@ -40,17 +41,28 @@ public final class Constants {
     public static final CANBus DRIVE_CAN_BUS = new CANBus("canivore", "./logs/example2.hoot");
 
     public static class ModifierConstants {
-        // Reduces drive speed by this factor when precision mode is active.
+        public static final DriveControlMode currentControlMode = DriveControlMode.ROOKIE;
+
+        public static enum DriveControlMode {
+            /** No unique mode active. */
+            STANDARD,
+
+            /** Rookie mode. Applies ~60% drive speed modifier. */
+            ROOKIE,
+
+            /** Super Rookie mode. Applies ~35% drive speed modifier. */
+            SUPER_ROOKIE,
+
+            /** Demo mode. Applies ~35% drive speed modifier and enables demo commands. */
+            DEMO
+        }
+
+        // Drive speed reduction factors
         public static final double PRECISION_DRIVE_MODIFIER = 0.4;
         public static final double NEUTRAL_DRIVE_MODIFIER = 0.5687;
         public static final double TRENCH_DRIVE_MODIFIER = 0.8;
-        // When true, reduces drive speed by 50%.
-        public static final boolean ROOKIE_MODE = false;
-        public static final double ROOKIE_DRIVE_MODIFIER = 0.5;
-        // When true, reduces drive speed by 75%.
-        // Overrides ROOKIE_MODE.
-        public static final boolean DEMO_MODE = false;
-        public static final double DEMO_DRIVE_MODIFIER = 0.25;
+        public static final double ROOKIE_DRIVE_MODIFIER = 0.5940;
+        public static final double DEMO_DRIVE_MODIFIER = 0.3467;
     }
 
     public static class ControllerConstants {
