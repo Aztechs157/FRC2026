@@ -12,6 +12,8 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import org.team157.robot.Constants;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.velocity.FlyWheel;
@@ -71,6 +73,16 @@ public class UptakeIOTalonFX implements UptakeIO {
     @Override
     public Command set(double dutyCycle) {
         return uptake.set(dutyCycle);
+    }
+
+    @Override
+    public Command set(Supplier<Double> dutyCycle) {
+        return uptake.set(dutyCycle);
+    }
+
+    @Override
+    public Command set(DoubleSupplier dutyCycle) {
+        return set((Supplier<Double>) dutyCycle::getAsDouble);
     }
 
     @Override

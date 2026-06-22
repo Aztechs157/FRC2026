@@ -2,6 +2,8 @@ package org.team157.robot.subsystems.uptake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLog;
 
 /**
@@ -51,6 +53,25 @@ public interface UptakeIO {
      * @return a {@link Command} setting the motor's duty cycle to the specified value.
      */
     default Command set(double dutyCycle) {
+        return Commands.none();
+    }
+
+    /**
+     * Directly sets the output duty cycle of the uptake rollers' motors.
+     *
+     * @param dutyCycle The supplied duty cycle to apply to the motor, between -1 and 1.
+     * @return a {@link Command} setting the motor's duty cycle to the specified value.
+     */
+    default Command set(DoubleSupplier dutyCycle) {
+        return Commands.none();
+    }
+    /**
+     * Directly sets the output duty cycle of the uptake rollers' motors.
+     *
+     * @param dutyCycle The supplied duty cycle to apply to the motor, between -1 and 1.
+     * @return a {@link Command} setting the motor's duty cycle to the specified value.
+     */
+    default Command set(Supplier<Double> dutyCycle) {
         return Commands.none();
     }
 }

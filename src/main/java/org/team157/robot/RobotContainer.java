@@ -183,7 +183,7 @@ public class RobotContainer {
             hood.setIO(new HoodIO() {});
             slapdown.setIO(new SlapdownIO() {});
             hopper.setIO(new HopperIO() {});
-            uptake.setIO(new UptakeIO() {});
+            uptake.setIO(new UptakeIO() {}, turret);
             flywheel.setIO(new FlywheelIO() {}, vision);
             turret.setIO(new TurretIO() {}, vision);
         } else {
@@ -195,7 +195,7 @@ public class RobotContainer {
             hood.setIO(new HoodIOTalonFX(hood));
             slapdown.setIO(new SlapdownIOTalonFX(slapdown));
             hopper.setIO(new HopperIOTalonFX(hopper));
-            uptake.setIO(new UptakeIOTalonFX(uptake));
+            uptake.setIO(new UptakeIOTalonFX(uptake), turret);
             flywheel.setIO(new FlywheelIOTalonFX(flywheel), vision);
             turret.setIO(new TurretIOTalonFX(turret), vision);
         }
@@ -313,8 +313,6 @@ public class RobotContainer {
                                         drive)
                                 .ignoringDisable(true));
 
-
-        
         /////////////////////
         /// FlYWHEEL HOOD ///
         /////////////////////
@@ -328,12 +326,11 @@ public class RobotContainer {
             driverController.b().onTrue(Commands.runOnce(drive::stopWithX, drive));
         }
 
-        
         ////////////////////////////
         /// INTAKE UPTAKE HOPPER ///
         ////////////////////////////
 
-        driverController.rightTrigger().whileTrue(uptake.set(1));
+        driverController.rightTrigger().whileTrue(uptake.runUptake());
         driverController.rightTrigger().whileTrue(hopper.set(1));
 
         driverController.leftTrigger().whileTrue(intake.runIntake());

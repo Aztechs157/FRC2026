@@ -123,6 +123,24 @@ public class Turret extends SubsystemBase {
     }
 
     /**
+     * Determines whether the turret's current angle is within tolerance of its setpoint angle by a
+     * specified amount of degrees.
+     *
+     * @param thresholdDegrees The +- tolerance range to check, in degrees.
+     * @return true if the turret's angle is within the specified threshold in either direction,
+     *     false otherwise.
+     */
+    public boolean isWithinTolerance(double thresholdDegrees) {
+        if (inputs.targetAngleDegrees > inputs.angleDegrees) {
+            return inputs.targetAngleDegrees - inputs.angleDegrees < thresholdDegrees;
+        } else if (inputs.targetAngleDegrees < inputs.angleDegrees) {
+            return inputs.angleDegrees - inputs.targetAngleDegrees < thresholdDegrees;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Gets the 2D rotational pose (yaw) of the turret for mechanism visualization. Feeds into the
      * {@link SunstoneMechanism3D} class for the AdvantageScope model.
      *
@@ -140,6 +158,7 @@ public class Turret extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Turret", inputs);
+        Logger.recordOutput("Misc/Turret Within Tolerance", isWithinTolerance(15));
     }
 
     @Override
