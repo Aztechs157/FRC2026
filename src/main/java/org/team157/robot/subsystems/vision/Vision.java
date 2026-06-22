@@ -42,7 +42,8 @@ public class Vision extends SubsystemBase {
 
     private boolean isBlueAlliance = true;
 
-    private double angleToUnadjustedTargetFromDrive = 0;
+    private static double angleToUnadjustedTargetFromDrive = 0;
+
     private static double distanceToTargetFromTurret = 0;
     private static double angleToTargetFromTurret = 0;
 
@@ -196,10 +197,52 @@ public class Vision extends SubsystemBase {
         angleToUnadjustedTargetFromDrive =
                 PhotonUtils.getYawToPose(robotPose, targetPose).getDegrees();
 
+        if (VisionConstants.USE_MOMENTUM) {
+            distanceToTargetFromTurret =
+                    PhotonUtils.getDistanceToPose(
+                            robotPose.plus(Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                            adjustedTargetPose);
+
+            angleToTargetFromTurret =
+                    PhotonUtils.getYawToPose(
+                                    robotPose.plus(
+                                            Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                                    adjustedTargetPose)
+                            .getDegrees();
+        } else {
+            distanceToTargetFromTurret =
+                    PhotonUtils.getDistanceToPose(
+                            robotPose.plus(Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                            targetPose);
+
+            angleToTargetFromTurret =
+                    PhotonUtils.getYawToPose(
+                                    robotPose.plus(
+                                            Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                                    targetPose)
+                            .getDegrees();
+        }
+
         // Logger outputs
         Logger.recordOutput("Targeting/Adjusted Target Pose", adjustedTargetPose);
         Logger.recordOutput("Targeting/Distance to Target from Turret", distanceToTargetFromTurret);
         Logger.recordOutput("Targeting/Angle to Target from Turret", angleToTargetFromTurret);
+    }
+
+    // TODO: make this an overload of the first method? have juggling enabled on a combination
+    // button press
+    public void setTargetParamsForJuggling(Pose2d robotPose) {
+        distanceToTargetFromTurret =
+                PhotonUtils.getDistanceToPose(
+                        robotPose.plus(Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                        robotPose);
+
+        angleToTargetFromTurret =
+                PhotonUtils.getYawToPose(
+                                robotPose.plus(
+                                        Mechanism3DConstants.XY_ORIGIN_TO_TURRET_BASE_OFFSET),
+                                robotPose)
+                        .getDegrees();
     }
 
     /**

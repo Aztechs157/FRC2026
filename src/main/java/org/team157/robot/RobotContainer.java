@@ -23,6 +23,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.team157.robot.Constants.FieldConstants;
 import org.team157.robot.Constants.Mode;
 import org.team157.robot.Constants.ModifierConstants;
+import org.team157.robot.Constants.ModifierConstants.DriveControlMode;
 import org.team157.robot.commands.DriveCommands;
 import org.team157.robot.generated.TunerConstants;
 import org.team157.robot.subsystems.HubTimer;
@@ -68,13 +69,6 @@ import org.team157.robot.subsystems.vision.VisionIOPhotonVisionSim;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    private double MaxSpeed =
-            1.0
-                    * TunerConstants.kSpeedAt12Volts.in(
-                            MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate =
-            RotationsPerSecond.of(0.75)
-                    .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     /**
      * Speed factor used in flywheel ballistic equations, to be manually adjusted by the operator
@@ -182,14 +176,6 @@ public class RobotContainer {
                 break;
         }
 
-        // Adjusts drive speed based on if the robot is in rookie/demo mode.
-        if (ModifierConstants.DEMO_MODE) {
-            MaxSpeed = MaxSpeed * ModifierConstants.DEMO_DRIVE_MODIFIER;
-            MaxAngularRate = MaxAngularRate * ModifierConstants.DEMO_DRIVE_MODIFIER;
-        } else if (ModifierConstants.ROOKIE_MODE) {
-            MaxSpeed = MaxSpeed * ModifierConstants.ROOKIE_DRIVE_MODIFIER;
-        }
-
         // Specify the IO implementation to be used for each subsystem
         if (Constants.currentMode == Mode.REPLAY) {
             // Disable IO implementations during log REPLAY
@@ -217,8 +203,8 @@ public class RobotContainer {
         NamedCommands.registerCommand("DeployIntake", slapdown.deployIntake());
         NamedCommands.registerCommand("RunIntake", intake.runIntake());
         NamedCommands.registerCommand("RunHopper", hopper.set(0.5));
-        NamedCommands.registerCommand(
-                "ShootBalls", uptake.set(1).alongWith(hood.setDynamicHoodAngle()));
+        NamedCommands.registerCommand("ShootBalls", shootBalls());
+        NamedCommands.registerCommand("Stop Shooting", stopShooter());
         NamedCommands.registerCommand("Wiggle", slapdown.wiggleIntake());
         NamedCommands.registerCommand(
                 "WiggleCubed",
@@ -287,9 +273,9 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> modifySpeed(-driverController.getLeftY()),
-                        () -> modifySpeed(-driverController.getLeftX()),
-                        () -> modifySpeed(-driverController.getRightX())));
+                        () -> joystickModifier(-driverController.getLeftY()),
+                        () -> joystickModifier(-driverController.getLeftX()),
+                        () -> joystickModifier(-driverController.getRightX())));
         // Update the pose estimation and turret tracking angle while no other vision commands are
         // running.
         vision.setDefaultCommand(vision.setDefault(drive, turret));
@@ -311,10 +297,7 @@ public class RobotContainer {
                 .and(dumperModeTrigger())
                 .whileTrue(
                         DriveCommands.joystickDriveAtAngle(
-                                drive,
-                                () -> -driverController.getLeftY(),
-                                () -> -driverController.getLeftX(),
-                                vision::getDriveAngleToFaceHub));
+                                drive, () -> 0, () -> 0, vision::getDriveAngleToFaceHub));
 
         // Reset gyro to 0° when start and back buttons are pressed
         driverController
@@ -329,12 +312,23 @@ public class RobotContainer {
                                                                 Rotation2d.kZero)),
                                         drive)
                                 .ignoringDisable(true));
+
+
+        
         /////////////////////
         /// FlYWHEEL HOOD ///
         /////////////////////
         // Enables dynamic control of the flywheel and hood.
-        driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
+        if (ModifierConstants.currentControlMode == DriveControlMode.DEMO) {
+            driverController.a().toggleOnTrue(flywheel.setVelocity(RPM.of(2800)));
+            driverController.b().toggleOnTrue(flywheel.setVelocity(RPM.of(800)));
 
+        } else {
+            driverController.a().toggleOnTrue(flywheel.setDynamicVelocity());
+            driverController.b().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        }
+
+        
         ////////////////////////////
         /// INTAKE UPTAKE HOPPER ///
         ////////////////////////////
@@ -373,7 +367,12 @@ public class RobotContainer {
         turretTrackingTrigger()
                 .and(dumperModeTrigger().negate())
                 .whileTrue(turret.trackTagGlobalRelative());
-        turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
+
+        if (ModifierConstants.currentControlMode == DriveControlMode.STANDARD) {
+            turretTrackingTrigger().whileTrue(flywheel.setDynamicVelocity());
+        } else {
+            turretTrackingTrigger().whileTrue(flywheel.setVelocity(RPM.of(2800)));
+        }
         turretTrackingTrigger()
                 .and(driverController.rightTrigger())
                 .whileTrue(hood.setDynamicHoodAngle());
@@ -464,29 +463,38 @@ public class RobotContainer {
     }
 
     /**
-     * Apply a speed modifier when the right bumper (dedicated toggle) or shooting trigger are held,
-     * or the robot is under the trench.
+     * Applies speed modifiers based on the current control mode and the robot's current
+     * position/state.
      */
-    public double modifySpeed(final double speed) {
+    public double joystickModifier(final double speed) {
+        double outputSpeed = speed;
+
+        // Applies precision modifier if shooting from within alliance zone, or when right bumper is
+        // held.
         if (driverController.rightBumper().getAsBoolean()
                 || driverController.rightTrigger().getAsBoolean()
                         && FieldConstants.positionDetails.isInAllianceZone(
                                 drive.getPose(), DriverStation.getAlliance())) {
-            return speed * ModifierConstants.PRECISION_DRIVE_MODIFIER;
+            outputSpeed *= ModifierConstants.PRECISION_DRIVE_MODIFIER;
         } else if (driverController.rightTrigger().getAsBoolean()
                 && !FieldConstants.positionDetails.isInAllianceZone(
                         drive.getPose(), DriverStation.getAlliance())) {
-            return speed * ModifierConstants.NEUTRAL_DRIVE_MODIFIER;
+            // Applies neutral modifier when shooting from outside of alliance zone
+            outputSpeed *= ModifierConstants.NEUTRAL_DRIVE_MODIFIER;
         } else if (drive.isUnderTrench()) {
-            return speed * ModifierConstants.TRENCH_DRIVE_MODIFIER;
-        } else {
-            return speed;
+            outputSpeed *= ModifierConstants.TRENCH_DRIVE_MODIFIER;
         }
+
+        return outputSpeed;
     }
 
-    /** Enables controller rumble when 2 seconds remain in the current shift. */
+    /**
+     * Enables controller rumble when 2 seconds remain in the current shift, or when the match is 7
+     * seconds from ending (for BC dot).
+     */
     public void setRumble() {
-        if (hubStatus.isShiftAboutToEnd(2)) {
+        if (hubStatus.isShiftAboutToEnd(2)
+                || (hubStatus.isShiftAboutToEnd(7) && DriverStation.isTeleop())) {
             driverController.setRumble(RumbleType.kLeftRumble, 1);
             driverController.setRumble(RumbleType.kRightRumble, 1);
             operatorController.setRumble(RumbleType.kLeftRumble, 1);
@@ -588,5 +596,16 @@ public class RobotContainer {
                 () -> {
                     dumperMode = !dumperMode;
                 });
+    }
+
+    /** Enables the uptake and dynamic hood during auto to shoot balls. */
+    private Command shootBalls() {
+        return uptake.set(1).alongWith(hood.setDynamicHoodAngle().withTimeout(9)).withTimeout(9);
+    }
+
+    /** Stops the uptake and stows the hood during auto to ensure safe trench clearance. */
+    private Command stopShooter() {
+
+        return uptake.set(0).alongWith(hood.setAngle(Degrees.of(65)));
     }
 }

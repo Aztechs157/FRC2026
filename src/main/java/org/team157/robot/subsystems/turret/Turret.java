@@ -8,6 +8,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
+import org.team157.robot.Constants.ModifierConstants;
+import org.team157.robot.Constants.ModifierConstants.DriveControlMode;
 import org.team157.robot.Robot;
 import org.team157.robot.subsystems.vision.Vision;
 
@@ -98,7 +100,12 @@ public class Turret extends SubsystemBase {
      * @param robotPose The current robot position on the field as a {@link Pose2d}.
      */
     public void updateRelativeAngleToTarget(Pose2d targetPose, Pose2d robotPose) {
-        vision.setTargetParams(targetPose, robotPose);
+
+        if (ModifierConstants.currentControlMode == DriveControlMode.DEMO) {
+            vision.setTargetParamsForJuggling(robotPose);
+        } else {
+            vision.setTargetParams(targetPose, robotPose);
+        }
         double turretToRobotAngleOffset =
                 vision.getTurretAngle() + TurretConstants.TURRET_ANGLE_OFFSET;
         if (Robot.isReal()) {

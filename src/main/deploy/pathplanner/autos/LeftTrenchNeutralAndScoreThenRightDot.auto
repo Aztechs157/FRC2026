@@ -17,13 +17,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LeftTrenchNeutralAndReturn"
+                  "pathName": "LeftTrenchNeutralAndReturnEndDepot"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "RunIntake"
+                  "name": "DeployIntake"
                 }
               }
             ]
@@ -36,7 +36,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 5.0
+                  "waitTime": 6.0
                 }
               },
               {
@@ -59,43 +59,24 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "wait",
                 "data": {
-                  "pathName": "LeftTrenchToDepotScore"
+                  "waitTime": 0.25
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "RunIntake"
+                  "name": "Stop Shooting"
                 }
               }
             ]
           }
         },
         {
-          "type": "deadline",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 5.0
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "RunHopper"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ShootBalls"
-                }
-              }
-            ]
+            "pathName": "LeftTrenchToLeftDot"
           }
         }
       ]

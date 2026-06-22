@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.942609649122807,
-        "y": 5.640910087719298
+        "x": 1.8912410841654772,
+        "y": 7.458377192982456
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2773573359829915,
-        "y": 3.077744071742968
+        "x": 2.954334216252912,
+        "y": 7.456144334906328
       },
       "isLocked": false,
-      "linkedName": "LeftBumpReturn"
+      "linkedName": "LeftTrenchReturn"
     },
     {
       "anchor": {
-        "x": 1.8285152057245075,
-        "y": 1.1063148479427547
+        "x": 8.282938659058486,
+        "y": 7.458377192982456
       },
       "prevControl": {
-        "x": 2.228958328843586,
-        "y": 1.5652262079202472
-      },
-      "nextControl": {
-        "x": 1.5603955097890783,
-        "y": 0.7990473055759686
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 0.7526390870185447,
-        "y": 0.67
-      },
-      "prevControl": {
-        "x": 1.3109686909587723,
-        "y": 0.886340808646076
+        "x": 7.265211465206297,
+        "y": 7.46010610506288
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "HPStation"
+      "linkedName": "LeftDot"
     }
   ],
   "rotationTargets": [],
@@ -61,7 +45,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": "ToHP",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

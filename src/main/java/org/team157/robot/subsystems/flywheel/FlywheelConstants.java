@@ -58,6 +58,6 @@ public final class FlywheelConstants {
             FLYWHEEL_RPM_LIMIT_LOWER = RPM.of(-5800);
     // RPM multiplier to account for external factors like air resistance and wheel slip. This is
     // determined experimentally.
-    public static final double SPEED_FACTOR = 1 / 0.385;
+    public static final double SPEED_FACTOR = 1 / 0.4;
     public static final Current CURRENT_LIMIT = Amps.of(40);
 }

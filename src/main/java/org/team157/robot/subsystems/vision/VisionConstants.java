@@ -13,6 +13,10 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
 public class VisionConstants {
+    // When true, enables adjustment of virtual target to account for momentum in dynamic shooting
+    // calculations
+    public static final boolean USE_MOMENTUM = false;
+
     // AprilTag layout
     public static AprilTagFieldLayout aprilTagLayout =
             AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);

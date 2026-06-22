@@ -56,12 +56,6 @@
                 "data": {
                   "name": "ShootBalls"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "WiggleCubed"
-                }
               }
             ]
           }
@@ -92,12 +86,6 @@
                 "type": "named",
                 "data": {
                   "name": "ShootBalls"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "WiggleCubed"
                 }
               }
             ]
