@@ -125,10 +125,10 @@ public class Turret extends SubsystemBase {
      */
     // TODO: examine how this handles angles around the wrapping point
     public boolean isWithinTolerance(double thresholdDegrees) {
-        if (vision.getTurretAngle() > inputs.angleDegrees) {
-            return vision.getTurretAngle() - inputs.angleDegrees < thresholdDegrees;
-        } else if (vision.getTurretAngle() < inputs.angleDegrees) {
-            return inputs.angleDegrees - vision.getTurretAngle() < thresholdDegrees;
+        if (inputs.targetAngleDegrees > inputs.angleDegrees) {
+            return inputs.targetAngleDegrees - inputs.angleDegrees < thresholdDegrees;
+        } else if (inputs.targetAngleDegrees < inputs.angleDegrees) {
+            return inputs.angleDegrees - inputs.targetAngleDegrees < thresholdDegrees;
         } else {
             return false;
         }

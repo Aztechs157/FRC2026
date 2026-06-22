@@ -15,6 +15,8 @@ public class Uptake extends SubsystemBase {
     private UptakeIO io;
     private Turret turret;
 
+    private static double dutyCycleSetpoint = 0;
+
     // Inputs from the motor and mechanism, to be updated periodically and logged.
     private final UptakeIOInputsAutoLogged inputs = new UptakeIOInputsAutoLogged();
 
@@ -51,21 +53,40 @@ public class Uptake extends SubsystemBase {
         return io.set(dutyCycle);
     }
 
-    public double getUptakeDutyCycleSetpoint() {
+    /**
+     * Determines the duty cycle setpoint of the uptake. Runs backwards when turret is not within
+     * tolerance, forwards otherwise.
+     */
+    public void setDutyCycleSetpoint() {
         if (!turret.isWithinTolerance(15)) {
-            return -0.25;
+            dutyCycleSetpoint = -0.157;
         } else {
-            return 1;
+            dutyCycleSetpoint = 1;
         }
     }
 
+    /**
+     * @return the duty cycle setpoint of the uptake.
+     */
+    public static double getDutyCycleSetpoint() {
+        return dutyCycleSetpoint;
+    }
+
+    /**
+     * Runs the uptake at a dynamic speed based on the current turret state, as determined in
+     * setDutyCycleSetpoint()
+     *
+     * @return a {@link Command} running the uptake at the desired speed
+     */
     public Command runUptake() {
-        return io.set(() -> getUptakeDutyCycleSetpoint());
+        return io.set(Uptake::getDutyCycleSetpoint);
     }
 
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        // Update the uptake's setpoint based on the turret's tolerance status
+        setDutyCycleSetpoint();
         // Updates the inputs to be logged by AdvantageKit and writes them to the Logger
         io.updateInputs(inputs);
         Logger.processInputs("Uptake", inputs);
