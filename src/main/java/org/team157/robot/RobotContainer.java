@@ -313,8 +313,6 @@ public class RobotContainer {
                                         drive)
                                 .ignoringDisable(true));
 
-
-        
         /////////////////////
         /// FlYWHEEL HOOD ///
         /////////////////////
@@ -328,7 +326,6 @@ public class RobotContainer {
             driverController.b().onTrue(Commands.runOnce(drive::stopWithX, drive));
         }
 
-        
         ////////////////////////////
         /// INTAKE UPTAKE HOPPER ///
         ////////////////////////////

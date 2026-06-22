@@ -130,7 +130,6 @@ public class Turret extends SubsystemBase {
      * @return true if the turret's angle is within the specified threshold in either direction,
      *     false otherwise.
      */
-    // TODO: examine how this handles angles around the wrapping point
     public boolean isWithinTolerance(double thresholdDegrees) {
         if (inputs.targetAngleDegrees > inputs.angleDegrees) {
             return inputs.targetAngleDegrees - inputs.angleDegrees < thresholdDegrees;

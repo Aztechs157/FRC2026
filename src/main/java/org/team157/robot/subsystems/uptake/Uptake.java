@@ -57,11 +57,11 @@ public class Uptake extends SubsystemBase {
      * Determines the duty cycle setpoint of the uptake. Runs backwards when turret is not within
      * tolerance, forwards otherwise.
      */
-    public void setDutyCycleSetpoint() {
-        if (!turret.isWithinTolerance(15)) {
-            dutyCycleSetpoint = -0.157;
+    public double setDutyCycleSetpoint() {
+        if (!turret.isWithinTolerance(15.7)) {
+            return UptakeConstants.RUN_SPEED_LOW;
         } else {
-            dutyCycleSetpoint = 1;
+            return UptakeConstants.RUN_SPEED_HIGH;
         }
     }
 
@@ -79,7 +79,7 @@ public class Uptake extends SubsystemBase {
      * @return a {@link Command} running the uptake at the desired speed
      */
     public Command runUptake() {
-        return io.set(Uptake::getDutyCycleSetpoint);
+        return io.set(this::setDutyCycleSetpoint);
     }
 
     @Override

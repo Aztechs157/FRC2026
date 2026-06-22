@@ -1,8 +1,8 @@
 {
   "hubs": [
     {
-      "x": -7,
-      "y": -7,
+      "x": 0,
+      "y": 116,
       "width": 1660,
       "height": 1063,
       "state": {
@@ -20,18 +20,19 @@
             "/RealOutputs/SwerveStates",
             "/RealOutputs/SwerveChassisSpeeds",
             "/RealOutputs/Odometry",
-            "/PowerDistribution"
+            "/PowerDistribution",
+            "/RealOutputs/Misc"
           ]
         },
         "tabs": {
-          "selected": 2,
+          "selected": 11,
           "tabs": [
             {
               "type": 0,
               "title": "",
               "controller": null,
               "controllerUUID": "grimvlgu9aluj8btvwotco2wpj0pto2h",
-              "renderer": "#/tab-reference/joysticks",
+              "renderer": "",
               "controlsHeight": 0
             },
             {
@@ -71,9 +72,9 @@
                 "cameraIndex": -2,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -0.989579002734471,
+                  -0.9895790027344714,
                   1.424465471809841,
-                  0.6935410341631252
+                  0.6935410341631246
                 ],
                 "cameraTarget": [
                   0.1951088968028726,
@@ -496,7 +497,17 @@
                     }
                   }
                 ],
-                "discreteSources": [],
+                "discreteSources": [
+                  {
+                    "type": "stripes",
+                    "logKey": "/RealOutputs/Misc/Turret Within Tolerance",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#80588e"
+                    }
+                  }
+                ],
                 "leftLockedRange": null,
                 "rightLockedRange": null,
                 "leftUnitConversion": {
@@ -550,6 +561,15 @@
                     "visible": true,
                     "options": {
                       "color": "#2b66a2"
+                    }
+                  },
+                  {
+                    "type": "stripes",
+                    "logKey": "/RealOutputs/Misc/Turret Within Tolerance",
+                    "logType": "Boolean",
+                    "visible": true,
+                    "options": {
+                      "color": "#80588e"
                     }
                   }
                 ],
