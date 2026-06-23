@@ -23,6 +23,9 @@ public final class TurretConstants {
     public static final int ENCODER_ID = 0;
     public static final double MIN_ENCODER_POSITION = 0.996, MAX_ENCODER_POSITION = 0.014;
     public static final double MIN_ANGLE = -178, MAX_ANGLE = 171;
+    // SysId feedforward constants (2026-06-22) — not yet wired in, kept for reference.
+    // kV and kA are in V·s/deg and V·s²/deg (velocity logged in deg/s, no unit correction needed).
+    public static final double KS = 0.79803, KV = 0.0018823, KA = 0.0012373;
     public static final double KP = 157, KI = 0, KD = 0;
     public static final double SIM_KP = 100, SIM_KI = 0, SIM_KD = 0;
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360),

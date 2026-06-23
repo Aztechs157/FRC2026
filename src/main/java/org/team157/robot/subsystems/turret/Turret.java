@@ -1,12 +1,14 @@
 package org.team157.robot.subsystems.turret;
 
 import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.Logger;
 import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.Constants.ModifierConstants.DriveControlMode;
@@ -24,6 +26,22 @@ public class Turret extends SubsystemBase {
 
     // Inputs from the motor, encoder, and mechanism, to be updated periodically and logged.
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+
+    // SysId routine for characterizing kS / kV / kA.
+    // - Quasistatic: 1 V/s ramp, 10 s timeout
+    // - Dynamic: 4 V step (reduced from default 7 V — turret range is limited by cable chain),
+    //   3 s timeout so you don't have to scramble to disable
+    // Unit note: velocity is already in deg/s, so sysid outputs kV in V·s/deg — no unit correction
+    // needed (unlike the flywheel RPM case which required a 60× factor).
+    private final SysIdRoutine sysId =
+            new SysIdRoutine(
+                    new SysIdRoutine.Config(
+                            null,
+                            Volts.of(4),
+                            Seconds.of(3),
+                            (state) -> Logger.recordOutput("Turret/SysIdState", state.toString())),
+                    new SysIdRoutine.Mechanism(
+                            (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
 
     // The current angle the turret is tracking towards.
     public static Angle trackingAngle = Degrees.of(0);
@@ -43,6 +61,39 @@ public class Turret extends SubsystemBase {
     public void setIO(TurretIO io, Vision vision) {
         this.io = io;
         this.vision = vision;
+    }
+
+    ///////////////////////////////
+    /// SYSID CHARACTERIZATION ///
+    ///////////////////////////////
+
+    /**
+     * Applies an open-loop voltage directly to the turret motor for SysId characterization.
+     * Respects hard limits: cuts voltage to zero if the turret is at or beyond either hard limit to
+     * protect the cable chain.
+     *
+     * @param volts Voltage to apply.
+     */
+    public void runCharacterization(double volts) {
+        double angle = inputs.angleDegrees;
+        boolean atUpperLimit = angle >= TurretConstants.UPPER_HARD_LIMIT.in(Degrees);
+        boolean atLowerLimit = angle <= TurretConstants.LOWER_HARD_LIMIT.in(Degrees);
+        // Block voltage that would drive further into a limit
+        if ((volts > 0 && atUpperLimit) || (volts < 0 && atLowerLimit)) {
+            io.setVoltage(0);
+        } else {
+            io.setVoltage(volts);
+        }
+    }
+
+    /** Returns a command to run a quasistatic SysId test in the specified direction. */
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return sysId.quasistatic(direction);
+    }
+
+    /** Returns a command to run a dynamic SysId test in the specified direction. */
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return sysId.dynamic(direction);
     }
 
     /**

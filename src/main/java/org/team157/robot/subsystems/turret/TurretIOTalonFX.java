@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
@@ -35,9 +36,13 @@ public class TurretIOTalonFX implements TurretIO {
     private final Pivot turret;
     private final SmartMotorController motor;
     private final DutyCycleEncoder encoder;
+    // Kept for SysId open-loop voltage control
+    private final TalonFX talonFX;
+    private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(false);
 
     public TurretIOTalonFX(SubsystemBase subsystem) {
         TalonFX talonFX = new TalonFX(TurretConstants.MOTOR_ID, Constants.RIO_CAN_BUS);
+        this.talonFX = talonFX;
         this.encoder = new DutyCycleEncoder(TurretConstants.ENCODER_ID);
 
         SmartMotorControllerConfig turretMotorConfig =
@@ -120,6 +125,11 @@ public class TurretIOTalonFX implements TurretIO {
     @Override
     public void stop() {
         turret.setDutyCycleSetpoint(0);
+    }
+
+    @Override
+    public void setVoltage(double volts) {
+        talonFX.setControl(voltageRequest.withOutput(volts));
     }
 
     @Override

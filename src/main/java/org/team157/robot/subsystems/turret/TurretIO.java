@@ -76,6 +76,14 @@ public interface TurretIO {
     }
 
     /**
+     * Applies an open-loop voltage to the turret motor. Used by the SysId routine to characterize
+     * feedforward constants ({@code kS}, {@code kV}, {@code kA}).
+     *
+     * @param volts Voltage to apply, clamped to the battery bus.
+     */
+    default void setVoltage(double volts) {}
+
+    /**
      * Gets the raw position of the turret's absolute encoder.
      *
      * @return The current position of the turret's encoder in rotations.
