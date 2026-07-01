@@ -38,39 +38,6 @@ public final class Constants {
     }
 
     public static final CANBus RIO_CAN_BUS = new CANBus("rio", "./logs/example.hoot");
-    public static final CANBus DRIVE_CAN_BUS = new CANBus("canivore", "./logs/example2.hoot");
-
-    public static class ModifierConstants {
-        public static final DriveControlMode currentControlMode = DriveControlMode.ROOKIE;
-
-        public static enum DriveControlMode {
-            /** No unique mode active. */
-            STANDARD,
-
-            /** Rookie mode. Applies ~60% drive speed modifier. */
-            ROOKIE,
-
-            /** Super Rookie mode. Applies ~35% drive speed modifier. */
-            SUPER_ROOKIE,
-
-            /** Demo mode. Applies ~35% drive speed modifier and enables demo commands. */
-            DEMO
-        }
-
-        // Drive speed reduction factors
-        public static final double PRECISION_DRIVE_MODIFIER = 0.4;
-        public static final double NEUTRAL_DRIVE_MODIFIER = 0.5687;
-        public static final double TRENCH_DRIVE_MODIFIER = 0.8;
-        public static final double ROOKIE_DRIVE_MODIFIER = 0.5940;
-        public static final double DEMO_DRIVE_MODIFIER = 0.3467;
-    }
-
-    public static class ControllerConstants {
-        // Ports for the Joysticks, as set in Driver Station
-        public static final int DRIVER_CONTROLLER_PORT = 0, OPERATOR_CONTROLLER_PORT = 1;
-        // Joystick Deadband
-        public static final double JOYSTICK_DEADBAND = 0.05;
-    }
 
     public static class FieldConstants {
         public static final Distance FIELD_LENGTH = Meters.of(16.54175);
