@@ -42,12 +42,6 @@ public class IntakeIOTalonFX implements IntakeIO {
         SmartMotorControllerConfig intakeMotorConfig =
                 new SmartMotorControllerConfig(subsystem)
                         .withControlMode(ControlMode.CLOSED_LOOP)
-                        .withClosedLoopController(
-                                IntakeConstants.KP,
-                                IntakeConstants.KI,
-                                IntakeConstants.KD,
-                                IntakeConstants.ANGULAR_VELOCITY,
-                                IntakeConstants.ANGULAR_ACCELERATION)
                         .withGearing(1)
                         .withMotorInverted(false)
                         .withIdleMode(MotorMode.COAST)
