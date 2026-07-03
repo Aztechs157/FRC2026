@@ -52,6 +52,31 @@ import org.team157.robot.subsystems.SunstoneMechanism3D.Mechanism3DConstants;
 import org.team157.robot.util.LocalADStarAK;
 
 public class Drive extends SubsystemBase {
+    public static class ModifierConstants {
+        public static final DriveControlMode currentControlMode = DriveControlMode.STANDARD;
+
+        public static enum DriveControlMode {
+            /** No unique mode active. */
+            STANDARD,
+
+            /** Rookie mode. Applies ~60% drive speed modifier. */
+            ROOKIE,
+
+            /** Super Rookie mode. Applies ~35% drive speed modifier. */
+            SUPER_ROOKIE,
+
+            /** Demo mode. Applies ~35% drive speed modifier and enables demo commands. */
+            DEMO
+        }
+
+        // Drive speed reduction factors
+        public static final double PRECISION_DRIVE_MODIFIER = 0.4;
+        public static final double NEUTRAL_DRIVE_MODIFIER = 0.5687;
+        public static final double TRENCH_DRIVE_MODIFIER = 0.8;
+        public static final double ROOKIE_DRIVE_MODIFIER = 0.5940;
+        public static final double DEMO_DRIVE_MODIFIER = 0.3467;
+    }
+
     // TunerConstants doesn't include these constants, so they are declared locally
     static final double ODOMETRY_FREQUENCY = TunerConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
     public static final double DRIVE_BASE_RADIUS =
