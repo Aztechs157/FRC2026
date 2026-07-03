@@ -4,7 +4,6 @@
 
 package org.team157.robot.subsystems.intake;
 
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
@@ -44,16 +43,6 @@ public class Intake extends SubsystemBase {
      */
     public Command set(double dutycycle) {
         return io.set(dutycycle);
-    }
-
-    /**
-     * Set the intake to a fixed target angular velocity.
-     *
-     * @param speed The target angular velocity.
-     * @return {@link Command} setting the intake to the specified velocity.
-     */
-    public Command setVelocity(AngularVelocity speed) {
-        return io.setVelocity(speed);
     }
 
     /**
