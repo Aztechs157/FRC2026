@@ -23,15 +23,18 @@ public final class TurretConstants {
     public static final int ENCODER_ID = 0;
     public static final double MIN_ENCODER_POSITION = 0.996, MAX_ENCODER_POSITION = 0.014;
     public static final double MIN_ANGLE = -178, MAX_ANGLE = 171;
-    // SysId feedforward constants (2026-06-22) — not yet wired in, kept for reference.
+    // Feedforward constants from SysId characterization (2026-06-22).
     // kV and kA are in V·s/deg and V·s²/deg (velocity logged in deg/s, no unit correction needed).
     public static final double KS = 0.79803, KV = 0.0018823, KA = 0.0012373;
-    public static final double KP = 157, KI = 0, KD = 0;
+    // KP reduced from 157 — feedforward handles steady-state, PID trims residual error.
+    public static final double KP = 157, KI = 0, KD = 1;
     public static final double SIM_KP = 100, SIM_KI = 0, SIM_KD = 0;
-    public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360),
+    // ANGULAR_VELOCITY: quasistatic underestimated true max (limited travel range);
+    // Kraken X44 at 28:1 theoretical ceiling ~1600 deg/s, 600 is a safe working target.
+    public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(600),
             SIM_ANGULAR_VELOCITY = DegreesPerSecond.of(3.6);
     public static final AngularAcceleration
-            ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(2880),
+            ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(3600),
             SIM_ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(28.8);
     public static final MechanismGearing GEARING = new MechanismGearing(GearBox.fromStages("28:1"));
     public static final Current CURRENT_LIMIT = Amps.of(40);

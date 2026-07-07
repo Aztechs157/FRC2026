@@ -12,6 +12,7 @@ import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -54,6 +55,9 @@ public class TurretIOTalonFX implements TurretIO {
                                 TurretConstants.KD,
                                 TurretConstants.ANGULAR_VELOCITY,
                                 TurretConstants.ANGULAR_ACCELERATION)
+                        .withFeedforward(
+                                new SimpleMotorFeedforward(
+                                        TurretConstants.KS, TurretConstants.KV, TurretConstants.KA))
                         .withSimClosedLoopController(
                                 TurretConstants.SIM_KP,
                                 TurretConstants.SIM_KI,

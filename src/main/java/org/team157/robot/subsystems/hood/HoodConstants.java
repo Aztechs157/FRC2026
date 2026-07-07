@@ -20,13 +20,13 @@ public class HoodConstants {
 
     public static final double MIN_ENCODER_POSITION = 0.28, MAX_ENCODER_POSITION = 0.82;
     public static final double MIN_ANGLE = 40, MAX_ANGLE = 65;
-    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(42), UPPER_SOFT_LIMIT = Degrees.of(63);
+    public static final Angle LOWER_SOFT_LIMIT = Degrees.of(42), UPPER_SOFT_LIMIT = Degrees.of(64);
     public static final Angle LOWER_HARD_LIMIT = Degrees.of(40), UPPER_HARD_LIMIT = Degrees.of(65);
     public static final double KP = 157, KI = 0, KD = 0;
     public static final double SIM_KP = 20, SIM_KI = 0, SIM_KD = 0;
-    public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
+    public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(720);
     public static final AngularAcceleration ANGULAR_ACCELERATION =
-            DegreesPerSecondPerSecond.of(360);
+            DegreesPerSecondPerSecond.of(7200);
     public static final MechanismGearing GEARING =
             new MechanismGearing(GearBox.fromStages("32:14", "16:1"));
     public static final Current CURRENT_LIMIT = Amps.of(40);
