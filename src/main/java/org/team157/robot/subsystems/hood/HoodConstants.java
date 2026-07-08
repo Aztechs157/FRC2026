@@ -26,7 +26,7 @@ public class HoodConstants {
     public static final double SIM_KP = 20, SIM_KI = 0, SIM_KD = 0;
     public static final AngularVelocity ANGULAR_VELOCITY = DegreesPerSecond.of(360);
     public static final AngularAcceleration ANGULAR_ACCELERATION =
-            DegreesPerSecondPerSecond.of(360);
+            DegreesPerSecondPerSecond.of(7200);
     public static final MechanismGearing GEARING =
             new MechanismGearing(GearBox.fromStages("32:14", "16:1"));
     public static final Current CURRENT_LIMIT = Amps.of(40);

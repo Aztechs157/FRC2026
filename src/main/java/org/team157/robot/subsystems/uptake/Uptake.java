@@ -73,6 +73,15 @@ public class Uptake extends SubsystemBase {
         return io.set(this::getDutyCycleSetpoint);
     }
 
+    /**
+     * Runs the uptake at a set speed, ignoring the tolerance state of the turret. For use with angu
+     *
+     * @return aa {@link Command} running the uptake at maximum speed.
+     */
+    public Command runUptakeIgnoringTolerance() {
+        return io.set(UptakeConstants.RUN_SPEED_HIGH);
+    }
+
     @Override
     public void periodic() {
         // This method will be called once per scheduler run

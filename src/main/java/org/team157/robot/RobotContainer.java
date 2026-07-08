@@ -330,7 +330,11 @@ public class RobotContainer {
         /// INTAKE UPTAKE HOPPER ///
         ////////////////////////////
 
-        driverController.rightTrigger().whileTrue(uptake.runUptake());
+        driverController.rightTrigger().and(turretTrackingTrigger()).whileTrue(uptake.runUptake());
+        driverController
+                .rightTrigger()
+                .and(turretTrackingTrigger().negate())
+                .whileTrue(uptake.runUptakeIgnoringTolerance());
         driverController.rightTrigger().whileTrue(hopper.set(1));
 
         driverController.leftTrigger().whileTrue(intake.runIntake());
