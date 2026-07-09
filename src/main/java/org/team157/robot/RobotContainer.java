@@ -249,6 +249,18 @@ public class RobotContainer {
             autoChooser.addOption(
                     "Flywheel SysId (Dynamic Reverse)",
                     flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+            autoChooser.addOption(
+                    "Turret SysId (Quasistatic Forward)",
+                    turret.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+            autoChooser.addOption(
+                    "Turret SysId (Quasistatic Reverse)",
+                    turret.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+            autoChooser.addOption(
+                    "Turret SysId (Dynamic Forward)",
+                    turret.sysIdDynamic(SysIdRoutine.Direction.kForward));
+            autoChooser.addOption(
+                    "Turret SysId (Dynamic Reverse)",
+                    turret.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         }
 
         // Configure the button bindings
