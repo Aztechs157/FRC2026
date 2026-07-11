@@ -24,6 +24,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.team157.robot.Constants.ModifierConstants;
 import org.team157.robot.util.Elastic;
 
 /**
@@ -87,7 +88,7 @@ public class Robot extends LoggedRobot {
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our autonomous chooser on the dashboard.
         m_robotContainer = new RobotContainer();
-
+        Logger.recordOutput("Drive Mode", ModifierConstants.currentControlMode);
         SmartDashboard.putData("Field", m_field);
     }
 

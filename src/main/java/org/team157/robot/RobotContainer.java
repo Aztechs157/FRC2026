@@ -380,11 +380,7 @@ public class RobotContainer {
                 .and(dumperMode().negate())
                 .whileTrue(turret.trackTagGlobalRelative());
 
-        if (ModifierConstants.currentControlMode == DriveControlMode.STANDARD) {
-            flywheelOverride().whileFalse(flywheel.setDynamicVelocity());
-        } else {
-            flywheelOverride().whileFalse(flywheel.setVelocity(RPM.of(2800)));
-        }
+        flywheelOverride().whileFalse(flywheel.setDynamicVelocity());
 
         hoodOverride()
                 .negate()
