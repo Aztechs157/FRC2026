@@ -439,7 +439,7 @@ public class RobotContainer {
         // back button is held to prevent accidental activation during teleop.
         operatorController //
                 .a() //
-                .and(operatorController.back()) //
+                .and(operatorController.back()) // 0
                 .toggleOnTrue(slapdown.deployIntake());
         operatorController
                 .y()
@@ -547,7 +547,7 @@ public class RobotContainer {
     // at a low speed to clear any jams.
     // TODO: remove from RobotContainer and into eventual Superstructure subsystem once it exists.
     private Command forceOuttake() {
-        return uptake.set(-0.5).alongWith(hopper.set(-0.5)).alongWith(intake.set(-0.5));
+        return uptake.set(-1).alongWith(hopper.set(-1)).alongWith(intake.set(-1));
     }
 
     /**
